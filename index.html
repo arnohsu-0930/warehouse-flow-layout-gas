@@ -1,0 +1,3345 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>平面動線與空間配置工作室 | Floor Plan Flow & Layout Studio</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232563eb'/%3E%3Cpath d='M7 22V10h18v12H7zm3-9v6h12v-6H10z' fill='%23fff'/%3E%3Cpath d='M12 16h8m-2-2l2 2-2 2' stroke='%2360a5fa' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+  <style>
+    :root {
+      --bg-app: #f1f5f9;
+      --bg-panel: #ffffff;
+      --bg-subtle: #f8fafc;
+      --border: #e2e8f0;
+      --border-strong: #cbd5e1;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-soft: #eff6ff;
+      --danger: #dc2626;
+      --danger-soft: #fef2f2;
+      --success: #16a34a;
+      --warning: #d97706;
+      --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+      --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+      --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.14);
+      --radius: 8px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Noto Sans TC', 'Microsoft JhengHei', 'PingFang TC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--text-main);
+      background: var(--bg-app);
+      font-size: 13px;
+    }
+
+    .app-shell {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+    }
+
+    /* Top Header */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 14px;
+      background: var(--bg-panel);
+      border-bottom: 1px solid var(--border);
+      z-index: 30;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-width: 0;
+    }
+
+    .brand-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #2563eb, #0ea5e9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+    }
+
+    .brand-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .divider-v {
+      width: 1px;
+      height: 22px;
+      background: var(--border);
+      margin: 0 2px;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 5px 9px;
+      border-radius: 6px;
+      border: 1px solid var(--border-strong);
+      background: #fff;
+      color: var(--text-main);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.1s;
+      white-space: nowrap;
+      line-height: 1.3;
+      font-family: inherit;
+    }
+
+    .btn:hover:not(:disabled) {
+      background: #f8fafc;
+      border-color: #94a3b8;
+    }
+
+    .btn:active:not(:disabled) { transform: translateY(1px); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .btn-primary {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+    .btn-primary:hover:not(:disabled) {
+      background: var(--primary-hover);
+      border-color: var(--primary-hover);
+    }
+
+    .btn-success {
+      background: #16a34a;
+      border-color: #16a34a;
+      color: #fff;
+    }
+    .btn-success:hover:not(:disabled) {
+      background: #15803d;
+      border-color: #15803d;
+    }
+
+    .btn-danger {
+      background: #fff;
+      border-color: #fca5a5;
+      color: var(--danger);
+    }
+    .btn-danger:hover:not(:disabled) {
+      background: var(--danger-soft);
+      border-color: var(--danger);
+    }
+
+    .btn-danger-solid {
+      background: var(--danger);
+      border-color: var(--danger);
+      color: #fff;
+    }
+    .btn-danger-solid:hover:not(:disabled) {
+      background: #b91c1c;
+    }
+
+    .btn-active {
+      background: var(--primary-soft) !important;
+      border-color: var(--primary) !important;
+      color: var(--primary) !important;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.16);
+    }
+
+    .btn-sm { padding: 4px 7px; font-size: 11.5px; }
+    .btn-xs { padding: 3px 6px; font-size: 11px; }
+
+    /* Tabs & Base Map Strip */
+    .tabbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 6px 14px;
+      background: #f8fafc;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+
+    .tabs-list {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      overflow-x: auto;
+      max-width: 100%;
+      padding-bottom: 1px;
+    }
+
+    .zone-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 9px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .zone-tab:hover { border-color: #94a3b8; color: var(--text-main); }
+    .zone-tab.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+      box-shadow: 0 2px 5px rgba(37, 99, 235, 0.22);
+    }
+
+    .tab-icon-btn {
+      border: none;
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+      padding: 0 2px;
+      font-size: 12px;
+      opacity: 0.78;
+      line-height: 1;
+      border-radius: 3px;
+    }
+    .tab-icon-btn:hover { opacity: 1; background: rgba(255, 255, 255, 0.22); }
+    .zone-tab:not(.active) .tab-icon-btn:hover { background: rgba(15, 23, 42, 0.08); }
+
+    .basemap-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .select-input, .text-input, .num-input {
+      border: 1px solid var(--border-strong);
+      border-radius: 6px;
+      padding: 4px 7px;
+      font-size: 12px;
+      color: var(--text-main);
+      background: #fff;
+      font-family: inherit;
+    }
+    .select-input:focus, .text-input:focus, .num-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+    }
+
+    /* Main Workspace Body */
+    .workspace-body {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Left Tool Dock */
+    .tool-dock {
+      width: 316px;
+      background: var(--bg-panel);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      flex-shrink: 0;
+      z-index: 20;
+    }
+
+    .mode-banner {
+      padding: 9px 12px;
+      background: #eff6ff;
+      border-bottom: 1px solid #bfdbfe;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+
+    .mode-banner.placing {
+      background: #fff7ed;
+      border-bottom-color: #fed7aa;
+    }
+
+    .mode-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #1e40af;
+    }
+    .mode-banner.placing .mode-label { color: #c2410c; }
+
+    .dock-section {
+      border-bottom: 1px solid var(--border);
+      padding: 10px 12px;
+    }
+
+    .dock-section-title {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.03em;
+      margin: 0 0 8px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+    .grid-6 { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
+
+    .row-flex {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .preset-chip {
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border-strong);
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      background: #fff;
+      transition: all 0.15s;
+    }
+    .preset-chip.p-chip { color: #1d4ed8; border-color: #93c5fd; background: #eff6ff; }
+    .preset-chip.m-chip { color: #15803d; border-color: #86efac; background: #f0fdf4; }
+    .preset-chip.w-chip { color: #b91c1c; border-color: #fca5a5; background: #fef2f2; }
+    .preset-chip.active-chip { box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.25); transform: scale(1.02); }
+
+    .marker-btn-T { background: #fdf2f8; border-color: #f9a8d4; color: #be185d; }
+    .marker-btn-M { background: #faf5ff; border-color: #d8b4fe; color: #7e22ce; }
+    .marker-btn-B { background: #eff6ff; border-color: #93c5fd; color: #1d4ed8; }
+    .hvac-sa { background: #eff6ff; border-color: #93c5fd; color: #1e40af; }
+    .hvac-ra { background: #fff7ed; border-color: #fdba74; color: #c2410c; }
+
+    .color-swatch {
+      width: 28px;
+      height: 26px;
+      padding: 1px;
+      border: 1px solid var(--border-strong);
+      border-radius: 6px;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    .rack-heights-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 5px;
+      margin-top: 6px;
+    }
+
+    .rack-height-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 3px 6px;
+      font-size: 11px;
+    }
+
+    .rack-height-item input {
+      width: 52px;
+      padding: 2px 4px;
+      border: 1px solid var(--border-strong);
+      border-radius: 4px;
+      text-align: center;
+      font-size: 11.5px;
+    }
+
+    .inspector-box {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px;
+      font-size: 12px;
+    }
+
+    /* Canvas Stage */
+    .canvas-stage {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      min-height: 0;
+      background: #e2e8f0;
+      background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+      background-size: 18px 18px;
+      position: relative;
+    }
+
+    .canvas-scroll-area {
+      flex: 1;
+      overflow: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      min-height: 0;
+    }
+
+    .canvas-frame {
+      background: #fff;
+      box-shadow: var(--shadow-lg);
+      border-radius: 4px;
+      line-height: 0;
+    }
+
+    .statusbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 5px 14px;
+      background: var(--bg-panel);
+      border-top: 1px solid var(--border);
+      font-size: 11.5px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+
+    /* Quick Help Drawer */
+    .help-drawer {
+      position: fixed;
+      top: 56px;
+      right: 16px;
+      width: 340px;
+      max-width: calc(100vw - 32px);
+      max-height: calc(100vh - 80px);
+      overflow-y: auto;
+      background: rgba(255, 255, 255, 0.98);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      box-shadow: var(--shadow-lg);
+      padding: 14px 16px;
+      z-index: 60;
+      display: none;
+    }
+    .help-drawer.open { display: block; }
+    .help-drawer h3 { margin: 0 0 8px 0; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
+    .help-drawer ul { margin: 0; padding-left: 18px; line-height: 1.65; color: #334155; }
+    .help-drawer li { margin-bottom: 4px; }
+    .kbd {
+      display: inline-block;
+      padding: 1px 5px;
+      border-radius: 4px;
+      border: 1px solid #cbd5e1;
+      background: #f1f5f9;
+      font-size: 11px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    /* Modals */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 16px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: var(--shadow-lg);
+      width: 100%;
+      max-width: 440px;
+      padding: 18px 20px;
+    }
+    .modal-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin: 0 0 10px 0;
+      color: var(--text-main);
+    }
+    .modal-desc {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      margin: 0 0 12px 0;
+      line-height: 1.5;
+    }
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .preset-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-bottom: 6px;
+      background: #f8fafc;
+    }
+
+    /* Toast */
+    .toast-container {
+      position: fixed;
+      bottom: 38px;
+      right: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      z-index: 120;
+      pointer-events: none;
+    }
+    .toast {
+      background: #0f172a;
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      box-shadow: var(--shadow-md);
+      max-width: 340px;
+      animation: fadeInToast 0.18s ease-out;
+    }
+    .toast.success { background: #15803d; }
+    .toast.error { background: #b91c1c; }
+    .toast.warn { background: #b45309; }
+
+    @keyframes fadeInToast {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Mobile responsive */
+    .mobile-only { display: none; }
+    .mobile-dock-backdrop { display: none; }
+
+    @media (max-width: 960px) {
+      .mobile-only { display: inline-flex; }
+      .brand-sub { display: none; }
+      .tool-dock {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 304px;
+        max-width: 88vw;
+        transform: translateX(-105%);
+        transition: transform 0.22s ease;
+        z-index: 80;
+        box-shadow: var(--shadow-lg);
+      }
+      .tool-dock.mobile-open { transform: translateX(0); }
+      .mobile-dock-backdrop.open {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.4);
+        z-index: 75;
+      }
+      .canvas-scroll-area { padding: 10px; }
+    }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+  <!-- Top Bar -->
+  <header class="topbar">
+    <div class="brand">
+      <button type="button" class="btn btn-sm mobile-only" id="btn-mobile-dock" data-testid="btn-mobile-dock" title="開啟工具面板">☰ 工具</button>
+      <div class="brand-icon" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+          <path d="M9 3v18M3 12h6M13 12h6m-2-2 2 2-2 2"></path>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-title">平面動線與空間配置工作室</div>
+        <div class="brand-sub">通用空間規劃 · 動線箭頭 · 點位配置 · 多層層架圖</div>
+      </div>
+    </div>
+
+    <div class="topbar-actions">
+      <button type="button" class="btn btn-sm" id="btn-undo" data-testid="btn-undo" title="復原 (Ctrl+Z)">↶ 復原</button>
+      <button type="button" class="btn btn-sm" id="btn-redo" data-testid="btn-redo" title="重做 (Ctrl+Y)">↷ 重做</button>
+      <span class="divider-v"></span>
+      <button type="button" class="btn btn-sm" id="btn-duplicate" data-testid="btn-duplicate" title="複製選取物件 (Ctrl+C / Ctrl+V)">📄 複製</button>
+      <button type="button" class="btn btn-sm" id="btn-layer-front" data-testid="btn-layer-front" title="移至最上層">⬆️ 最上</button>
+      <button type="button" class="btn btn-sm" id="btn-layer-back" data-testid="btn-layer-back" title="移至最下層">⬇️ 最下</button>
+      <button type="button" class="btn btn-sm btn-danger" id="btn-delete" data-testid="btn-delete" title="刪除選取物件 (Delete)">🗑️ 刪除</button>
+      <span class="divider-v"></span>
+      <button type="button" class="btn btn-sm" id="btn-export-json" data-testid="btn-export-json" title="匯出完整專案設定檔 (.json)">💾 匯出 JSON</button>
+      <label class="btn btn-sm" title="匯入專案設定檔 (.json)" style="margin:0;">
+        📥 匯入 JSON
+        <input type="file" id="input-import-json" data-testid="input-import-json" accept=".json,application/json" style="display:none;">
+      </label>
+      <button type="button" class="btn btn-sm" id="btn-cloud-modal" data-testid="btn-cloud-modal" title="雲端專案存取">☁️ 雲端</button>
+      <button type="button" class="btn btn-sm btn-primary" id="btn-export-png" data-testid="btn-export-png" title="匯出高解析 PNG 圖片 (適合貼入 Word/簡報)">⬇️ 匯出 PNG</button>
+      <span class="divider-v"></span>
+      <button type="button" class="btn btn-sm btn-danger" id="btn-clear-canvas" data-testid="btn-clear-canvas" title="清除目前分頁上的物件">🧹 清除畫布</button>
+      <button type="button" class="btn btn-sm btn-danger" id="btn-reset-all" data-testid="btn-reset-all" title="重置全部專案並清除瀏覽器快取">↺ 重置全部</button>
+      <button type="button" class="btn btn-sm" id="btn-help" data-testid="btn-help" title="操作說明與快捷鍵">❓ 說明</button>
+    </div>
+  </header>
+
+  <!-- Zone Tabs & Base Map Bar -->
+  <div class="tabbar">
+    <div class="tabs-list" id="tabs-list" data-testid="tabs-list"></div>
+
+    <div class="basemap-controls">
+      <label class="btn btn-sm" title="上傳自訂平面圖 (PNG / JPG / SVG)" style="margin:0;">
+        📂 上傳底圖
+        <input type="file" id="input-bg-upload" data-testid="input-bg-upload" accept="image/png,image/jpeg,image/webp,image/svg+xml,.svg" style="display:none;">
+      </label>
+      <select id="select-template" data-testid="select-template" class="select-input" title="選擇內建平面圖範本">
+        <option value="blank">空白畫布 (1200×800)</option>
+        <option value="office">通用辦公 / 診所平面範本</option>
+        <option value="facility">通用實驗室 / 空間平面範本</option>
+        <option value="warehouse2d">標準倉儲平面範本 (2D)</option>
+        <option value="storage2d">精簡儲位平面範本 (2D)</option>
+        <option value="isometric3d">等角立體空間範本 (3D)</option>
+      </select>
+      <button type="button" class="btn btn-sm" id="btn-apply-template" data-testid="btn-apply-template">套用範本</button>
+      <span class="divider-v"></span>
+      <button type="button" class="btn btn-xs" id="btn-zoom-out" title="縮小">－</button>
+      <span id="zoom-display" style="font-size:11.5px;font-weight:700;min-width:42px;text-align:center;">100%</span>
+      <button type="button" class="btn btn-xs" id="btn-zoom-in" title="放大">＋</button>
+      <button type="button" class="btn btn-xs" id="btn-zoom-fit" title="適應視窗">適應</button>
+    </div>
+  </div>
+
+  <!-- Main Workspace -->
+  <div class="workspace-body">
+    <div class="mobile-dock-backdrop" id="mobile-dock-backdrop"></div>
+
+    <!-- Left Tool Dock -->
+    <aside class="tool-dock" id="tool-dock">
+      <div class="mode-banner" id="mode-banner">
+        <span class="mode-label" id="mode-label" data-testid="mode-label">🖱️ 選取 / 編輯模式</span>
+        <button type="button" class="btn btn-xs" id="btn-cancel-mode" data-testid="btn-cancel-mode" style="display:none;">取消 (Esc)</button>
+      </div>
+
+      <!-- 1. Flow Arrows -->
+      <section class="dock-section">
+        <div class="dock-section-title">
+          <span>1. 動線箭頭 (文字永遠水平正向)</span>
+        </div>
+        <div class="row-flex" style="margin-bottom:7px;">
+          <button type="button" class="preset-chip p-chip active-chip" data-arrow-preset="P" data-testid="preset-arrow-P">P 人流</button>
+          <button type="button" class="preset-chip m-chip" data-arrow-preset="M" data-testid="preset-arrow-M">M 物流</button>
+          <button type="button" class="preset-chip w-chip" data-arrow-preset="W" data-testid="preset-arrow-W">W 廢棄物</button>
+        </div>
+        <div class="row-flex" style="margin-bottom:7px;">
+          <input type="text" id="arrow-custom-label" data-testid="arrow-custom-label" class="text-input" value="P" maxlength="12" placeholder="自訂標籤" style="width:92px;" title="箭頭顯示文字">
+          <input type="color" id="arrow-custom-color" data-testid="arrow-custom-color" class="color-swatch" value="#2563eb" title="箭頭顏色">
+          <span style="font-size:11px;color:var(--text-muted);">點選方向放置：</span>
+        </div>
+        <div class="grid-6">
+          <button type="button" class="btn btn-xs" data-tool="arrow" data-dir="left" data-testid="tool-arrow-left" title="向左箭頭">⬅</button>
+          <button type="button" class="btn btn-xs" data-tool="arrow" data-dir="right" data-testid="tool-arrow-right" title="向右箭頭">➔</button>
+          <button type="button" class="btn btn-xs" data-tool="arrow" data-dir="double-h" data-testid="tool-arrow-double-h" title="水平雙向箭頭">↔</button>
+          <button type="button" class="btn btn-xs" data-tool="arrow" data-dir="up" data-testid="tool-arrow-up" title="向上箭頭">⬆</button>
+          <button type="button" class="btn btn-xs" data-tool="arrow" data-dir="down" data-testid="tool-arrow-down" title="向下箭頭">⬇</button>
+          <button type="button" class="btn btn-xs" data-tool="arrow" data-dir="double-v" data-testid="tool-arrow-double-v" title="垂直雙向箭頭">↕</button>
+        </div>
+      </section>
+
+      <!-- 2. Masking & Labels -->
+      <section class="dock-section">
+        <div class="dock-section-title">
+          <span>2. 遮罩、標籤與圖例</span>
+        </div>
+        <div class="grid-2" style="margin-bottom:6px;">
+          <button type="button" class="btn btn-sm" data-tool="mask-rect" data-testid="tool-mask-rect" title="無框白色方形遮罩 (點擊或拖曳)">⬜ 白色方遮罩</button>
+          <button type="button" class="btn btn-sm" data-tool="mask-circle" data-testid="tool-mask-circle" title="無框白色圓形遮罩 (點擊或拖曳)">⚪ 白色圓遮罩</button>
+          <button type="button" class="btn btn-sm" data-tool="label" data-testid="tool-label" title="新增區域文字標籤 (永遠置頂)">📝 區域標籤</button>
+          <button type="button" class="btn btn-sm" data-tool="legend-flow" data-testid="tool-legend-flow" title="插入多色動線圖例">📋 動線圖例</button>
+          <button type="button" class="btn btn-sm" data-tool="legend-hvac" data-testid="tool-legend-hvac" title="插入點位與空調圖例">📋 點位圖例</button>
+          <button type="button" class="btn btn-sm" data-tool="draw-rect" data-testid="tool-draw-rect" title="繪製自訂外框方塊">🔲 自訂方框</button>
+        </div>
+        <div class="row-flex">
+          <button type="button" class="btn btn-sm" data-tool="free-arrow" data-testid="tool-free-arrow" style="flex:1;" title="拖曳繪製任意角度箭頭">↗ 自由箭頭</button>
+          <label style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;">
+            繪圖色
+            <input type="color" id="draw-custom-color" class="color-swatch" value="#e11d48">
+          </label>
+        </div>
+      </section>
+
+      <!-- 3. Mapping, HVAC & Equipment -->
+      <section class="dock-section">
+        <div class="dock-section-title">
+          <span>3. 點位、空調與尺寸標註</span>
+        </div>
+        <div class="grid-3" style="margin-bottom:6px;">
+          <button type="button" class="btn btn-sm marker-btn-T" data-tool="marker-T" data-testid="tool-marker-T" title="上層點位 (自動編號)">💗 T 點位</button>
+          <button type="button" class="btn btn-sm marker-btn-M" data-tool="marker-M" data-testid="tool-marker-M" title="中層點位 (自動編號)">💜 M 點位</button>
+          <button type="button" class="btn btn-sm marker-btn-B" data-tool="marker-B" data-testid="tool-marker-B" title="下層點位 (自動編號)">💙 B 點位</button>
+        </div>
+        <div class="row-flex" style="margin-bottom:8px;justify-content:space-between;">
+          <label style="font-size:11.5px;color:var(--text-muted);display:flex;align-items:center;gap:5px;">
+            下一點位編號:
+            <input type="number" id="next-marker-num" data-testid="next-marker-num" class="num-input" value="1" min="1" max="999" style="width:58px;">
+          </label>
+          <button type="button" class="btn btn-xs" id="btn-reset-marker-num" title="編號歸 1">歸 1</button>
+        </div>
+
+        <div class="grid-2" style="margin-bottom:6px;">
+          <button type="button" class="btn btn-sm hvac-sa" data-tool="hvac-sa" data-testid="tool-hvac-sa" title="出風口 SA">🟦 SA 出風</button>
+          <button type="button" class="btn btn-sm hvac-ra" data-tool="hvac-ra" data-testid="tool-hvac-ra" title="回風口 RA">🟧 RA 回風</button>
+          <button type="button" class="btn btn-sm hvac-sa" data-tool="hvac-sad" data-testid="tool-hvac-sad" title="向下出風 SA-D">⦻ SA-D</button>
+          <button type="button" class="btn btn-sm hvac-ra" data-tool="hvac-rau" data-testid="tool-hvac-rau" title="向上回風 RA-U">⦿ RA-U</button>
+          <button type="button" class="btn btn-sm hvac-sa" data-tool="sa-dir" data-testid="tool-sa-dir" title="拖曳繪製 SA 出風方向箭頭">↗ SA 方向</button>
+          <button type="button" class="btn btn-sm hvac-ra" data-tool="ra-dir" data-testid="tool-ra-dir" title="拖曳繪製 RA 回風方向箭頭">↗ RA 方向</button>
+        </div>
+
+        <button type="button" class="btn btn-sm" data-tool="dimension" data-testid="tool-dimension" style="width:100%;margin-bottom:8px;background:#fef2f2;border-color:#fca5a5;color:#b91c1c;" title="點擊或拖曳建立尺寸標註線">
+          📏 尺寸標註線 (自訂數值)
+        </button>
+
+        <div class="row-flex" style="margin-bottom:6px;justify-content:space-between;">
+          <span style="font-size:11.5px;font-weight:700;color:var(--text-muted);">設備 / 棧板 / 立柱</span>
+          <select id="equip-view-mode" data-testid="equip-view-mode" class="select-input" style="padding:2px 5px;font-size:11px;">
+            <option value="2d">2D 平面</option>
+            <option value="3d">3D 等角</option>
+          </select>
+        </div>
+        <div class="grid-2" style="margin-bottom:5px;">
+          <button type="button" class="btn btn-sm" data-tool="pallet" data-testid="tool-pallet" style="background:#fffbeb;border-color:#fcd34d;color:#92400e;">📦 棧板/設備</button>
+          <button type="button" class="btn btn-sm" data-tool="pillar" data-testid="tool-pillar" style="background:#f0fdf4;border-color:#86efac;color:#166534;">▮ 立柱</button>
+        </div>
+        <div class="row-flex">
+          <span style="font-size:11px;color:var(--text-muted);">立柱顏色:</span>
+          <select id="pillar-color" class="select-input" style="flex:1;padding:3px 6px;font-size:11.5px;">
+            <option value="#15803d">綠色立柱</option>
+            <option value="#1d4ed8">藍色立柱</option>
+            <option value="#ca8a04">黃色立柱</option>
+            <option value="#475569">深灰立柱</option>
+          </select>
+        </div>
+      </section>
+
+      <!-- 4. Multi-Tier Rack / Shelf Diagram Generator -->
+      <section class="dock-section">
+        <div class="dock-section-title">
+          <span>4. 多層貨架 / 層架圖產生器</span>
+          <button type="button" class="btn btn-xs" id="btn-toggle-racks" data-testid="btn-toggle-racks" title="顯示或隱藏畫布上的貨架圖">👁️ 顯隱</button>
+        </div>
+        <div class="row-flex" style="margin-bottom:6px;">
+          <input type="text" id="rack-name" data-testid="rack-name" class="text-input" value="標準多層層架" placeholder="層架名稱" style="flex:1;">
+          <select id="rack-style" data-testid="rack-style" class="select-input" style="width:76px;">
+            <option value="3d">3D 立體</option>
+            <option value="2d">2D 立面</option>
+          </select>
+        </div>
+        <div class="row-flex" style="margin-bottom:6px;">
+          <label style="font-size:11.5px;display:flex;align-items:center;gap:4px;">
+            層數:
+            <input type="number" id="rack-tiers" data-testid="rack-tiers" class="num-input" value="4" min="2" max="8" style="width:48px;">
+          </label>
+          <label style="font-size:11.5px;display:flex;align-items:center;gap:4px;">
+            M層:
+            <select id="rack-m-tier" data-testid="rack-m-tier" class="select-input" style="width:68px;"></select>
+          </label>
+          <select id="rack-theme" data-testid="rack-theme" class="select-input" style="flex:1;">
+            <option value="blue">藍色系</option>
+            <option value="green">綠色系</option>
+            <option value="amber">黃色系</option>
+            <option value="slate">灰色系</option>
+            <option value="purple">紫色系</option>
+          </select>
+        </div>
+        <div style="font-size:11px;color:var(--text-muted);">各層高度 (cm)：</div>
+        <div class="rack-heights-grid" id="rack-heights-grid" data-testid="rack-heights-grid"></div>
+        <div class="grid-2" style="margin-top:8px;">
+          <button type="button" class="btn btn-sm btn-primary" id="btn-insert-rack" data-testid="btn-insert-rack">➕ 插入貨架圖</button>
+          <button type="button" class="btn btn-sm" id="btn-update-rack" data-testid="btn-update-rack" disabled>🔄 更新已選</button>
+        </div>
+      </section>
+
+      <!-- 5. Selected Object Inspector -->
+      <section class="dock-section">
+        <div class="dock-section-title">
+          <span>5. 選取物件屬性</span>
+        </div>
+        <div class="inspector-box" id="inspector-box" data-testid="inspector-box">
+          <div style="color:var(--text-muted);font-size:11.5px;">尚未選取物件。點擊畫布上任一物件即可拖曳、縮放、旋轉或調整屬性。</div>
+        </div>
+      </section>
+    </aside>
+
+    <!-- Main Canvas Stage -->
+    <main class="canvas-stage">
+      <div class="canvas-scroll-area" id="canvas-scroll-area">
+        <div class="canvas-frame" id="canvas-frame">
+          <canvas id="studio-canvas" data-testid="studio-canvas"></canvas>
+        </div>
+      </div>
+
+      <footer class="statusbar">
+        <div class="row-flex">
+          <span id="status-tab">分頁：主區域 1</span>
+          <span>|</span>
+          <span id="status-size">畫布：1200 × 800</span>
+          <span>|</span>
+          <span id="status-count" data-testid="status-count">物件：0</span>
+        </div>
+        <div class="row-flex">
+          <span id="status-save" data-testid="status-save">💾 自動儲存就緒</span>
+        </div>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<!-- Dismissible Quick Help Drawer -->
+<aside class="help-drawer" id="help-drawer" data-testid="help-drawer" aria-label="操作說明">
+  <h3>
+    <span>💡 快速操作指南</span>
+    <button type="button" class="btn btn-xs" id="btn-close-help" data-testid="btn-close-help" title="關閉">✕</button>
+  </h3>
+  <ul>
+    <li><strong>更換底圖：</strong>支援上傳任意 PNG / JPG / SVG 平面圖，或直接套用內建通用/倉儲/立體範本。</li>
+    <li><strong>多分頁管理：</strong>上方分頁列可新增、雙擊重新命名、複製或刪除不同樓層/區域平面。</li>
+    <li><strong>放置物件：</strong>點選左側工具後，在畫布上<strong>點擊或拖曳</strong>；按 <span class="kbd">Esc</span> 回到選取模式。</li>
+    <li><strong>文字正向箭頭：</strong>P / M / W 與自訂動線箭頭支援 6 種方向，旋轉時文字仍保持水平正向。</li>
+    <li><strong>快速複製：</strong>按住 <span class="kbd">Ctrl</span> 拖曳物件即可原位複製，或使用 <span class="kbd">Ctrl+C</span> / <span class="kbd">Ctrl+V</span>。</li>
+    <li><strong>復原與刪除：</strong><span class="kbd">Ctrl+Z</span> 復原、<span class="kbd">Ctrl+Y</span> 重做、<span class="kbd">Delete</span> / <span class="kbd">Backspace</span> 刪除。</li>
+    <li><strong>雙擊編輯：</strong>雙擊文字標籤、圖例、T/M/B 點位編號或尺寸線，皆可直接修改內容。</li>
+    <li><strong>高解析輸出：</strong>點選「匯出 PNG」會輸出 2 倍解析度純淨無框線圖片，適合直接貼入 Word 或簡報。</li>
+  </ul>
+</aside>
+
+<!-- Generic Prompt / Confirm Modal -->
+<div class="modal-backdrop" id="generic-modal" data-testid="generic-modal" role="dialog" aria-modal="true">
+  <div class="modal-card">
+    <h3 class="modal-title" id="modal-title">提示</h3>
+    <p class="modal-desc" id="modal-desc"></p>
+    <input type="text" id="modal-input" data-testid="modal-input" class="text-input" style="width:100%;display:none;padding:8px 10px;font-size:13px;">
+    <div class="modal-footer">
+      <button type="button" class="btn" id="modal-cancel" data-testid="modal-cancel">取消</button>
+      <button type="button" class="btn btn-primary" id="modal-ok" data-testid="modal-ok">確定</button>
+    </div>
+  </div>
+</div>
+
+<!-- Cloud Presets Modal -->
+<div class="modal-backdrop" id="cloud-modal" data-testid="cloud-modal" role="dialog" aria-modal="true">
+  <div class="modal-card" style="max-width:480px;">
+    <h3 class="modal-title">☁️ 雲端專案存取 (GAS PropertiesService)</h3>
+    <p class="modal-desc" id="cloud-mode-desc">可將整個多區域工作區壓縮儲存至雲端，隨時載入共用。</p>
+    <div id="cloud-save-row" class="row-flex" style="margin-bottom:12px;">
+      <input type="text" id="cloud-preset-name" class="text-input" placeholder="輸入專案名稱（例如：A棟1F動線配置）" style="flex:1;padding:6px 9px;">
+      <button type="button" class="btn btn-primary" id="btn-cloud-save">儲存目前專案</button>
+    </div>
+    <div id="cloud-presets-list" style="max-height:240px;overflow-y:auto;"></div>
+    <div class="modal-footer">
+      <button type="button" class="btn" id="btn-cloud-close">關閉</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  const STORAGE_KEY = 'FPLS_WORKSPACE_V1';
+  const CUSTOM_PROPS = [
+    'customType', 'isAlwaysTop', 'isMask', 'markerType', 'markerNumber',
+    'arrowMeta', 'dimMeta', 'rackConfig', 'equipMeta', 'objId'
+  ];
+
+  const RACK_THEMES = {
+    blue:   { box: '#2563eb', stroke: '#1e40af', plane: '#dbeafe', title: '#1e40af' },
+    green:  { box: '#16a34a', stroke: '#166534', plane: '#dcfce7', title: '#166534' },
+    amber:  { box: '#d97706', stroke: '#b45309', plane: '#fef3c7', title: '#b45309' },
+    slate:  { box: '#475569', stroke: '#334155', plane: '#e2e8f0', title: '#334155' },
+    purple: { box: '#7c3aed', stroke: '#5b21b6', plane: '#ede9fe', title: '#5b21b6' }
+  };
+
+  // State
+  let canvas = null;
+  let tabs = [];
+  let activeTabId = null;
+  let currentZoom = 1;
+  let isFitMode = true;
+  let isRestoring = false;
+  let saveTimer = null;
+
+  // Placement state
+  let activeTool = null; // null = select mode
+  let activeToolMeta = {};
+  let isDrawing = false;
+  let drawStart = { x: 0, y: 0 };
+  let previewObj = null;
+
+  // Clipboard & Ctrl+Drag state
+  let clipboardObj = null;
+  let ctrlDragPending = false;
+  let ctrlDragOrigin = { left: 0, top: 0 };
+
+  // Rack configurator state
+  let rackHeightsState = { 0: 240, 1: 160, 2: 90, 3: 15, 4: 0, 5: 0, 6: 0, 7: 0 };
+  let racksVisible = true;
+
+  // Modal state
+  let modalResolver = null;
+
+  // Helpers
+  function uid(prefix) {
+    return (prefix || 'id') + '_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7);
+  }
+
+  function showToast(msg, type) {
+    const container = document.getElementById('toast-container');
+    const el = document.createElement('div');
+    el.className = 'toast' + (type ? ' ' + type : '');
+    el.textContent = msg;
+    container.appendChild(el);
+    setTimeout(() => {
+      el.style.opacity = '0';
+      el.style.transition = 'opacity 0.25s';
+      setTimeout(() => el.remove(), 260);
+    }, 2600);
+  }
+
+  function isGasEnvironment() {
+    return typeof google !== 'undefined' && google.script && google.script.run;
+  }
+
+  function openModal(opts) {
+    return new Promise((resolve) => {
+      modalResolver = resolve;
+      const backdrop = document.getElementById('generic-modal');
+      const titleEl = document.getElementById('modal-title');
+      const descEl = document.getElementById('modal-desc');
+      const inputEl = document.getElementById('modal-input');
+      const cancelBtn = document.getElementById('modal-cancel');
+      const okBtn = document.getElementById('modal-ok');
+
+      titleEl.textContent = opts.title || '提示';
+      descEl.textContent = opts.desc || '';
+      okBtn.textContent = opts.okText || '確定';
+      okBtn.className = opts.danger ? 'btn btn-danger-solid' : 'btn btn-primary';
+      cancelBtn.style.display = opts.hideCancel ? 'none' : 'inline-flex';
+
+      if (opts.mode === 'prompt') {
+        inputEl.style.display = 'block';
+        inputEl.value = opts.defaultValue || '';
+        inputEl.placeholder = opts.placeholder || '';
+      } else {
+        inputEl.style.display = 'none';
+      }
+
+      backdrop.classList.add('open');
+      if (opts.mode === 'prompt') {
+        setTimeout(() => { inputEl.focus(); inputEl.select(); }, 30);
+      } else {
+        setTimeout(() => okBtn.focus(), 30);
+      }
+    });
+  }
+
+  function closeModal(confirmed) {
+    const backdrop = document.getElementById('generic-modal');
+    const inputEl = document.getElementById('modal-input');
+    const isPrompt = inputEl.style.display !== 'none';
+    backdrop.classList.remove('open');
+    const resolver = modalResolver;
+    modalResolver = null;
+    if (resolver) {
+      if (!confirmed) resolver(isPrompt ? null : false);
+      else resolver(isPrompt ? inputEl.value : true);
+    }
+  }
+
+  // ==================== Built-in Templates (Inline SVG Data URLs, Zero External Deps) ====================
+  function svgToDataUrl(svgStr) {
+    return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgStr.trim());
+  }
+
+  function getTemplateAsset(templateId) {
+    if (templateId === 'blank') {
+      return { width: 1200, height: 800, dataUrl: null };
+    }
+    if (templateId === 'office') {
+      const svg = `
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <rect width="1200" height="800" fill="#ffffff"/>
+  <rect x="40" y="40" width="1120" height="720" fill="#f8fafc" stroke="#1e293b" stroke-width="5"/>
+  <!-- Reception & Entrance -->
+  <rect x="40" y="40" width="320" height="240" fill="#eff6ff" stroke="#334155" stroke-width="3"/>
+  <text x="200" y="165" font-family="sans-serif" font-size="20" font-weight="bold" fill="#475569" text-anchor="middle">入口接待區 / 櫃檯</text>
+  <!-- Meeting Room -->
+  <rect x="360" y="40" width="400" height="240" fill="#f0fdf4" stroke="#334155" stroke-width="3"/>
+  <rect x="460" y="110" width="200" height="90" rx="14" fill="#fff" stroke="#64748b" stroke-width="2"/>
+  <text x="560" y="162" font-family="sans-serif" font-size="18" font-weight="bold" fill="#475569" text-anchor="middle">會議室 / 諮詢室</text>
+  <!-- Service Room -->
+  <rect x="760" y="40" width="400" height="240" fill="#fefce8" stroke="#334155" stroke-width="3"/>
+  <text x="960" y="165" font-family="sans-serif" font-size="20" font-weight="bold" fill="#475569" text-anchor="middle">設備間 / 檔案室</text>
+  <!-- Central Corridor -->
+  <rect x="40" y="280" width="1120" height="140" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="8,6"/>
+  <text x="600" y="356" font-family="sans-serif" font-size="18" fill="#94a3b8" text-anchor="middle">主要通行走道 (Corridor)</text>
+  <!-- Open Workspace -->
+  <rect x="40" y="420" width="720" height="340" fill="#f8fafc" stroke="#334155" stroke-width="3"/>
+  <g fill="#fff" stroke="#94a3b8" stroke-width="1.5">
+    <rect x="90" y="470" width="160" height="70"/><rect x="280" y="470" width="160" height="70"/><rect x="470" y="470" width="160" height="70"/>
+    <rect x="90" y="610" width="160" height="70"/><rect x="280" y="610" width="160" height="70"/><rect x="470" y="610" width="160" height="70"/>
+  </g>
+  <text x="370" y="582" font-family="sans-serif" font-size="18" font-weight="bold" fill="#475569" text-anchor="middle">開放辦公 / 服務作業區</text>
+  <!-- Utility / Rest Area -->
+  <rect x="760" y="420" width="400" height="340" fill="#f1f5f9" stroke="#334155" stroke-width="3"/>
+  <text x="960" y="595" font-family="sans-serif" font-size="20" font-weight="bold" fill="#475569" text-anchor="middle">茶水休息 / 備品區</text>
+  <!-- Door Arcs -->
+  <path d="M 160 280 L 160 230 A 50 50 0 0 1 210 280" fill="none" stroke="#1e293b" stroke-width="2"/>
+  <path d="M 520 280 L 520 230 A 50 50 0 0 1 570 280" fill="none" stroke="#1e293b" stroke-width="2"/>
+  <path d="M 920 420 L 920 470 A 50 50 0 0 0 970 420" fill="none" stroke="#1e293b" stroke-width="2"/>
+</svg>`;
+      return { width: 1200, height: 800, dataUrl: svgToDataUrl(svg) };
+    }
+    if (templateId === 'facility') {
+      const svg = `
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <rect width="1200" height="800" fill="#ffffff"/>
+  <rect x="40" y="40" width="1120" height="720" fill="#f8fafc" stroke="#0f172a" stroke-width="5"/>
+  <rect x="40" y="40" width="260" height="300" fill="#e0f2fe" stroke="#334155" stroke-width="3"/>
+  <text x="170" y="195" font-family="sans-serif" font-size="19" font-weight="bold" fill="#0369a1" text-anchor="middle">緩衝 / 更衣室</text>
+  <rect x="300" y="40" width="540" height="440" fill="#f0fdf4" stroke="#334155" stroke-width="3"/>
+  <rect x="380" y="140" width="380" height="80" fill="#fff" stroke="#64748b" stroke-width="2"/>
+  <rect x="380" y="290" width="380" height="80" fill="#fff" stroke="#64748b" stroke-width="2"/>
+  <text x="570" y="100" font-family="sans-serif" font-size="20" font-weight="bold" fill="#15803d" text-anchor="middle">核心作業 / 實驗室主區</text>
+  <rect x="840" y="40" width="320" height="440" fill="#fef3c7" stroke="#334155" stroke-width="3"/>
+  <text x="1000" y="265" font-family="sans-serif" font-size="19" font-weight="bold" fill="#92400e" text-anchor="middle">儀器 / 檢驗區</text>
+  <rect x="40" y="340" width="260" height="420" fill="#f1f5f9" stroke="#334155" stroke-width="3"/>
+  <text x="170" y="555" font-family="sans-serif" font-size="19" font-weight="bold" fill="#475569" text-anchor="middle">收發 / 暫存區</text>
+  <rect x="300" y="480" width="540" height="280" fill="#ffffff" stroke="#334155" stroke-width="3"/>
+  <text x="570" y="625" font-family="sans-serif" font-size="19" font-weight="bold" fill="#475569" text-anchor="middle">包裝 / 出貨準備區</text>
+  <rect x="840" y="480" width="320" height="280" fill="#fee2e2" stroke="#334155" stroke-width="3"/>
+  <text x="1000" y="625" font-family="sans-serif" font-size="19" font-weight="bold" fill="#991b1b" text-anchor="middle">廢棄物暫存 / 清洗間</text>
+</svg>`;
+      return { width: 1200, height: 800, dataUrl: svgToDataUrl(svg) };
+    }
+    if (templateId === 'warehouse2d') {
+      const svg = `
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <rect width="1200" height="800" fill="#ffffff"/>
+  <rect x="50" y="45" width="760" height="690" fill="#eef6ee" stroke="#0f172a" stroke-width="4"/>
+  <!-- Loading Platform & Ramp -->
+  <rect x="50" y="45" width="200" height="110" fill="#f8fafc" stroke="#1e293b" stroke-width="2.5"/>
+  <text x="150" y="110" font-family="sans-serif" font-size="18" font-weight="bold" fill="#1e293b" text-anchor="middle">裝卸平台 Platform</text>
+  <path d="M 50 45 L 110 45 A 60 60 0 0 1 50 105 Z" fill="none" stroke="#1e293b" stroke-width="1.5"/>
+  <path d="M 250 45 L 190 45 A 60 60 0 0 0 250 105 Z" fill="none" stroke="#1e293b" stroke-width="1.5"/>
+  <rect x="250" y="45" width="240" height="110" fill="#f8fafc" stroke="#1e293b" stroke-width="2.5"/>
+  <text x="370" y="95" font-family="sans-serif" font-size="18" font-weight="bold" fill="#1e293b" text-anchor="middle">斜坡道 Ramp</text>
+  <text x="370" y="122" font-family="sans-serif" font-size="14" fill="#64748b" text-anchor="middle">8%</text>
+  <!-- Rack Bays -->
+  <g stroke="#334155" stroke-width="1.8" fill="#ffffff">
+    <rect x="75" y="185" width="90" height="80"/><line x1="75" y1="185" x2="165" y2="265"/><line x1="165" y1="185" x2="75" y2="265"/>
+    <rect x="75" y="265" width="90" height="80"/><line x1="75" y1="265" x2="165" y2="345"/><line x1="165" y1="265" x2="75" y2="345"/>
+    <rect x="75" y="345" width="90" height="80"/><line x1="75" y1="345" x2="165" y2="425"/><line x1="165" y1="345" x2="75" y2="425"/>
+    <rect x="75" y="425" width="90" height="80"/><line x1="75" y1="425" x2="165" y2="505"/><line x1="165" y1="425" x2="75" y2="505"/>
+    <rect x="300" y="185" width="90" height="80"/><line x1="300" y1="185" x2="390" y2="265"/><line x1="390" y1="185" x2="300" y2="265"/>
+    <rect x="300" y="265" width="90" height="80"/><line x1="300" y1="265" x2="390" y2="345"/><line x1="390" y1="265" x2="300" y2="345"/>
+    <rect x="300" y="345" width="90" height="80"/><line x1="300" y1="345" x2="390" y2="425"/><line x1="390" y1="345" x2="300" y2="425"/>
+    <rect x="300" y="425" width="90" height="80"/><line x1="300" y1="425" x2="390" y2="505"/><line x1="390" y1="425" x2="300" y2="505"/>
+    <rect x="390" y="185" width="90" height="80"/><line x1="390" y1="185" x2="480" y2="265"/><line x1="480" y1="185" x2="390" y2="265"/>
+    <rect x="390" y="265" width="90" height="80"/><line x1="390" y1="265" x2="480" y2="345"/><line x1="480" y1="265" x2="390" y2="345"/>
+    <rect x="390" y="345" width="90" height="80"/><line x1="390" y1="345" x2="480" y2="425"/><line x1="480" y1="345" x2="390" y2="425"/>
+    <rect x="390" y="425" width="90" height="80"/><line x1="390" y1="425" x2="480" y2="505"/><line x1="480" y1="425" x2="390" y2="505"/>
+    <rect x="650" y="185" width="110" height="75"/><line x1="650" y1="185" x2="760" y2="260"/><line x1="760" y1="185" x2="650" y2="260"/>
+    <rect x="650" y="260" width="110" height="75"/><line x1="650" y1="260" x2="760" y2="335"/><line x1="760" y1="260" x2="650" y2="335"/>
+    <rect x="650" y="335" width="110" height="75"/><line x1="650" y1="335" x2="760" y2="410"/><line x1="760" y1="335" x2="650" y2="410"/>
+    <rect x="650" y="410" width="110" height="75"/><line x1="650" y1="410" x2="760" y2="485"/><line x1="760" y1="410" x2="650" y2="485"/>
+    <rect x="650" y="485" width="110" height="75"/><line x1="650" y1="485" x2="760" y2="560"/><line x1="760" y1="485" x2="650" y2="560"/>
+  </g>
+  <!-- Bottom Staging & Charging -->
+  <path d="M 450 735 L 450 650 L 620 650 L 620 735" fill="none" stroke="#1e293b" stroke-dasharray="6,5" stroke-width="2"/>
+  <text x="535" y="688" font-family="sans-serif" font-size="14" font-weight="bold" fill="#334155" text-anchor="middle">EQUIPMENT /</text>
+  <text x="535" y="708" font-family="sans-serif" font-size="14" font-weight="bold" fill="#334155" text-anchor="middle">CHARGING</text>
+  <g stroke="#334155" stroke-width="1.5" fill="#fff">
+    <rect x="75" y="665" width="75" height="50"/><rect x="150" y="665" width="75" height="50"/>
+    <rect x="225" y="665" width="75" height="50"/><rect x="300" y="665" width="75" height="50"/>
+  </g>
+  <rect x="850" y="45" width="310" height="690" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="6,5"/>
+  <text x="1005" y="80" font-family="sans-serif" font-size="15" font-weight="bold" fill="#64748b" text-anchor="middle">右側圖例 / 多層貨架圖放置區</text>
+</svg>`;
+      return { width: 1200, height: 800, dataUrl: svgToDataUrl(svg) };
+    }
+    if (templateId === 'storage2d') {
+      const svg = `
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <rect width="1200" height="800" fill="#ffffff"/>
+  <path d="M 320 60 L 580 60 L 580 180 L 720 180 L 720 720 L 320 720 Z" fill="#f0f9ff" stroke="#0f172a" stroke-width="5"/>
+  <path d="M 320 60 L 250 60 A 70 70 0 0 0 320 125" fill="none" stroke="#1e293b" stroke-width="2"/>
+  <path d="M 320 190 L 250 190 A 70 70 0 0 1 320 125" fill="none" stroke="#1e293b" stroke-width="2"/>
+  <g stroke="#334155" stroke-width="1.8" fill="#fff">
+    <rect x="338" y="210" width="95" height="82"/><line x1="338" y1="210" x2="433" y2="292"/><line x1="433" y1="210" x2="338" y2="292"/>
+    <rect x="338" y="292" width="95" height="82"/><line x1="338" y1="292" x2="433" y2="374"/><line x1="433" y1="292" x2="338" y2="374"/>
+    <rect x="338" y="374" width="95" height="82"/><line x1="338" y1="374" x2="433" y2="456"/><line x1="433" y1="374" x2="338" y2="456"/>
+    <rect x="338" y="456" width="95" height="82"/><line x1="338" y1="456" x2="433" y2="538"/><line x1="433" y1="456" x2="338" y2="538"/>
+    <rect x="338" y="538" width="95" height="82"/><line x1="338" y1="538" x2="433" y2="620"/><line x1="433" y1="538" x2="338" y2="620"/>
+    <rect x="605" y="210" width="95" height="82"/><line x1="605" y1="210" x2="700" y2="292"/><line x1="700" y1="210" x2="605" y2="292"/>
+    <rect x="605" y="292" width="95" height="82"/><line x1="605" y1="292" x2="700" y2="374"/><line x1="700" y1="292" x2="605" y2="374"/>
+    <rect x="605" y="374" width="95" height="82"/><line x1="605" y1="374" x2="700" y2="456"/><line x1="700" y1="374" x2="605" y2="456"/>
+    <rect x="605" y="456" width="95" height="82"/><line x1="605" y1="456" x2="700" y2="538"/><line x1="700" y1="456" x2="605" y2="538"/>
+    <rect x="605" y="538" width="95" height="82"/><line x1="605" y1="538" x2="700" y2="620"/><line x1="700" y1="538" x2="605" y2="620"/>
+  </g>
+  <text x="520" y="758" font-family="sans-serif" font-size="16" font-weight="bold" fill="#334155" text-anchor="middle">精簡儲位空間平面配置 (2D)</text>
+</svg>`;
+      return { width: 1200, height: 800, dataUrl: svgToDataUrl(svg) };
+    }
+    if (templateId === 'isometric3d') {
+      const ox = 540, oy = 290, s = 0.92;
+      const iso = (x, y, z) => `${(ox + (-x * 0.866 + y * 0.866) * s).toFixed(1)},${(oy + (x * 0.5 + y * 0.5 - z) * s).toFixed(1)}`;
+      const svg = `
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <rect width="1200" height="800" fill="#ffffff"/>
+  <polygon points="${iso(0,0,0)} ${iso(380,0,0)} ${iso(380,580,0)} ${iso(0,580,0)}" fill="#f0fdf4" stroke="#1e293b" stroke-width="2.5" stroke-linejoin="round"/>
+  <polygon points="${iso(0,0,0)} ${iso(380,0,0)} ${iso(380,0,260)} ${iso(0,0,260)}" fill="#e2e8f0" stroke="#1e293b" stroke-width="2.5" stroke-linejoin="round"/>
+  <polygon points="${iso(0,0,0)} ${iso(0,580,0)} ${iso(0,580,260)} ${iso(0,0,260)}" fill="#f1f5f9" stroke="#1e293b" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- Door -->
+  <polygon points="${iso(380,30,0)} ${iso(380,140,0)} ${iso(380,140,185)} ${iso(380,30,185)}" fill="#ffffff" stroke="#1e293b" stroke-width="2"/>
+  <line x1="${iso(380,85,0).split(',')[0]}" y1="${iso(380,85,0).split(',')[1]}" x2="${iso(380,85,185).split(',')[0]}" y2="${iso(380,85,185).split(',')[1]}" stroke="#1e293b" stroke-width="1.5"/>
+  <polygon points="${iso(380,45,105)} ${iso(380,70,105)} ${iso(380,70,145)} ${iso(380,45,145)}" fill="#dbeafe" stroke="#1e293b" stroke-width="1"/>
+  <polygon points="${iso(380,100,105)} ${iso(380,125,105)} ${iso(380,125,145)} ${iso(380,100,145)}" fill="#dbeafe" stroke="#1e293b" stroke-width="1"/>
+  <text x="600" y="758" font-family="sans-serif" font-size="16" font-weight="bold" fill="#334155" text-anchor="middle">等角立體空間範本 (3D Isometric)</text>
+</svg>`;
+      return { width: 1200, height: 800, dataUrl: svgToDataUrl(svg) };
+    }
+    return { width: 1200, height: 800, dataUrl: null };
+  }
+
+  // ==================== Tab Management ====================
+  function createDefaultTab(name, templateId) {
+    const tpl = getTemplateAsset(templateId || 'office');
+    return {
+      id: uid('tab'),
+      name: name || '主區域 1',
+      templateId: templateId || 'office',
+      bgDataUrl: tpl.dataUrl,
+      virtualWidth: tpl.width,
+      virtualHeight: tpl.height,
+      fabricJson: null,
+      sensorCounter: 1,
+      undoStack: [],
+      redoStack: []
+    };
+  }
+
+  function getActiveTab() {
+    return tabs.find(t => t.id === activeTabId) || tabs[0];
+  }
+
+  function snapshotActiveTabToMemory() {
+    const tab = getActiveTab();
+    if (!tab || !canvas) return;
+    tab.fabricJson = canvas.toJSON(CUSTOM_PROPS);
+    tab.fabricJson.backgroundImage = null; // Stored separately in tab.bgDataUrl
+  }
+
+  function pushUndoSnapshot() {
+    if (isRestoring || !canvas) return;
+    const tab = getActiveTab();
+    if (!tab) return;
+    const json = canvas.toJSON(CUSTOM_PROPS);
+    json.backgroundImage = null;
+    const snap = JSON.stringify({
+      fabricJson: json,
+      sensorCounter: tab.sensorCounter,
+      virtualWidth: tab.virtualWidth,
+      virtualHeight: tab.virtualHeight,
+      bgDataUrl: tab.bgDataUrl
+    });
+    if (tab.undoStack.length > 0 && tab.undoStack[tab.undoStack.length - 1] === snap) {
+      return;
+    }
+    tab.undoStack.push(snap);
+    if (tab.undoStack.length > 40) tab.undoStack.shift();
+    tab.redoStack = [];
+    updateUndoRedoButtons();
+    updateStatusCounts();
+    scheduleAutoSave();
+  }
+
+  function loadBgAsync(dataUrl) {
+    return new Promise((resolve) => {
+      if (!dataUrl) {
+        canvas.setBackgroundImage(null, () => {
+          canvas.backgroundColor = '#ffffff';
+          canvas.renderAll();
+          resolve(null);
+        });
+        return;
+      }
+      fabric.Image.fromURL(dataUrl, (img) => {
+        if (!img || !img.width) {
+          canvas.setBackgroundImage(null, () => {
+            canvas.backgroundColor = '#ffffff';
+            canvas.renderAll();
+            resolve(null);
+          });
+          return;
+        }
+        canvas.setBackgroundImage(img, () => {
+          canvas.renderAll();
+          resolve(img);
+        }, { originX: 'left', originY: 'top', scaleX: 1, scaleY: 1 });
+      }, { crossOrigin: 'anonymous' });
+    });
+  }
+
+  async function renderTabToCanvas(tab, skipPushUndo) {
+    if (!tab || !canvas) return;
+    isRestoring = true;
+    try {
+      setPlacementMode(null);
+      canvas.discardActiveObject();
+      canvas.clear();
+      canvas.backgroundColor = '#ffffff';
+
+      if (tab.fabricJson) {
+        await new Promise((resolve) => {
+          canvas.loadFromJSON(tab.fabricJson, () => resolve());
+        });
+      }
+
+      const bgImg = await loadBgAsync(tab.bgDataUrl);
+      if (bgImg && bgImg.width && bgImg.height) {
+        tab.virtualWidth = bgImg.width;
+        tab.virtualHeight = bgImg.height;
+      }
+
+      // Sync rack visibility
+      canvas.getObjects().forEach(o => {
+        if (o.customType === 'rackDiagram') o.visible = racksVisible;
+      });
+      keepLabelsOnTop();
+      fitCanvasToViewport();
+      canvas.renderAll();
+
+      document.getElementById('next-marker-num').value = tab.sensorCounter;
+      document.getElementById('select-template').value = tab.templateId || 'blank';
+      document.getElementById('status-tab').textContent = '分頁：' + tab.name;
+      document.getElementById('status-size').textContent = `畫布：${tab.virtualWidth} × ${tab.virtualHeight}`;
+
+      if (!skipPushUndo && tab.undoStack.length === 0) {
+        isRestoring = false;
+        pushUndoSnapshot();
+      }
+    } finally {
+      isRestoring = false;
+      updateUndoRedoButtons();
+      updateStatusCounts();
+      updateInspector();
+    }
+  }
+
+  async function switchTab(tabId) {
+    if (tabId === activeTabId) return;
+    snapshotActiveTabToMemory();
+    activeTabId = tabId;
+    renderTabsBar();
+    await renderTabToCanvas(getActiveTab());
+    scheduleAutoSave();
+  }
+
+  function renderTabsBar() {
+    const list = document.getElementById('tabs-list');
+    list.innerHTML = '';
+
+    tabs.forEach((tab) => {
+      const el = document.createElement('div');
+      el.className = 'zone-tab' + (tab.id === activeTabId ? ' active' : '');
+      el.dataset.tabId = tab.id;
+      el.setAttribute('data-testid', 'zone-tab');
+
+      const nameSpan = document.createElement('span');
+      nameSpan.textContent = tab.name;
+      nameSpan.title = '雙擊重新命名';
+      nameSpan.ondblclick = (e) => {
+        e.stopPropagation();
+        renameTab(tab.id);
+      };
+      el.appendChild(nameSpan);
+
+      const renameBtn = document.createElement('button');
+      renameBtn.type = 'button';
+      renameBtn.className = 'tab-icon-btn';
+      renameBtn.textContent = '✎';
+      renameBtn.title = '重新命名分頁';
+      renameBtn.onclick = (e) => { e.stopPropagation(); renameTab(tab.id); };
+      el.appendChild(renameBtn);
+
+      const dupBtn = document.createElement('button');
+      dupBtn.type = 'button';
+      dupBtn.className = 'tab-icon-btn';
+      dupBtn.textContent = '❐';
+      dupBtn.title = '複製此分頁';
+      dupBtn.onclick = (e) => { e.stopPropagation(); duplicateTab(tab.id); };
+      el.appendChild(dupBtn);
+
+      if (tabs.length > 1) {
+        const delBtn = document.createElement('button');
+        delBtn.type = 'button';
+        delBtn.className = 'tab-icon-btn';
+        delBtn.textContent = '×';
+        delBtn.title = '刪除此分頁';
+        delBtn.onclick = (e) => { e.stopPropagation(); deleteTab(tab.id); };
+        el.appendChild(delBtn);
+      }
+
+      el.onclick = () => switchTab(tab.id);
+      list.appendChild(el);
+    });
+
+    const addBtn = document.createElement('button');
+    addBtn.type = 'button';
+    addBtn.className = 'btn btn-xs';
+    addBtn.id = 'btn-add-tab';
+    addBtn.setAttribute('data-testid', 'btn-add-tab');
+    addBtn.textContent = '＋ 新增分頁';
+    addBtn.onclick = addNewTab;
+    list.appendChild(addBtn);
+  }
+
+  async function addNewTab() {
+    snapshotActiveTabToMemory();
+    const newTab = createDefaultTab(`區域 ${tabs.length + 1}`, 'blank');
+    tabs.push(newTab);
+    activeTabId = newTab.id;
+    renderTabsBar();
+    await renderTabToCanvas(newTab);
+    scheduleAutoSave();
+    showToast(`已新增分頁「${newTab.name}」`, 'success');
+  }
+
+  async function renameTab(tabId) {
+    const tab = tabs.find(t => t.id === tabId);
+    if (!tab) return;
+    const val = await openModal({
+      mode: 'prompt',
+      title: '重新命名分頁',
+      desc: '請輸入新的區域或樓層名稱：',
+      defaultValue: tab.name,
+      placeholder: '例如：1F 辦公區、B1 倉儲區'
+    });
+    if (val && val.trim()) {
+      tab.name = val.trim().slice(0, 40);
+      renderTabsBar();
+      if (tab.id === activeTabId) {
+        document.getElementById('status-tab').textContent = '分頁：' + tab.name;
+      }
+      scheduleAutoSave();
+    }
+  }
+
+  async function duplicateTab(tabId) {
+    snapshotActiveTabToMemory();
+    const src = tabs.find(t => t.id === tabId);
+    if (!src) return;
+    const copy = {
+      id: uid('tab'),
+      name: src.name + ' (複本)',
+      templateId: src.templateId,
+      bgDataUrl: src.bgDataUrl,
+      virtualWidth: src.virtualWidth,
+      virtualHeight: src.virtualHeight,
+      fabricJson: src.fabricJson ? JSON.parse(JSON.stringify(src.fabricJson)) : null,
+      sensorCounter: src.sensorCounter,
+      undoStack: [],
+      redoStack: []
+    };
+    tabs.push(copy);
+    activeTabId = copy.id;
+    renderTabsBar();
+    await renderTabToCanvas(copy);
+    scheduleAutoSave();
+    showToast(`已複製分頁「${copy.name}」`, 'success');
+  }
+
+  async function deleteTab(tabId) {
+    if (tabs.length <= 1) return;
+    const target = tabs.find(t => t.id === tabId);
+    if (!target) return;
+    const ok = await openModal({
+      mode: 'confirm',
+      title: '刪除分頁',
+      desc: `確定要刪除分頁「${target.name}」嗎？此分頁上的所有配置將會移除。`,
+      danger: true,
+      okText: '刪除'
+    });
+    if (!ok) return;
+    const idx = tabs.findIndex(t => t.id === tabId);
+    tabs.splice(idx, 1);
+    if (activeTabId === tabId) {
+      activeTabId = tabs[Math.max(0, idx - 1)].id;
+      await renderTabToCanvas(getActiveTab());
+    }
+    renderTabsBar();
+    scheduleAutoSave();
+    showToast(`已刪除分頁「${target.name}」`);
+  }
+
+  // ==================== Zoom & Viewport ====================
+  function applyZoom(zoom) {
+    const tab = getActiveTab();
+    if (!tab || !canvas) return;
+    currentZoom = Math.max(0.2, Math.min(2.5, zoom));
+    canvas.setDimensions({
+      width: Math.round(tab.virtualWidth * currentZoom),
+      height: Math.round(tab.virtualHeight * currentZoom)
+    });
+    canvas.setZoom(currentZoom);
+    document.getElementById('zoom-display').textContent = Math.round(currentZoom * 100) + '%';
+    canvas.renderAll();
+  }
+
+  function fitCanvasToViewport() {
+    const tab = getActiveTab();
+    const scrollArea = document.getElementById('canvas-scroll-area');
+    if (!tab || !scrollArea) return;
+    isFitMode = true;
+    const pad = window.innerWidth <= 960 ? 20 : 40;
+    const availW = Math.max(240, scrollArea.clientWidth - pad);
+    const availH = Math.max(240, scrollArea.clientHeight - pad);
+    const z = Math.min(availW / tab.virtualWidth, availH / tab.virtualHeight, 1.2);
+    applyZoom(z);
+  }
+
+  // ==================== Layer Ordering ====================
+  function keepLabelsOnTop() {
+    if (!canvas) return;
+    const objs = canvas.getObjects();
+    // Keep masks below non-masks only if newly added; always keep top-pinned labels above everything
+    const alwaysTop = objs.filter(o => o.isAlwaysTop || o.type === 'i-text' || o.type === 'textbox');
+    alwaysTop.forEach(o => canvas.bringToFront(o));
+  }
+
+  function updateStatusCounts() {
+    if (!canvas) return;
+    document.getElementById('status-count').textContent = '物件：' + canvas.getObjects().length;
+  }
+
+  function updateUndoRedoButtons() {
+    const tab = getActiveTab();
+    document.getElementById('btn-undo').disabled = !tab || tab.undoStack.length <= 1;
+    document.getElementById('btn-redo').disabled = !tab || tab.redoStack.length === 0;
+  }
+
+  // ==================== Undo / Redo ====================
+  async function applySnapshotString(snapStr) {
+    const tab = getActiveTab();
+    if (!tab || !snapStr) return;
+    const data = JSON.parse(snapStr);
+    tab.fabricJson = data.fabricJson;
+    tab.sensorCounter = data.sensorCounter || 1;
+    tab.virtualWidth = data.virtualWidth || 1200;
+    tab.virtualHeight = data.virtualHeight || 800;
+    tab.bgDataUrl = data.bgDataUrl || null;
+    await renderTabToCanvas(tab, true);
+    scheduleAutoSave();
+  }
+
+  async function performUndo() {
+    const tab = getActiveTab();
+    if (!tab || tab.undoStack.length <= 1) return;
+    const current = tab.undoStack.pop();
+    tab.redoStack.push(current);
+    const prev = tab.undoStack[tab.undoStack.length - 1];
+    await applySnapshotString(prev);
+    showToast('已復原上一步');
+  }
+
+  async function performRedo() {
+    const tab = getActiveTab();
+    if (!tab || tab.redoStack.length === 0) return;
+    const next = tab.redoStack.pop();
+    tab.undoStack.push(next);
+    await applySnapshotString(next);
+    showToast('已重做');
+  }
+
+  // ==================== Object Builders ====================
+  function createFlowArrowGroup(opts) {
+    const color = opts.color || '#2563eb';
+    const labelText = (opts.label || 'P').trim() || 'P';
+    const dir = opts.dir || 'right';
+    const length = Math.max(70, opts.length || 130);
+    const thickness = 6;
+    const headSize = 20;
+
+    let linePts;
+    let textLeft = 0;
+    let textTop = 0;
+
+    if (dir === 'left' || dir === 'right' || dir === 'double-h') {
+      linePts = [-length / 2, 0, length / 2, 0];
+      textTop = -24;
+      textLeft = 0;
+    } else {
+      linePts = [0, -length / 2, 0, length / 2];
+      textTop = 0;
+      textLeft = 28;
+    }
+
+    const items = [];
+    items.push(new fabric.Line(linePts, {
+      stroke: color,
+      strokeWidth: thickness,
+      originX: 'center',
+      originY: 'center',
+      strokeLineCap: 'round'
+    }));
+
+    const mkHead = (x, y, angle) => new fabric.Triangle({
+      width: headSize,
+      height: headSize + 4,
+      fill: color,
+      left: x,
+      top: y,
+      angle: angle,
+      originX: 'center',
+      originY: 'center'
+    });
+
+    if (dir === 'right' || dir === 'double-h') items.push(mkHead(length / 2, 0, 90));
+    if (dir === 'left' || dir === 'double-h') items.push(mkHead(-length / 2, 0, -90));
+    if (dir === 'down' || dir === 'double-v') items.push(mkHead(0, length / 2, 180));
+    if (dir === 'up' || dir === 'double-v') items.push(mkHead(0, -length / 2, 0));
+
+    const badgeText = new fabric.Text(' ' + labelText + ' ', {
+      fontSize: 16,
+      fontWeight: 'bold',
+      fontFamily: 'sans-serif',
+      fill: '#ffffff',
+      backgroundColor: color,
+      left: textLeft,
+      top: textTop,
+      angle: 0,
+      originX: 'center',
+      originY: 'center'
+    });
+    items.push(badgeText);
+
+    const group = new fabric.Group(items, {
+      left: opts.x,
+      top: opts.y,
+      originX: 'center',
+      originY: 'center',
+      borderColor: color,
+      cornerColor: color,
+      customType: 'flowArrow',
+      objId: uid('arr'),
+      arrowMeta: { color, label: labelText, dir, length }
+    });
+    return group;
+  }
+
+  function keepArrowTextUpright(group) {
+    if (!group || group.customType !== 'flowArrow') return;
+    const objs = group.getObjects();
+    const txt = objs.find(o => o.type === 'text');
+    if (txt) {
+      txt.set('angle', -(group.angle || 0));
+      group.dirty = true;
+    }
+  }
+
+  function createFlowLegend(x, y) {
+    const text = '【動線圖例 Legend】\nP : 人流 (Personnel Flow)\nM : 物流 (Material Flow)\nW : 廢棄物流 (Waste Flow)';
+    const styles = { 1: {}, 2: {}, 3: {} };
+    for (let i = 0; i < 60; i++) {
+      styles[1][i] = { fill: '#2563eb' };
+      styles[2][i] = { fill: '#16a34a' };
+      styles[3][i] = { fill: '#dc2626' };
+    }
+    const tb = new fabric.Textbox(text, {
+      left: x,
+      top: y,
+      width: 270,
+      fontSize: 15,
+      fontFamily: 'sans-serif',
+      fontWeight: 'bold',
+      fill: '#0f172a',
+      backgroundColor: 'rgba(255,255,255,0.96)',
+      padding: 10,
+      lineHeight: 1.5,
+      originX: 'center',
+      originY: 'center',
+      borderColor: '#64748b',
+      cornerColor: '#64748b',
+      styles: styles,
+      shadow: new fabric.Shadow({ color: 'rgba(15,23,42,0.16)', blur: 8, offsetX: 2, offsetY: 3 }),
+      customType: 'legend',
+      isAlwaysTop: true,
+      objId: uid('leg')
+    });
+    return tb;
+  }
+
+  function createHvacLegend(x, y) {
+    const text = '【點位與空調圖例】\nT : 上層 (Top)   M : 中層 (Middle)   B : 下層 (Bottom)\nSA : 出風口 (Supply Air)   SA-D : 向下出風\nRA : 回風口 (Return Air)   RA-U : 向上回風';
+    const styles = { 1: {}, 2: {}, 3: {} };
+    for (let i = 0; i < 70; i++) {
+      styles[1][i] = { fill: '#7e22ce' };
+      styles[2][i] = { fill: '#1d4ed8' };
+      styles[3][i] = { fill: '#c2410c' };
+    }
+    return new fabric.Textbox(text, {
+      left: x,
+      top: y,
+      width: 390,
+      fontSize: 14,
+      fontFamily: 'sans-serif',
+      fontWeight: 'bold',
+      fill: '#0f172a',
+      backgroundColor: 'rgba(255,255,255,0.96)',
+      padding: 10,
+      lineHeight: 1.55,
+      originX: 'center',
+      originY: 'center',
+      borderColor: '#64748b',
+      cornerColor: '#64748b',
+      styles: styles,
+      shadow: new fabric.Shadow({ color: 'rgba(15,23,42,0.16)', blur: 8, offsetX: 2, offsetY: 3 }),
+      customType: 'legend',
+      isAlwaysTop: true,
+      objId: uid('leg')
+    });
+  }
+
+  function createMarkerGroup(type, num, x, y) {
+    const palette = {
+      T: { fill: '#ff66b2', text: '#0f172a' },
+      M: { fill: '#9c27b0', text: '#ffffff' },
+      B: { fill: '#3366cc', text: '#ffffff' }
+    };
+    const p = palette[type] || palette.T;
+    const mainCircle = new fabric.Circle({
+      radius: 13,
+      fill: p.fill,
+      stroke: '#0f172a',
+      strokeWidth: 1.5,
+      originX: 'center',
+      originY: 'center',
+      left: 0,
+      top: 0
+    });
+    const letter = new fabric.Text(type, {
+      fontSize: 13,
+      fontWeight: 'bold',
+      fontFamily: 'sans-serif',
+      fill: p.text,
+      originX: 'center',
+      originY: 'center',
+      left: 0,
+      top: 0.5
+    });
+    const badgeCircle = new fabric.Circle({
+      radius: 9.5,
+      fill: '#ffffff',
+      stroke: '#64748b',
+      strokeWidth: 1.2,
+      originX: 'center',
+      originY: 'center',
+      left: 16,
+      top: -12
+    });
+    const numText = new fabric.Text(String(num), {
+      fontSize: 10.5,
+      fontWeight: 'bold',
+      fontFamily: 'sans-serif',
+      fill: '#0f172a',
+      originX: 'center',
+      originY: 'center',
+      left: 16,
+      top: -11.5
+    });
+    return new fabric.Group([mainCircle, letter, badgeCircle, numText], {
+      left: x,
+      top: y,
+      originX: 'center',
+      originY: 'center',
+      customType: 'marker',
+      markerType: type,
+      markerNumber: String(num),
+      objId: uid('mk')
+    });
+  }
+
+  function createHvacIconGroup(kind, x, y) {
+    const items = [];
+    if (kind === 'hvac-sa') {
+      items.push(new fabric.Rect({ width: 28, height: 28, fill: '#cce5ff', stroke: '#004085', strokeWidth: 2, originX: 'center', originY: 'center' }));
+      items.push(new fabric.Line([-14, -14, 14, 14], { stroke: '#004085', strokeWidth: 2, originX: 'center', originY: 'center' }));
+      items.push(new fabric.Line([-14, 14, 14, -14], { stroke: '#004085', strokeWidth: 2, originX: 'center', originY: 'center' }));
+      items.push(new fabric.Text('SA', { fontSize: 11, fontWeight: 'bold', fontFamily: 'sans-serif', fill: '#004085', backgroundColor: 'rgba(255,255,255,0.85)', top: -24, originX: 'center', originY: 'center' }));
+    } else if (kind === 'hvac-ra') {
+      items.push(new fabric.Rect({ width: 28, height: 28, fill: '#fff4e6', stroke: '#fd7e14', strokeWidth: 2, originX: 'center', originY: 'center' }));
+      items.push(new fabric.Line([-14, -14, 14, 14], { stroke: '#fd7e14', strokeWidth: 2, originX: 'center', originY: 'center' }));
+      items.push(new fabric.Text('RA', { fontSize: 11, fontWeight: 'bold', fontFamily: 'sans-serif', fill: '#c2410c', backgroundColor: 'rgba(255,255,255,0.85)', top: -24, originX: 'center', originY: 'center' }));
+    } else if (kind === 'hvac-sad') {
+      items.push(new fabric.Circle({ radius: 13, fill: '#e6f2ff', stroke: '#007bff', strokeWidth: 2, originX: 'center', originY: 'center' }));
+      items.push(new fabric.Line([-9, -9, 9, 9], { stroke: '#007bff', strokeWidth: 2, originX: 'center', originY: 'center' }));
+      items.push(new fabric.Line([-9, 9, 9, -9], { stroke: '#007bff', strokeWidth: 2, originX: 'center', originY: 'center' }));
+      items.push(new fabric.Text('SA-D', { fontSize: 11, fontWeight: 'bold', fontFamily: 'sans-serif', fill: '#007bff', backgroundColor: 'rgba(255,255,255,0.88)', top: -22, originX: 'center', originY: 'center' }));
+    } else if (kind === 'hvac-rau') {
+      items.push(new fabric.Circle({ radius: 13, fill: '#fff4e6', stroke: '#fd7e14', strokeWidth: 2, strokeDashArray: [4, 2], originX: 'center', originY: 'center' }));
+      items.push(new fabric.Circle({ radius: 4, fill: '#fd7e14', originX: 'center', originY: 'center' }));
+      items.push(new fabric.Text('RA-U', { fontSize: 11, fontWeight: 'bold', fontFamily: 'sans-serif', fill: '#ea580c', backgroundColor: 'rgba(255,255,255,0.88)', top: -22, originX: 'center', originY: 'center' }));
+    }
+    return new fabric.Group(items, {
+      left: x,
+      top: y,
+      originX: 'center',
+      originY: 'center',
+      customType: kind,
+      objId: uid('hv')
+    });
+  }
+
+  function createVectorArrowGroup(x1, y1, x2, y2, opts) {
+    const color = opts.color || '#007bff';
+    const dashed = !!opts.dashed;
+    const label = opts.label || '';
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const dist = Math.hypot(dx, dy);
+    const angleRad = Math.atan2(dy, dx);
+    const angleDeg = angleRad * 180 / Math.PI;
+    const cx = (x1 + x2) / 2;
+    const cy = (y1 + y2) / 2;
+
+    const items = [];
+    items.push(new fabric.Line([-dist / 2, 0, dist / 2 - 4, 0], {
+      stroke: color,
+      strokeWidth: 3.5,
+      strokeDashArray: dashed ? [6, 4] : null,
+      originX: 'center',
+      originY: 'center'
+    }));
+    items.push(new fabric.Triangle({
+      width: 15,
+      height: 18,
+      fill: color,
+      left: dist / 2,
+      top: 0,
+      angle: 90,
+      originX: 'center',
+      originY: 'center'
+    }));
+    if (label) {
+      items.push(new fabric.Text(' ' + label + ' ', {
+        fontSize: 13,
+        fontWeight: 'bold',
+        fontFamily: 'sans-serif',
+        fill: color,
+        backgroundColor: 'rgba(255,255,255,0.9)',
+        left: 0,
+        top: -16,
+        angle: -angleDeg,
+        originX: 'center',
+        originY: 'center'
+      }));
+    }
+    return new fabric.Group(items, {
+      left: cx,
+      top: cy,
+      angle: angleDeg,
+      originX: 'center',
+      originY: 'center',
+      customType: opts.customType || 'vectorArrow',
+      objId: uid('va')
+    });
+  }
+
+  function createDimensionGroup(x1, y1, x2, y2, labelText) {
+    const color = '#dc2626';
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const dist = Math.max(40, Math.hypot(dx, dy));
+    const angleDeg = Math.atan2(dy, dx) * 180 / Math.PI;
+    const cx = (x1 + x2) / 2;
+    const cy = (y1 + y2) / 2;
+
+    const items = [
+      new fabric.Line([-dist / 2, 0, dist / 2, 0], { stroke: color, strokeWidth: 2.2, originX: 'center', originY: 'center' }),
+      new fabric.Line([-dist / 2, -9, -dist / 2, 9], { stroke: color, strokeWidth: 2.2, originX: 'center', originY: 'center' }),
+      new fabric.Line([dist / 2, -9, dist / 2, 9], { stroke: color, strokeWidth: 2.2, originX: 'center', originY: 'center' }),
+      new fabric.Text(' ' + labelText + ' ', {
+        fontSize: 14,
+        fontWeight: 'bold',
+        fontFamily: 'sans-serif',
+        fill: color,
+        backgroundColor: 'rgba(255,255,255,0.92)',
+        left: 0,
+        top: -15,
+        angle: (angleDeg > 90 || angleDeg < -90) ? 180 : 0,
+        originX: 'center',
+        originY: 'center'
+      })
+    ];
+
+    return new fabric.Group(items, {
+      left: cx,
+      top: cy,
+      angle: angleDeg,
+      originX: 'center',
+      originY: 'center',
+      customType: 'dimension',
+      dimMeta: { text: labelText, length: dist },
+      objId: uid('dim')
+    });
+  }
+
+  function createEquipmentGroup(kind, is3d, color, x, y) {
+    const items = [];
+    if (kind === 'pallet') {
+      if (!is3d) {
+        const w = 74, h = 80;
+        items.push(new fabric.Rect({ width: w, height: h, fill: 'rgba(230, 194, 128, 0.42)', stroke: '#8b5a2b', strokeWidth: 2, originX: 'center', originY: 'center' }));
+        items.push(new fabric.Line([-w / 2, -h * 0.22, w / 2, -h * 0.22], { stroke: 'rgba(139,90,43,0.55)', strokeWidth: 1.2, originX: 'center', originY: 'center' }));
+        items.push(new fabric.Line([-w / 2, h * 0.22, w / 2, h * 0.22], { stroke: 'rgba(139,90,43,0.55)', strokeWidth: 1.2, originX: 'center', originY: 'center' }));
+      } else {
+        const iso = (ix, iy, iz) => ({ x: (-ix * 0.866 + iy * 0.866) * 0.9, y: (ix * 0.5 + iy * 0.5 - iz) * 0.9 });
+        const w = 72, l = 66, h = 12;
+        items.push(new fabric.Polygon([iso(0, 0, h), iso(w, 0, h), iso(w, l, h), iso(0, l, h)], { fill: 'rgba(230, 194, 128, 0.5)', stroke: '#8b5a2b', strokeWidth: 1.5 }));
+        items.push(new fabric.Polygon([iso(w, 0, 0), iso(w, l, 0), iso(w, l, h), iso(w, 0, h)], { fill: 'rgba(212, 163, 89, 0.55)', stroke: '#8b5a2b', strokeWidth: 1.5 }));
+        items.push(new fabric.Polygon([iso(0, l, 0), iso(w, l, 0), iso(w, l, h), iso(0, l, h)], { fill: 'rgba(194, 140, 70, 0.55)', stroke: '#8b5a2b', strokeWidth: 1.5 }));
+      }
+    } else {
+      const c = color || '#15803d';
+      if (!is3d) {
+        const w = 14, h = 68;
+        items.push(new fabric.Rect({ width: w, height: h, fill: 'rgba(255,255,255,0.65)', stroke: c, strokeWidth: 2.2, originX: 'center', originY: 'center' }));
+        items.push(new fabric.Line([-w / 2, -h / 2, w / 2, h / 2], { stroke: c, strokeWidth: 1.2, originX: 'center', originY: 'center' }));
+        items.push(new fabric.Line([w / 2, -h / 2, -w / 2, h / 2], { stroke: c, strokeWidth: 1.2, originX: 'center', originY: 'center' }));
+      } else {
+        const iso = (ix, iy, iz) => ({ x: (-ix * 0.866 + iy * 0.866) * 0.9, y: (ix * 0.5 + iy * 0.5 - iz) * 0.9 });
+        const w = 52, l = 10, h = 115;
+        const pts = [[0, 0], [w, 0], [0, l], [w, l]];
+        pts.forEach(([px, py]) => {
+          const p0 = iso(px, py, 0), p1 = iso(px, py, h);
+          items.push(new fabric.Line([p0.x, p0.y, p1.x, p1.y], { stroke: c, strokeWidth: 2 }));
+        });
+        items.push(new fabric.Polygon([iso(0, 0, h), iso(w, 0, h), iso(w, l, h), iso(0, l, h)], { fill: 'rgba(255,255,255,0.2)', stroke: c, strokeWidth: 1.8 }));
+        items.push(new fabric.Polygon([iso(0, 0, 0), iso(w, 0, 0), iso(w, l, 0), iso(0, l, 0)], { fill: 'transparent', stroke: c, strokeWidth: 1.8 }));
+      }
+    }
+
+    return new fabric.Group(items, {
+      left: x,
+      top: y,
+      originX: 'center',
+      originY: 'center',
+      customType: 'equipment',
+      equipMeta: { kind, is3d, color },
+      objId: uid('eq')
+    });
+  }
+
+  // ==================== Multi-Tier Rack / Shelf Diagram Builder ====================
+  function buildRackDiagramGroup(config, x, y) {
+    const theme = RACK_THEMES[config.theme] || RACK_THEMES.blue;
+    const tiers = Math.max(2, Math.min(8, parseInt(config.tiers, 10) || 4));
+    const mIndex = typeof config.mIndex === 'number' ? config.mIndex : -1;
+    const heights = config.heights || {};
+    const style = config.style || '3d';
+    const name = (config.name || '多層貨架').trim();
+
+    const items = [];
+    const totalH = 300;
+    const gap = totalH / (tiers - 1);
+
+    // Outer dashed card frame
+    items.push(new fabric.Rect({
+      left: -18,
+      top: -42,
+      width: 268,
+      height: totalH + 104,
+      rx: 8,
+      ry: 8,
+      fill: 'rgba(255,255,255,0.95)',
+      stroke: theme.box,
+      strokeWidth: 1.8,
+      strokeDashArray: [6, 4]
+    }));
+
+    // Title
+    items.push(new fabric.Text('■ ' + name, {
+      left: -6,
+      top: -32,
+      fontSize: 15,
+      fontWeight: 'bold',
+      fontFamily: 'sans-serif',
+      fill: theme.title
+    }));
+
+    if (style === '3d') {
+      // 4 vertical 3D frame posts
+      [[28, 8, 28, 8 + totalH], [138, 8, 138, 8 + totalH], [4, 34, 4, 34 + totalH], [114, 34, 114, 34 + totalH]].forEach(pts => {
+        items.push(new fabric.Line(pts, { stroke: theme.stroke, strokeWidth: 3 }));
+      });
+    } else {
+      // 2D elevation posts
+      items.push(new fabric.Line([14, 8, 14, 18 + totalH], { stroke: theme.stroke, strokeWidth: 4 }));
+      items.push(new fabric.Line([134, 8, 134, 18 + totalH], { stroke: theme.stroke, strokeWidth: 4 }));
+    }
+
+    for (let i = 0; i < tiers; i++) {
+      const yPos = 8 + i * gap;
+      let levelName = '';
+      let badgeFill = '#eab308';
+      let badgeText = '#0f172a';
+      let shortTag = 'L' + (tiers - i);
+
+      if (i === 0) {
+        levelName = 'Top'; shortTag = 'T'; badgeFill = '#ff66b2'; badgeText = '#0f172a';
+      } else if (i === tiers - 1) {
+        levelName = 'Bottom'; shortTag = 'B'; badgeFill = '#3366cc'; badgeText = '#ffffff';
+      } else if (i === mIndex) {
+        levelName = 'Middle'; shortTag = 'M'; badgeFill = '#9c27b0'; badgeText = '#ffffff';
+      } else {
+        levelName = 'Level ' + (tiers - i);
+      }
+
+      const hVal = heights[i] !== undefined ? heights[i] : 0;
+
+      if (style === '3d') {
+        items.push(new fabric.Polygon([
+          { x: 28, y: yPos },
+          { x: 138, y: yPos },
+          { x: 114, y: yPos + 26 },
+          { x: 4, y: yPos + 26 }
+        ], {
+          fill: i === 0 ? '#ffffff' : theme.plane,
+          stroke: theme.stroke,
+          strokeWidth: 2
+        }));
+
+        // Sensor puck on tier center
+        items.push(new fabric.Ellipse({
+          left: 71,
+          top: yPos + 13,
+          rx: 12,
+          ry: 5,
+          fill: badgeFill,
+          stroke: '#0f172a',
+          strokeWidth: 1,
+          originX: 'center',
+          originY: 'center'
+        }));
+      } else {
+        items.push(new fabric.Rect({
+          left: 14,
+          top: yPos,
+          width: 120,
+          height: 10,
+          fill: i === 0 ? '#ffffff' : theme.plane,
+          stroke: theme.stroke,
+          strokeWidth: 2
+        }));
+        items.push(new fabric.Circle({
+          left: 74,
+          top: yPos + 5,
+          radius: 8,
+          fill: badgeFill,
+          stroke: '#0f172a',
+          strokeWidth: 1,
+          originX: 'center',
+          originY: 'center'
+        }));
+        items.push(new fabric.Text(shortTag, {
+          left: 74,
+          top: yPos + 5,
+          fontSize: 9,
+          fontWeight: 'bold',
+          fontFamily: 'sans-serif',
+          fill: badgeText,
+          originX: 'center',
+          originY: 'center'
+        }));
+      }
+
+      // Right-side level + height label
+      const labelY = style === '3d' ? yPos + 6 : yPos - 2;
+      items.push(new fabric.Text(`${levelName} (${hVal} cm)`, {
+        left: 148,
+        top: labelY,
+        fontSize: 12,
+        fontWeight: 'bold',
+        fontFamily: 'sans-serif',
+        fill: '#0f172a'
+      }));
+    }
+
+    return new fabric.Group(items, {
+      left: x,
+      top: y,
+      originX: 'center',
+      originY: 'center',
+      borderColor: theme.box,
+      cornerColor: theme.box,
+      customType: 'rackDiagram',
+      rackConfig: JSON.parse(JSON.stringify({ name, tiers, mIndex, style, theme: config.theme, heights })),
+      objId: uid('rack')
+    });
+  }
+
+  // ==================== Rack Configurator Panel Logic ====================
+  function syncRackMSelect() {
+    const tiers = Math.max(2, Math.min(8, parseInt(document.getElementById('rack-tiers').value, 10) || 4));
+    const sel = document.getElementById('rack-m-tier');
+    const prevVal = parseInt(sel.value, 10);
+    sel.innerHTML = '';
+
+    if (tiers <= 2) {
+      const opt = document.createElement('option');
+      opt.value = '-1';
+      opt.textContent = '無';
+      sel.appendChild(opt);
+      sel.disabled = true;
+    } else {
+      sel.disabled = false;
+      const noneOpt = document.createElement('option');
+      noneOpt.value = '-1';
+      noneOpt.textContent = '無';
+      sel.appendChild(noneOpt);
+      for (let i = 1; i < tiers - 1; i++) {
+        const opt = document.createElement('option');
+        opt.value = String(i);
+        opt.textContent = `第 ${i + 1} 層`;
+        sel.appendChild(opt);
+      }
+      if (!isNaN(prevVal) && prevVal >= 1 && prevVal < tiers - 1) {
+        sel.value = String(prevVal);
+      } else {
+        sel.value = String(Math.floor((tiers - 1) / 2));
+      }
+    }
+    renderRackHeightInputs();
+  }
+
+  function renderRackHeightInputs() {
+    const tiers = Math.max(2, Math.min(8, parseInt(document.getElementById('rack-tiers').value, 10) || 4));
+    const mIndex = parseInt(document.getElementById('rack-m-tier').value, 10);
+    const grid = document.getElementById('rack-heights-grid');
+    grid.innerHTML = '';
+
+    for (let i = 0; i < tiers; i++) {
+      let shortName = 'L' + (tiers - i);
+      if (i === 0) shortName = 'T (Top)';
+      else if (i === tiers - 1) shortName = 'B (Bot)';
+      else if (i === mIndex) shortName = 'M (Mid)';
+
+      if (rackHeightsState[i] === undefined) {
+        rackHeightsState[i] = Math.max(10, Math.round(240 - i * (220 / Math.max(1, tiers - 1))));
+      }
+
+      const item = document.createElement('label');
+      item.className = 'rack-height-item';
+      const span = document.createElement('span');
+      span.textContent = shortName;
+      const inp = document.createElement('input');
+      inp.type = 'number';
+      inp.value = rackHeightsState[i];
+      inp.setAttribute('data-testid', `rack-height-${i}`);
+      inp.oninput = () => {
+        rackHeightsState[i] = parseFloat(inp.value) || 0;
+      };
+      item.appendChild(span);
+      item.appendChild(inp);
+      grid.appendChild(item);
+    }
+  }
+
+  function readRackConfigFromUI() {
+    const tiers = Math.max(2, Math.min(8, parseInt(document.getElementById('rack-tiers').value, 10) || 4));
+    const mIndex = parseInt(document.getElementById('rack-m-tier').value, 10);
+    const heights = {};
+    for (let i = 0; i < tiers; i++) {
+      heights[i] = rackHeightsState[i] !== undefined ? rackHeightsState[i] : 0;
+    }
+    return {
+      name: document.getElementById('rack-name').value.trim() || '多層貨架',
+      tiers,
+      mIndex: isNaN(mIndex) ? -1 : mIndex,
+      style: document.getElementById('rack-style').value,
+      theme: document.getElementById('rack-theme').value,
+      heights
+    };
+  }
+
+  function populateRackUIFromConfig(cfg) {
+    if (!cfg) return;
+    document.getElementById('rack-name').value = cfg.name || '多層貨架';
+    document.getElementById('rack-tiers').value = cfg.tiers || 4;
+    document.getElementById('rack-style').value = cfg.style || '3d';
+    document.getElementById('rack-theme').value = cfg.theme || 'blue';
+    rackHeightsState = Object.assign({}, rackHeightsState, cfg.heights || {});
+    syncRackMSelect();
+    if (cfg.mIndex !== undefined) {
+      document.getElementById('rack-m-tier').value = String(cfg.mIndex);
+    }
+    renderRackHeightInputs();
+  }
+
+  function insertRackToCanvas() {
+    const tab = getActiveTab();
+    if (!tab || !canvas) return;
+    const cfg = readRackConfigFromUI();
+    const x = Math.round(tab.virtualWidth * 0.78);
+    const y = Math.round(tab.virtualHeight * 0.45);
+    const group = buildRackDiagramGroup(cfg, x, y);
+    racksVisible = true;
+    canvas.add(group);
+    keepLabelsOnTop();
+    canvas.setActiveObject(group);
+    canvas.renderAll();
+    pushUndoSnapshot();
+    updateInspector();
+    showToast(`已插入「${cfg.name}」(${cfg.tiers}層)`, 'success');
+  }
+
+  function updateSelectedRack() {
+    const obj = canvas.getActiveObject();
+    if (!obj || obj.customType !== 'rackDiagram') return;
+    const cfg = readRackConfigFromUI();
+    const updated = buildRackDiagramGroup(cfg, obj.left, obj.top);
+    updated.set({ scaleX: obj.scaleX, scaleY: obj.scaleY, angle: obj.angle });
+    canvas.remove(obj);
+    canvas.add(updated);
+    keepLabelsOnTop();
+    canvas.setActiveObject(updated);
+    canvas.renderAll();
+    pushUndoSnapshot();
+    showToast(`已更新貨架圖「${cfg.name}」`, 'success');
+  }
+
+  function toggleRacksVisibility() {
+    if (!canvas) return;
+    racksVisible = !racksVisible;
+    let count = 0;
+    canvas.getObjects().forEach(o => {
+      if (o.customType === 'rackDiagram') {
+        o.visible = racksVisible;
+        count++;
+      }
+    });
+    canvas.discardActiveObject();
+    canvas.renderAll();
+    showToast(count ? (racksVisible ? `已顯示 ${count} 組貨架圖` : `已隱藏 ${count} 組貨架圖`) : '目前畫布上尚無貨架圖');
+  }
+
+  // ==================== Placement Mode Management ====================
+  const TOOL_NAMES = {
+    'arrow': '動線箭頭',
+    'mask-rect': '白色方形遮罩 (點擊或拖曳)',
+    'mask-circle': '白色圓形遮罩 (點擊或拖曳)',
+    'label': '區域文字標籤',
+    'legend-flow': '動線圖例',
+    'legend-hvac': '點位/空調圖例',
+    'draw-rect': '自訂方框 (點擊或拖曳)',
+    'free-arrow': '自由箭頭 (拖曳或點擊)',
+    'marker-T': 'T 點位 (連續點擊放置)',
+    'marker-M': 'M 點位 (連續點擊放置)',
+    'marker-B': 'B 點位 (連續點擊放置)',
+    'hvac-sa': 'SA 出風口',
+    'hvac-ra': 'RA 回風口',
+    'hvac-sad': 'SA-D 向下出風',
+    'hvac-rau': 'RA-U 向上回風',
+    'sa-dir': 'SA 出風方向箭頭 (拖曳或點擊)',
+    'ra-dir': 'RA 回風方向箭頭 (拖曳或點擊)',
+    'dimension': '尺寸標註線 (拖曳或點擊)',
+    'pallet': '棧板 / 設備方塊',
+    'pillar': '立柱'
+  };
+
+  function setPlacementMode(tool, meta) {
+    activeTool = tool;
+    activeToolMeta = meta || {};
+    isDrawing = false;
+    if (previewObj && canvas) {
+      canvas.remove(previewObj);
+      previewObj = null;
+    }
+
+    document.querySelectorAll('[data-tool]').forEach(btn => btn.classList.remove('btn-active'));
+    const banner = document.getElementById('mode-banner');
+    const label = document.getElementById('mode-label');
+    const cancelBtn = document.getElementById('btn-cancel-mode');
+
+    if (tool) {
+      let selector = `[data-tool="${tool}"]`;
+      if (tool === 'arrow' && activeToolMeta.dir) {
+        selector += `[data-dir="${activeToolMeta.dir}"]`;
+      }
+      const btn = document.querySelector(selector);
+      if (btn) btn.classList.add('btn-active');
+
+      banner.classList.add('placing');
+      label.textContent = '📍 放置中：' + (TOOL_NAMES[tool] || tool);
+      cancelBtn.style.display = 'inline-flex';
+      if (canvas) {
+        canvas.defaultCursor = 'crosshair';
+        canvas.selection = false;
+        canvas.discardActiveObject();
+        canvas.forEachObject(o => { o.selectable = false; o.evented = false; });
+        canvas.renderAll();
+      }
+      closeMobileDock();
+    } else {
+      banner.classList.remove('placing');
+      label.textContent = '🖱️ 選取 / 編輯模式';
+      cancelBtn.style.display = 'none';
+      if (canvas) {
+        canvas.defaultCursor = 'default';
+        canvas.selection = true;
+        canvas.forEachObject(o => { o.selectable = true; o.evented = true; });
+        canvas.renderAll();
+      }
+    }
+  }
+
+  // ==================== Canvas Interaction ====================
+  function initCanvas() {
+    canvas = new fabric.Canvas('studio-canvas', {
+      preserveObjectStacking: true,
+      selection: true,
+      backgroundColor: '#ffffff'
+    });
+
+    fabric.Object.prototype.set({
+      transparentCorners: false,
+      cornerColor: '#2563eb',
+      cornerStrokeColor: '#ffffff',
+      borderColor: '#2563eb',
+      cornerSize: 9,
+      padding: 4,
+      cornerStyle: 'circle'
+    });
+
+    // Keep flow arrow badge upright when rotated
+    canvas.on('object:rotating', (opt) => {
+      if (opt.target && opt.target.customType === 'flowArrow') {
+        keepArrowTextUpright(opt.target);
+      }
+    });
+
+    canvas.on('selection:created', updateInspector);
+    canvas.on('selection:updated', updateInspector);
+    canvas.on('selection:cleared', updateInspector);
+
+    canvas.on('object:modified', (opt) => {
+      if (opt.target && opt.target.customType === 'flowArrow') {
+        keepArrowTextUpright(opt.target);
+      }
+      keepLabelsOnTop();
+      pushUndoSnapshot();
+    });
+
+    canvas.on('text:changed', () => {
+      scheduleAutoSave();
+    });
+
+    canvas.on('text:editing:exited', () => {
+      pushUndoSnapshot();
+    });
+
+    // Double-click custom edit for markers & dimension lines
+    canvas.on('mouse:dblclick', async (opt) => {
+      if (activeTool || !opt.target) return;
+      const obj = opt.target;
+      if (obj.customType === 'marker') {
+        const val = await openModal({
+          mode: 'prompt',
+          title: `編輯 ${obj.markerType} 點位編號`,
+          desc: '請輸入新的編號或代碼（例如：1、A1、T-01）：',
+          defaultValue: obj.markerNumber || '1'
+        });
+        if (val !== null && val.trim() !== '') {
+          const updated = createMarkerGroup(obj.markerType, val.trim().slice(0, 8), obj.left, obj.top);
+          updated.set({ scaleX: obj.scaleX, scaleY: obj.scaleY, angle: obj.angle });
+          canvas.remove(obj);
+          canvas.add(updated);
+          keepLabelsOnTop();
+          canvas.setActiveObject(updated);
+          canvas.renderAll();
+          pushUndoSnapshot();
+          updateInspector();
+        }
+      } else if (obj.customType === 'dimension') {
+        const val = await openModal({
+          mode: 'prompt',
+          title: '編輯尺寸標註文字',
+          desc: '請輸入尺寸或距離備註（例如：3.5 m、120 cm）：',
+          defaultValue: (obj.dimMeta && obj.dimMeta.text) || ''
+        });
+        if (val !== null && val.trim() !== '') {
+          const len = (obj.dimMeta && obj.dimMeta.length) || 140;
+          const rad = (obj.angle || 0) * Math.PI / 180;
+          const x1 = obj.left - Math.cos(rad) * len / 2;
+          const y1 = obj.top - Math.sin(rad) * len / 2;
+          const x2 = obj.left + Math.cos(rad) * len / 2;
+          const y2 = obj.top + Math.sin(rad) * len / 2;
+          const updated = createDimensionGroup(x1, y1, x2, y2, val.trim());
+          updated.set({ scaleX: obj.scaleX, scaleY: obj.scaleY });
+          canvas.remove(obj);
+          canvas.add(updated);
+          keepLabelsOnTop();
+          canvas.setActiveObject(updated);
+          canvas.renderAll();
+          pushUndoSnapshot();
+          updateInspector();
+        }
+      }
+    });
+
+    // Mouse Down
+    canvas.on('mouse:down', (opt) => {
+      // Ctrl+Drag duplicate in select mode
+      if (!activeTool && opt.target && (opt.e.ctrlKey || opt.e.metaKey)) {
+        if (!opt.transform || opt.transform.action === 'drag') {
+          ctrlDragPending = true;
+          ctrlDragOrigin = { left: opt.target.left, top: opt.target.top };
+        }
+        return;
+      }
+
+      if (!activeTool) return;
+      const ptr = canvas.getPointer(opt.e);
+      drawStart = { x: ptr.x, y: ptr.y };
+
+      // Drag-capable tools
+      if (['mask-rect', 'mask-circle', 'draw-rect', 'free-arrow', 'sa-dir', 'ra-dir', 'dimension'].includes(activeTool)) {
+        isDrawing = true;
+        const drawColor = document.getElementById('draw-custom-color').value;
+        if (activeTool === 'mask-rect') {
+          previewObj = new fabric.Rect({
+            left: ptr.x, top: ptr.y, width: 1, height: 1,
+            fill: '#ffffff', stroke: '#cbd5e1', strokeWidth: 1, strokeDashArray: [4, 3],
+            originX: 'center', originY: 'center', selectable: false, evented: false
+          });
+        } else if (activeTool === 'mask-circle') {
+          previewObj = new fabric.Circle({
+            left: ptr.x, top: ptr.y, radius: 1,
+            fill: '#ffffff', stroke: '#cbd5e1', strokeWidth: 1, strokeDashArray: [4, 3],
+            originX: 'center', originY: 'center', selectable: false, evented: false
+          });
+        } else if (activeTool === 'draw-rect') {
+          previewObj = new fabric.Rect({
+            left: ptr.x, top: ptr.y, width: 1, height: 1,
+            fill: 'transparent', stroke: drawColor, strokeWidth: 3, strokeDashArray: [5, 4],
+            originX: 'center', originY: 'center', selectable: false, evented: false
+          });
+        } else {
+          const strokeC = activeTool === 'sa-dir' ? '#007bff' : activeTool === 'ra-dir' ? '#fd7e14' : activeTool === 'dimension' ? '#dc2626' : drawColor;
+          previewObj = new fabric.Line([ptr.x, ptr.y, ptr.x, ptr.y], {
+            stroke: strokeC, strokeWidth: 3, strokeDashArray: [5, 4],
+            selectable: false, evented: false
+          });
+        }
+        canvas.add(previewObj);
+        canvas.renderAll();
+        return;
+      }
+
+      // Single-click placement tools
+      const tab = getActiveTab();
+      let placed = null;
+      let exitAfter = false;
+
+      if (activeTool === 'arrow') {
+        const label = document.getElementById('arrow-custom-label').value || 'P';
+        const color = document.getElementById('arrow-custom-color').value || '#2563eb';
+        placed = createFlowArrowGroup({ color, label, dir: activeToolMeta.dir || 'right', x: ptr.x, y: ptr.y });
+      } else if (activeTool === 'label') {
+        placed = new fabric.IText('區域名稱', {
+          left: ptr.x,
+          top: ptr.y,
+          fontSize: 20,
+          fontWeight: 'bold',
+          fontFamily: 'sans-serif',
+          fill: '#0f172a',
+          backgroundColor: 'rgba(255,255,255,0.92)',
+          textAlign: 'center',
+          originX: 'center',
+          originY: 'center',
+          padding: 6,
+          borderColor: '#7c3aed',
+          cornerColor: '#7c3aed',
+          customType: 'label',
+          isAlwaysTop: true,
+          objId: uid('lbl')
+        });
+        exitAfter = true;
+      } else if (activeTool === 'legend-flow') {
+        placed = createFlowLegend(ptr.x, ptr.y);
+        exitAfter = true;
+      } else if (activeTool === 'legend-hvac') {
+        placed = createHvacLegend(ptr.x, ptr.y);
+        exitAfter = true;
+      } else if (activeTool.startsWith('marker-')) {
+        const mType = activeTool.split('-')[1];
+        const nextNum = parseInt(document.getElementById('next-marker-num').value, 10) || tab.sensorCounter || 1;
+        placed = createMarkerGroup(mType, nextNum, ptr.x, ptr.y);
+        tab.sensorCounter = nextNum + 1;
+        document.getElementById('next-marker-num').value = tab.sensorCounter;
+      } else if (activeTool.startsWith('hvac-')) {
+        placed = createHvacIconGroup(activeTool, ptr.x, ptr.y);
+      } else if (activeTool === 'pallet' || activeTool === 'pillar') {
+        const is3d = document.getElementById('equip-view-mode').value === '3d';
+        const pColor = document.getElementById('pillar-color').value;
+        placed = createEquipmentGroup(activeTool, is3d, pColor, ptr.x, ptr.y);
+      }
+
+      if (placed) {
+        canvas.add(placed);
+        keepLabelsOnTop();
+        if (exitAfter) {
+          setPlacementMode(null);
+          canvas.setActiveObject(placed);
+          if (placed.type === 'i-text') {
+            placed.enterEditing();
+            placed.selectAll();
+          }
+        } else {
+          placed.selectable = false;
+          placed.evented = false;
+        }
+        canvas.renderAll();
+        pushUndoSnapshot();
+        updateInspector();
+      }
+    });
+
+    // Mouse Move
+    canvas.on('mouse:move', (opt) => {
+      if (!isDrawing || !previewObj) return;
+      const ptr = canvas.getPointer(opt.e);
+      const w = Math.abs(ptr.x - drawStart.x);
+      const h = Math.abs(ptr.y - drawStart.y);
+      const midX = (drawStart.x + ptr.x) / 2;
+      const midY = (drawStart.y + ptr.y) / 2;
+
+      if (activeTool === 'mask-rect' || activeTool === 'draw-rect') {
+        previewObj.set({ left: midX, top: midY, width: Math.max(2, w), height: Math.max(2, h) });
+      } else if (activeTool === 'mask-circle') {
+        previewObj.set({ left: midX, top: midY, radius: Math.max(2, Math.hypot(w, h) / 2) });
+      } else {
+        previewObj.set({ x2: ptr.x, y2: ptr.y });
+      }
+      canvas.renderAll();
+    });
+
+    // Ctrl+Drag clone on first move
+    canvas.on('object:moving', (opt) => {
+      if (ctrlDragPending && opt.target) {
+        ctrlDragPending = false;
+        const origin = { left: ctrlDragOrigin.left, top: ctrlDragOrigin.top };
+        opt.target.clone((cloned) => {
+          if (cloned.type === 'activeSelection') {
+            cloned.set({ left: origin.left, top: origin.top });
+            cloned.getObjects().forEach(o => {
+              const m = fabric.util.multiplyTransformMatrices(cloned.calcTransformMatrix(), o.calcTransformMatrix());
+              const d = fabric.util.qrDecompose(m);
+              o.set({
+                left: d.translateX, top: d.translateY,
+                scaleX: d.scaleX, scaleY: d.scaleY,
+                angle: d.angle, evented: true, selectable: true
+              });
+              canvas.add(o);
+            });
+          } else {
+            cloned.set({ left: origin.left, top: origin.top, evented: true, selectable: true, objId: uid('dup') });
+            canvas.add(cloned);
+          }
+          keepLabelsOnTop();
+          canvas.renderAll();
+        }, CUSTOM_PROPS);
+      }
+    });
+
+    // Mouse Up
+    canvas.on('mouse:up', async (opt) => {
+      ctrlDragPending = false;
+      if (!isDrawing) return;
+      isDrawing = false;
+      const ptr = canvas.getPointer(opt.e);
+      if (previewObj) {
+        canvas.remove(previewObj);
+        previewObj = null;
+      }
+
+      const w = Math.abs(ptr.x - drawStart.x);
+      const h = Math.abs(ptr.y - drawStart.y);
+      const dist = Math.hypot(ptr.x - drawStart.x, ptr.y - drawStart.y);
+      const midX = (drawStart.x + ptr.x) / 2;
+      const midY = (drawStart.y + ptr.y) / 2;
+      const drawColor = document.getElementById('draw-custom-color').value;
+
+      let created = null;
+
+      if (activeTool === 'mask-rect') {
+        created = new fabric.Rect({
+          left: dist < 10 ? drawStart.x : midX,
+          top: dist < 10 ? drawStart.y : midY,
+          width: dist < 10 ? 120 : Math.max(16, w),
+          height: dist < 10 ? 60 : Math.max(16, h),
+          fill: '#ffffff',
+          stroke: null,
+          strokeWidth: 0,
+          originX: 'center',
+          originY: 'center',
+          borderColor: '#94a3b8',
+          cornerColor: '#94a3b8',
+          customType: 'maskRect',
+          isMask: true,
+          objId: uid('mr')
+        });
+      } else if (activeTool === 'mask-circle') {
+        created = new fabric.Circle({
+          left: dist < 10 ? drawStart.x : midX,
+          top: dist < 10 ? drawStart.y : midY,
+          radius: dist < 10 ? 40 : Math.max(12, dist / 2),
+          fill: '#ffffff',
+          stroke: null,
+          strokeWidth: 0,
+          originX: 'center',
+          originY: 'center',
+          borderColor: '#94a3b8',
+          cornerColor: '#94a3b8',
+          customType: 'maskCircle',
+          isMask: true,
+          objId: uid('mc')
+        });
+      } else if (activeTool === 'draw-rect') {
+        created = new fabric.Rect({
+          left: dist < 10 ? drawStart.x : midX,
+          top: dist < 10 ? drawStart.y : midY,
+          width: dist < 10 ? 120 : Math.max(16, w),
+          height: dist < 10 ? 80 : Math.max(16, h),
+          fill: 'transparent',
+          stroke: drawColor,
+          strokeWidth: 3,
+          originX: 'center',
+          originY: 'center',
+          customType: 'drawRect',
+          objId: uid('dr')
+        });
+      } else if (activeTool === 'sa-dir' || activeTool === 'ra-dir' || activeTool === 'free-arrow') {
+        const x1 = dist < 12 ? drawStart.x - 55 : drawStart.x;
+        const y1 = dist < 12 ? drawStart.y : drawStart.y;
+        const x2 = dist < 12 ? drawStart.x + 55 : ptr.x;
+        const y2 = dist < 12 ? drawStart.y : ptr.y;
+        const opts = activeTool === 'sa-dir'
+          ? { color: '#007bff', dashed: false, label: 'SA', customType: 'saDir' }
+          : activeTool === 'ra-dir'
+            ? { color: '#fd7e14', dashed: true, label: 'RA', customType: 'raDir' }
+            : { color: drawColor, dashed: false, label: '', customType: 'freeArrow' };
+        created = createVectorArrowGroup(x1, y1, x2, y2, opts);
+      } else if (activeTool === 'dimension') {
+        const x1 = dist < 12 ? drawStart.x - 80 : drawStart.x;
+        const y1 = dist < 12 ? drawStart.y : drawStart.y;
+        const x2 = dist < 12 ? drawStart.x + 80 : ptr.x;
+        const y2 = dist < 12 ? drawStart.y : ptr.y;
+        const val = await openModal({
+          mode: 'prompt',
+          title: '輸入尺寸標註文字',
+          desc: '請輸入長度或距離標註（例如：3.5 m、120 cm）：',
+          defaultValue: '3.0 m',
+          placeholder: '例如：3.5 m'
+        });
+        if (val !== null && val.trim() !== '') {
+          created = createDimensionGroup(x1, y1, x2, y2, val.trim());
+        }
+      }
+
+      if (created) {
+        canvas.add(created);
+        keepLabelsOnTop();
+        setPlacementMode(null);
+        canvas.setActiveObject(created);
+        canvas.renderAll();
+        pushUndoSnapshot();
+        updateInspector();
+      }
+    });
+  }
+
+  // ==================== Inspector ====================
+  function updateInspector() {
+    const box = document.getElementById('inspector-box');
+    const updateRackBtn = document.getElementById('btn-update-rack');
+    const obj = canvas ? canvas.getActiveObject() : null;
+
+    updateRackBtn.disabled = !(obj && obj.customType === 'rackDiagram');
+
+    if (!obj) {
+      box.innerHTML = '<div style="color:var(--text-muted);font-size:11.5px;">尚未選取物件。點擊畫布上任一物件即可調整屬性、複製、分層或刪除。</div>';
+      return;
+    }
+
+    if (obj.customType === 'rackDiagram' && obj.rackConfig) {
+      populateRackUIFromConfig(obj.rackConfig);
+    }
+
+    const typeNames = {
+      flowArrow: '動線箭頭',
+      maskRect: '白色方形遮罩',
+      maskCircle: '白色圓形遮罩',
+      label: '區域文字標籤 (置頂)',
+      legend: '圖例卡片 (置頂)',
+      marker: `點位標記 (${obj.markerType || ''})`,
+      'hvac-sa': 'SA 出風口',
+      'hvac-ra': 'RA 回風口',
+      'hvac-sad': 'SA-D 向下出風',
+      'hvac-rau': 'RA-U 向上回風',
+      saDir: 'SA 出風方向',
+      raDir: 'RA 回風方向',
+      dimension: '尺寸標註線',
+      equipment: '設備 / 棧板 / 立柱',
+      rackDiagram: '多層貨架圖',
+      drawRect: '自訂方框',
+      freeArrow: '自由箭頭'
+    };
+
+    const label = typeNames[obj.customType] || (obj.type === 'activeSelection' ? `多選物件 (${obj.getObjects().length})` : obj.type);
+    const opacityPct = Math.round((obj.opacity !== undefined ? obj.opacity : 1) * 100);
+
+    box.innerHTML = `
+      <div style="font-weight:700;margin-bottom:6px;color:var(--text-main);">已選：${label}</div>
+      <div class="row-flex" style="margin-bottom:6px;justify-content:space-between;">
+        <span style="font-size:11px;color:var(--text-muted);">透明度: <strong id="insp-op-val">${opacityPct}%</strong></span>
+        <input type="range" id="insp-opacity" min="15" max="100" value="${opacityPct}" style="width:130px;">
+      </div>
+      <div class="grid-2" style="margin-bottom:4px;">
+        <button type="button" class="btn btn-xs" id="insp-fwd">↑ 上移一層</button>
+        <button type="button" class="btn btn-xs" id="insp-bwd">↓ 下移一層</button>
+      </div>
+      ${obj.customType === 'marker' ? `<div style="font-size:11px;color:#2563eb;margin-top:4px;">提示：雙擊點位可修改編號 (目前: ${obj.markerNumber})</div>` : ''}
+      ${obj.customType === 'dimension' ? `<div style="font-size:11px;color:#2563eb;margin-top:4px;">提示：雙擊尺寸線可修改文字</div>` : ''}
+      ${obj.customType === 'rackDiagram' ? `<div style="font-size:11px;color:#2563eb;margin-top:4px;">提示：可在上方「層架圖產生器」修改後點「更新已選」</div>` : ''}
+    `;
+
+    document.getElementById('insp-opacity').oninput = function () {
+      const v = parseInt(this.value, 10) / 100;
+      document.getElementById('insp-op-val').textContent = this.value + '%';
+      obj.set('opacity', v);
+      canvas.renderAll();
+    };
+    document.getElementById('insp-opacity').onchange = () => pushUndoSnapshot();
+    document.getElementById('insp-fwd').onclick = () => {
+      canvas.bringForward(obj);
+      keepLabelsOnTop();
+      canvas.renderAll();
+      pushUndoSnapshot();
+    };
+    document.getElementById('insp-bwd').onclick = () => {
+      canvas.sendBackwards(obj);
+      keepLabelsOnTop();
+      canvas.renderAll();
+      pushUndoSnapshot();
+    };
+  }
+
+  // ==================== Edit Actions ====================
+  function deleteSelected() {
+    if (!canvas) return;
+    const actives = canvas.getActiveObjects();
+    if (!actives.length) return;
+    canvas.discardActiveObject();
+    actives.forEach(o => canvas.remove(o));
+    canvas.renderAll();
+    pushUndoSnapshot();
+    updateInspector();
+  }
+
+  function copySelected() {
+    if (!canvas) return;
+    const active = canvas.getActiveObject();
+    if (!active) return;
+    active.clone((cloned) => {
+      clipboardObj = cloned;
+      showToast('已複製選取物件');
+    }, CUSTOM_PROPS);
+  }
+
+  function pasteClipboard() {
+    if (!canvas || !clipboardObj) return;
+    clipboardObj.clone((cloned) => {
+      canvas.discardActiveObject();
+      cloned.set({
+        left: cloned.left + 28,
+        top: cloned.top + 28,
+        evented: true,
+        selectable: true
+      });
+      if (cloned.type === 'activeSelection') {
+        cloned.canvas = canvas;
+        cloned.forEachObject(o => {
+          o.objId = uid('p');
+          canvas.add(o);
+        });
+        cloned.setCoords();
+      } else {
+        cloned.objId = uid('p');
+        canvas.add(cloned);
+      }
+      clipboardObj.left += 28;
+      clipboardObj.top += 28;
+      keepLabelsOnTop();
+      canvas.setActiveObject(cloned);
+      canvas.renderAll();
+      pushUndoSnapshot();
+      updateInspector();
+    }, CUSTOM_PROPS);
+  }
+
+  function duplicateSelected() {
+    if (!canvas) return;
+    const active = canvas.getActiveObject();
+    if (!active) {
+      showToast('請先選取要複製的物件', 'warn');
+      return;
+    }
+    active.clone((cloned) => {
+      clipboardObj = cloned;
+      pasteClipboard();
+    }, CUSTOM_PROPS);
+  }
+
+  function bringToFrontSelected() {
+    const active = canvas && canvas.getActiveObject();
+    if (!active) return;
+    canvas.bringToFront(active);
+    keepLabelsOnTop();
+    canvas.renderAll();
+    pushUndoSnapshot();
+  }
+
+  function sendToBackSelected() {
+    const active = canvas && canvas.getActiveObject();
+    if (!active) return;
+    canvas.sendToBack(active);
+    keepLabelsOnTop();
+    canvas.renderAll();
+    pushUndoSnapshot();
+  }
+
+  // ==================== Base Map Upload & Templates ====================
+  function handleBaseMapUpload(file) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async (ev) => {
+      const dataUrl = ev.target.result;
+      const tab = getActiveTab();
+      if (!tab) return;
+      tab.bgDataUrl = dataUrl;
+      tab.templateId = 'custom';
+      const img = await loadBgAsync(dataUrl);
+      if (img && img.width && img.height) {
+        tab.virtualWidth = img.width;
+        tab.virtualHeight = img.height;
+      }
+      fitCanvasToViewport();
+      document.getElementById('status-size').textContent = `畫布：${tab.virtualWidth} × ${tab.virtualHeight}`;
+      pushUndoSnapshot();
+      showToast('已套用自訂底圖', 'success');
+    };
+    reader.readAsDataURL(file);
+  }
+
+  async function applySelectedTemplate() {
+    const tplId = document.getElementById('select-template').value;
+    const tab = getActiveTab();
+    if (!tab) return;
+    const tpl = getTemplateAsset(tplId);
+    tab.templateId = tplId;
+    tab.bgDataUrl = tpl.dataUrl;
+    tab.virtualWidth = tpl.width;
+    tab.virtualHeight = tpl.height;
+    await loadBgAsync(tab.bgDataUrl);
+    fitCanvasToViewport();
+    document.getElementById('status-size').textContent = `畫布：${tab.virtualWidth} × ${tab.virtualHeight}`;
+    pushUndoSnapshot();
+    showToast('已切換畫布底圖範本', 'success');
+  }
+
+  // ==================== Serialization, LocalStorage, Export/Import JSON & PNG ====================
+  function serializeWorkspace() {
+    snapshotActiveTabToMemory();
+    return {
+      version: 1,
+      app: 'FloorPlanFlowLayoutStudio',
+      savedAt: new Date().toISOString(),
+      activeTabId: activeTabId,
+      tabs: tabs.map(t => ({
+        id: t.id,
+        name: t.name,
+        templateId: t.templateId,
+        bgDataUrl: t.bgDataUrl,
+        virtualWidth: t.virtualWidth,
+        virtualHeight: t.virtualHeight,
+        fabricJson: t.fabricJson,
+        sensorCounter: t.sensorCounter
+      }))
+    };
+  }
+
+  async function restoreWorkspaceFromPayload(payload) {
+    if (!payload || !Array.isArray(payload.tabs) || payload.tabs.length === 0) {
+      throw new Error('設定檔格式不正確或缺少分頁資料');
+    }
+    tabs = payload.tabs.map((t, idx) => ({
+      id: t.id || uid('tab'),
+      name: t.name || `區域 ${idx + 1}`,
+      templateId: t.templateId || 'blank',
+      bgDataUrl: t.bgDataUrl || null,
+      virtualWidth: t.virtualWidth || 1200,
+      virtualHeight: t.virtualHeight || 800,
+      fabricJson: t.fabricJson || null,
+      sensorCounter: parseInt(t.sensorCounter, 10) || 1,
+      undoStack: [],
+      redoStack: []
+    }));
+    activeTabId = tabs.some(t => t.id === payload.activeTabId) ? payload.activeTabId : tabs[0].id;
+    renderTabsBar();
+    await renderTabToCanvas(getActiveTab());
+    scheduleAutoSave();
+  }
+
+  function scheduleAutoSave() {
+    if (saveTimer) clearTimeout(saveTimer);
+    document.getElementById('status-save').textContent = '⏳ 儲存中...';
+    saveTimer = setTimeout(() => {
+      try {
+        const json = JSON.stringify(serializeWorkspace());
+        localStorage.setItem(STORAGE_KEY, json);
+        document.getElementById('status-save').textContent = '💾 已自動儲存於瀏覽器';
+      } catch (err) {
+        document.getElementById('status-save').textContent = '⚠️ 底圖較大，請使用「匯出 JSON」保存';
+      }
+    }, 350);
+  }
+
+  function exportWorkspaceJson() {
+    const payload = serializeWorkspace();
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const stamp = new Date().toISOString().slice(0, 10);
+    a.href = url;
+    a.download = `floor_plan_studio_${stamp}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    showToast('已匯出專案設定檔 (.json)', 'success');
+  }
+
+  function importWorkspaceJson(file) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async (ev) => {
+      try {
+        const parsed = JSON.parse(ev.target.result);
+        await restoreWorkspaceFromPayload(parsed);
+        showToast(`已成功匯入專案 (${tabs.length} 個分頁)`, 'success');
+      } catch (err) {
+        showToast('匯入失敗：' + (err.message || 'JSON 格式錯誤'), 'error');
+      }
+    };
+    reader.readAsText(file, 'utf-8');
+  }
+
+  function exportHighResPng() {
+    const tab = getActiveTab();
+    if (!tab || !canvas) return;
+    canvas.discardActiveObject();
+    canvas.renderAll();
+
+    const prevZoom = canvas.getZoom();
+    const prevW = canvas.getWidth();
+    const prevH = canvas.getHeight();
+    const prevVpt = canvas.viewportTransform ? canvas.viewportTransform.slice() : [1, 0, 0, 1, 0, 0];
+
+    canvas.setZoom(1);
+    canvas.setDimensions({ width: tab.virtualWidth, height: tab.virtualHeight });
+    canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
+    canvas.renderAll();
+
+    const dataUrl = canvas.toDataURL({
+      format: 'png',
+      quality: 1,
+      multiplier: 2
+    });
+
+    canvas.setDimensions({ width: prevW, height: prevH });
+    canvas.setZoom(prevZoom);
+    canvas.setViewportTransform(prevVpt);
+    canvas.renderAll();
+
+    const safeName = (tab.name || 'floor_plan').replace(/[\\/:*?"<>|]/g, '_');
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = `${safeName}_高解析配置圖.png`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    showToast('已匯出 2x 高解析 PNG 圖片', 'success');
+  }
+
+  async function clearCurrentCanvas() {
+    const tab = getActiveTab();
+    if (!tab || !canvas) return;
+    const ok = await openModal({
+      mode: 'confirm',
+      title: '清除目前畫布物件',
+      desc: `確定要清除「${tab.name}」畫布上的所有標註與物件嗎？（底圖會保留）`,
+      danger: true,
+      okText: '清除畫布'
+    });
+    if (!ok) return;
+    canvas.discardActiveObject();
+    canvas.getObjects().slice().forEach(o => canvas.remove(o));
+    tab.sensorCounter = 1;
+    document.getElementById('next-marker-num').value = 1;
+    canvas.renderAll();
+    pushUndoSnapshot();
+    updateInspector();
+    showToast('已清除目前畫布物件');
+  }
+
+  async function resetEntireWorkspace() {
+    const ok = await openModal({
+      mode: 'confirm',
+      title: '重置全部工作區',
+      desc: '確定要清空所有分頁、物件與瀏覽器自動儲存快取，恢復為全新初始狀態嗎？',
+      danger: true,
+      okText: '全部重置'
+    });
+    if (!ok) return;
+    if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
+    try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
+    tabs = [createDefaultTab('主區域 1', 'office')];
+    activeTabId = tabs[0].id;
+    renderTabsBar();
+    await renderTabToCanvas(tabs[0]);
+    if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
+    try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
+    document.getElementById('status-save').textContent = '✨ 已重置為乾淨初始狀態';
+    showToast('工作區已完全重置', 'success');
+  }
+
+  // ==================== GAS Cloud Presets ====================
+  function openCloudModal() {
+    const modal = document.getElementById('cloud-modal');
+    const desc = document.getElementById('cloud-mode-desc');
+    const saveRow = document.getElementById('cloud-save-row');
+    const listEl = document.getElementById('cloud-presets-list');
+    modal.classList.add('open');
+
+    if (!isGasEnvironment()) {
+      desc.textContent = '目前為本機瀏覽器模式（非 Google Apps Script 執行環境）。您的進度已自動儲存於本機瀏覽器，並可透過「匯出 / 匯入 JSON」保存與分享。';
+      saveRow.style.display = 'none';
+      listEl.innerHTML = '<div style="padding:12px;text-align:center;color:var(--text-muted);background:#f8fafc;border-radius:6px;">部署至 GAS Web App 後即可啟用雲端儲存庫。</div>';
+      return;
+    }
+
+    desc.textContent = '可將多區域專案透過 Gzip 壓縮分片儲存於 GAS 雲端屬性庫，跨裝置讀取。';
+    saveRow.style.display = 'flex';
+    refreshCloudList();
+  }
+
+  function refreshCloudList() {
+    const listEl = document.getElementById('cloud-presets-list');
+    listEl.innerHTML = '<div style="padding:12px;text-align:center;color:var(--text-muted);">載入雲端清單中...</div>';
+    google.script.run
+      .withSuccessHandler((res) => {
+        if (!res || !res.ok) {
+          listEl.innerHTML = `<div style="padding:12px;color:var(--danger);">${(res && res.error) || '讀取失敗'}</div>`;
+          return;
+        }
+        if (!res.presets.length) {
+          listEl.innerHTML = '<div style="padding:12px;text-align:center;color:var(--text-muted);background:#f8fafc;border-radius:6px;">目前尚未建立任何雲端專案。</div>';
+          return;
+        }
+        listEl.innerHTML = '';
+        res.presets.forEach((p) => {
+          const row = document.createElement('div');
+          row.className = 'preset-item';
+          const info = document.createElement('div');
+          const dt = p.updatedAt ? new Date(p.updatedAt).toLocaleString('zh-TW') : '';
+          info.innerHTML = `<div style="font-weight:700;font-size:12.5px;"></div><div style="font-size:11px;color:var(--text-muted);">${dt} · ${Math.ceil((p.compressedBytes || 0) / 1024)} KB</div>`;
+          info.firstChild.textContent = p.name;
+
+          const acts = document.createElement('div');
+          acts.className = 'row-flex';
+          const loadBtn = document.createElement('button');
+          loadBtn.type = 'button';
+          loadBtn.className = 'btn btn-xs btn-primary';
+          loadBtn.textContent = '載入';
+          loadBtn.onclick = () => loadFromCloud(p.id);
+
+          const delBtn = document.createElement('button');
+          delBtn.type = 'button';
+          delBtn.className = 'btn btn-xs btn-danger';
+          delBtn.textContent = '刪除';
+          delBtn.onclick = () => deleteFromCloud(p.id, p.name);
+
+          acts.appendChild(loadBtn);
+          acts.appendChild(delBtn);
+          row.appendChild(info);
+          row.appendChild(acts);
+          listEl.appendChild(row);
+        });
+      })
+      .withFailureHandler((err) => {
+        listEl.innerHTML = `<div style="padding:12px;color:var(--danger);">連線錯誤：${err.message || err}</div>`;
+      })
+      .listCloudPresets();
+  }
+
+  function saveToCloud() {
+    if (!isGasEnvironment()) return;
+    const nameInput = document.getElementById('cloud-preset-name');
+    const name = nameInput.value.trim() || (getActiveTab().name + ' 專案');
+    const btn = document.getElementById('btn-cloud-save');
+    btn.disabled = true;
+    btn.textContent = '儲存中...';
+    const json = JSON.stringify(serializeWorkspace());
+    google.script.run
+      .withSuccessHandler((res) => {
+        btn.disabled = false;
+        btn.textContent = '儲存目前專案';
+        if (res && res.ok) {
+          nameInput.value = '';
+          showToast(`已儲存至雲端：「${res.preset.name}」`, 'success');
+          refreshCloudList();
+        } else {
+          showToast((res && res.error) || '雲端儲存失敗', 'error');
+        }
+      })
+      .withFailureHandler((err) => {
+        btn.disabled = false;
+        btn.textContent = '儲存目前專案';
+        showToast('雲端儲存錯誤：' + (err.message || err), 'error');
+      })
+      .saveCloudPreset(uid('p'), name, json);
+  }
+
+  function loadFromCloud(presetId) {
+    if (!isGasEnvironment()) return;
+    google.script.run
+      .withSuccessHandler(async (res) => {
+        if (res && res.ok && res.data) {
+          try {
+            await restoreWorkspaceFromPayload(JSON.parse(res.data));
+            document.getElementById('cloud-modal').classList.remove('open');
+            showToast(`已載入雲端專案：「${res.preset.name}」`, 'success');
+          } catch (err) {
+            showToast('解析雲端專案失敗：' + err.message, 'error');
+          }
+        } else {
+          showToast((res && res.error) || '載入失敗', 'error');
+        }
+      })
+      .withFailureHandler((err) => showToast('雲端讀取失敗：' + (err.message || err), 'error'))
+      .loadCloudPreset(presetId);
+  }
+
+  async function deleteFromCloud(presetId, name) {
+    const ok = await openModal({
+      mode: 'confirm',
+      title: '刪除雲端專案',
+      desc: `確定要從雲端刪除「${name}」嗎？`,
+      danger: true,
+      okText: '刪除'
+    });
+    if (!ok) return;
+    google.script.run
+      .withSuccessHandler((res) => {
+        if (res && res.ok) {
+          showToast(`已刪除雲端專案「${name}」`);
+          refreshCloudList();
+        } else {
+          showToast((res && res.error) || '刪除失敗', 'error');
+        }
+      })
+      .withFailureHandler((err) => showToast('刪除錯誤：' + (err.message || err), 'error'))
+      .deleteCloudPreset(presetId);
+  }
+
+  // ==================== Mobile Dock Helpers ====================
+  function openMobileDock() {
+    document.getElementById('tool-dock').classList.add('mobile-open');
+    document.getElementById('mobile-dock-backdrop').classList.add('open');
+  }
+  function closeMobileDock() {
+    document.getElementById('tool-dock').classList.remove('mobile-open');
+    document.getElementById('mobile-dock-backdrop').classList.remove('open');
+  }
+
+  // ==================== Event Wiring ====================
+  function bindEvents() {
+    // Mobile dock
+    document.getElementById('btn-mobile-dock').onclick = () => {
+      const dock = document.getElementById('tool-dock');
+      if (dock.classList.contains('mobile-open')) closeMobileDock();
+      else openMobileDock();
+    };
+    document.getElementById('mobile-dock-backdrop').onclick = closeMobileDock;
+
+    // Topbar actions
+    document.getElementById('btn-undo').onclick = performUndo;
+    document.getElementById('btn-redo').onclick = performRedo;
+    document.getElementById('btn-duplicate').onclick = duplicateSelected;
+    document.getElementById('btn-layer-front').onclick = bringToFrontSelected;
+    document.getElementById('btn-layer-back').onclick = sendToBackSelected;
+    document.getElementById('btn-delete').onclick = deleteSelected;
+    document.getElementById('btn-export-json').onclick = exportWorkspaceJson;
+    document.getElementById('input-import-json').onchange = function (e) {
+      importWorkspaceJson(e.target.files[0]);
+      this.value = '';
+    };
+    document.getElementById('btn-cloud-modal').onclick = openCloudModal;
+    document.getElementById('btn-export-png').onclick = exportHighResPng;
+    document.getElementById('btn-clear-canvas').onclick = clearCurrentCanvas;
+    document.getElementById('btn-reset-all').onclick = resetEntireWorkspace;
+
+    // Help drawer
+    document.getElementById('btn-help').onclick = () => {
+      document.getElementById('help-drawer').classList.toggle('open');
+    };
+    document.getElementById('btn-close-help').onclick = () => {
+      document.getElementById('help-drawer').classList.remove('open');
+    };
+
+    // Base map & zoom
+    document.getElementById('input-bg-upload').onchange = function (e) {
+      handleBaseMapUpload(e.target.files[0]);
+      this.value = '';
+    };
+    document.getElementById('btn-apply-template').onclick = applySelectedTemplate;
+    document.getElementById('btn-zoom-in').onclick = () => { isFitMode = false; applyZoom(currentZoom + 0.15); };
+    document.getElementById('btn-zoom-out').onclick = () => { isFitMode = false; applyZoom(currentZoom - 0.15); };
+    document.getElementById('btn-zoom-fit').onclick = fitCanvasToViewport;
+
+    // Cancel placement mode
+    document.getElementById('btn-cancel-mode').onclick = () => setPlacementMode(null);
+
+    // Arrow presets
+    const PRESETS = {
+      P: { label: 'P', color: '#2563eb' },
+      M: { label: 'M', color: '#16a34a' },
+      W: { label: 'W', color: '#dc2626' }
+    };
+    document.querySelectorAll('[data-arrow-preset]').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('[data-arrow-preset]').forEach(b => b.classList.remove('active-chip'));
+        btn.classList.add('active-chip');
+        const p = PRESETS[btn.dataset.arrowPreset];
+        if (p) {
+          document.getElementById('arrow-custom-label').value = p.label;
+          document.getElementById('arrow-custom-color').value = p.color;
+        }
+      };
+    });
+
+    // Tool buttons
+    document.querySelectorAll('[data-tool]').forEach(btn => {
+      btn.onclick = () => {
+        const tool = btn.dataset.tool;
+        const dir = btn.dataset.dir || null;
+        if (activeTool === tool && (!dir || activeToolMeta.dir === dir)) {
+          setPlacementMode(null);
+        } else {
+          setPlacementMode(tool, dir ? { dir } : {});
+        }
+      };
+    });
+
+    // Marker counter input
+    document.getElementById('next-marker-num').onchange = function () {
+      const tab = getActiveTab();
+      if (tab) tab.sensorCounter = Math.max(1, parseInt(this.value, 10) || 1);
+    };
+    document.getElementById('btn-reset-marker-num').onclick = () => {
+      const tab = getActiveTab();
+      if (tab) tab.sensorCounter = 1;
+      document.getElementById('next-marker-num').value = 1;
+      showToast('點位編號已歸 1');
+    };
+
+    // Rack configurator
+    document.getElementById('rack-tiers').onchange = syncRackMSelect;
+    document.getElementById('rack-m-tier').onchange = renderRackHeightInputs;
+    document.getElementById('btn-insert-rack').onclick = insertRackToCanvas;
+    document.getElementById('btn-update-rack').onclick = updateSelectedRack;
+    document.getElementById('btn-toggle-racks').onclick = toggleRacksVisibility;
+
+    // Generic modal
+    document.getElementById('modal-ok').onclick = () => closeModal(true);
+    document.getElementById('modal-cancel').onclick = () => closeModal(false);
+    document.getElementById('modal-input').onkeydown = (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); closeModal(true); }
+      if (e.key === 'Escape') { e.preventDefault(); closeModal(false); }
+    };
+
+    // Cloud modal
+    document.getElementById('btn-cloud-close').onclick = () => {
+      document.getElementById('cloud-modal').classList.remove('open');
+    };
+    document.getElementById('btn-cloud-save').onclick = saveToCloud;
+
+    // Global keyboard shortcuts
+    window.addEventListener('keydown', (e) => {
+      const modalOpen = document.getElementById('generic-modal').classList.contains('open')
+        || document.getElementById('cloud-modal').classList.contains('open');
+      if (modalOpen) {
+        if (e.key === 'Escape') {
+          if (document.getElementById('generic-modal').classList.contains('open')) closeModal(false);
+          document.getElementById('cloud-modal').classList.remove('open');
+        }
+        return;
+      }
+
+      const tag = (e.target && e.target.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+      const activeObj = canvas && canvas.getActiveObject();
+      if (activeObj && activeObj.isEditing) return;
+
+      if (e.key === 'Escape') {
+        if (activeTool) setPlacementMode(null);
+        document.getElementById('help-drawer').classList.remove('open');
+        return;
+      }
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        e.preventDefault();
+        deleteSelected();
+        return;
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
+        e.preventDefault();
+        copySelected();
+        return;
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'v') {
+        e.preventDefault();
+        pasteClipboard();
+        return;
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        performUndo();
+        return;
+      }
+      if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'y' || (e.shiftKey && e.key.toLowerCase() === 'z'))) {
+        e.preventDefault();
+        performRedo();
+        return;
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      if (isFitMode) fitCanvasToViewport();
+    });
+  }
+
+  // ==================== Bootstrap ====================
+  async function boot() {
+    initCanvas();
+    syncRackMSelect();
+    bindEvents();
+
+    let restored = false;
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        await restoreWorkspaceFromPayload(JSON.parse(saved));
+        restored = true;
+        document.getElementById('status-save').textContent = '💾 已恢復上次瀏覽器進度';
+      }
+    } catch (_) {
+      restored = false;
+    }
+
+    if (!restored) {
+      tabs = [createDefaultTab('主區域 1', 'office')];
+      activeTabId = tabs[0].id;
+      renderTabsBar();
+      await renderTabToCanvas(tabs[0]);
+      document.getElementById('status-save').textContent = '💾 自動儲存就緒';
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', boot);
+})();
+</script>
+</body>
+</html>

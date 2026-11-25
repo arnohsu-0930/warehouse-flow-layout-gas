@@ -1,0 +1,1969 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>互動式點位配置工具</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eef2f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+        .app-container {
+            background-color: white;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            padding: 20px;
+            border-radius: 12px;
+            max-width: 1300px;
+            width: 100%;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            margin: 0 0 10px 0;
+            color: #2c3e50;
+            font-size: 24px;
+        }
+        
+        /* 控制列樣式 */
+        .control-panel {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            align-items: center;
+        }
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .control-group strong {
+            color: #495057;
+            font-size: 14px;
+        }
+        
+        /* 按鈕樣式 */
+        button {
+            cursor: pointer;
+            padding: 6px 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            background-color: #fff;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        button:hover { background-color: #e9ecef; }
+        
+        /* 選擇按鈕狀態 */
+        .mode-btn.active { background-color: #e2e6ea; border-color: #dae0e5; }
+        #btn-T.active { background-color: #ffe6f0; border-color: #ff66b2; color: #cc0066; }
+        #btn-M.active { background-color: #f3e5f5; border-color: #9c27b0; color: #6a1b9a; }
+        #btn-B.active { background-color: #e6f0ff; border-color: #3366cc; color: #003399; }
+        
+        #btn-SUPPLY.active { background-color: #cce5ff; border-color: #004085; color: #004085; }
+        #btn-RETURN.active { background-color: #fff4e6; border-color: #fd7e14; color: #d9480f; }
+        
+        #btn-DIM.active { background-color: #f8d7da; border-color: #721c24; color: #721c24; }
+        #btn-DRAW_RECT.active, #btn-DRAW_ARROW.active { background-color: #e2e3e5; border-color: #6c757d; color: #343a40; }
+        #btn-PALLET.active, #btn-PILLAR.active { background-color: #fdf3e5; border-color: #d4a359; color: #8b5a2b; }
+        
+        [id^="btn-S-"].active { background-color: #cce5ff; border-color: #007bff; color: #0056b3; }
+        [id^="btn-R-"].active { background-color: #ffe8cc; border-color: #fd7e14; color: #e8590c; }
+
+        .plan-btn.active { background-color: #fff3cd; border-color: #ffeeba; color: #856404; font-weight: bold;}
+        
+        /* 自訂名稱輸入框 */
+        .name-input {
+            width: 130px;
+            padding: 4px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        /* 系統按鈕 */
+        .action-btn { background-color: #f1f3f5; font-size: 14px; }
+        .action-btn.clear { color: #dc3545; }
+        
+        .tier-input {
+            width: 40px;
+            padding: 4px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        /* 動態高度輸入框容器 */
+        .dynamic-inputs {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            max-width: 280px;
+        }
+        .dynamic-inputs label {
+            font-size: 12px;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+        .dynamic-inputs input {
+            width: 38px;
+            padding: 2px;
+            border: 1px solid #ced4da;
+            border-radius: 3px;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        /* SVG 容器 */
+        .svg-container {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #fff;
+            cursor: crosshair;
+            display: flex;
+            justify-content: center;
+            user-select: none;
+        }
+        svg {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* 拖曳點位樣式 */
+        .sensor-group {
+            cursor: grab;
+            transition: filter 0.2s;
+        }
+        .sensor-group:active {
+            cursor: grabbing;
+        }
+        .sensor-group.selected {
+            filter: drop-shadow(0px 0px 4px rgba(0, 123, 255, 0.8));
+        }
+
+        /* 可拖曳標籤專用樣式 */
+        .draggable-label-text {
+            cursor: move;
+            user-select: none;
+            transition: filter 0.2s;
+        }
+        .draggable-label-text:hover {
+            filter: drop-shadow(0px 0px 4px rgba(0,0,0,0.4));
+        }
+
+        /* 控制點樣式 */
+        .resize-handle {
+            fill: transparent;
+            stroke: transparent;
+            cursor: crosshair;
+            transition: all 0.2s;
+            pointer-events: all;
+        }
+        .resize-handle:hover {
+            r: 14px;
+            fill: rgba(0, 0, 0, 0.15);
+        }
+        .dim-handle {
+            fill: transparent;
+            stroke: transparent;
+        }
+        .dim-handle:hover {
+            fill: rgba(220, 53, 69, 0.3);
+            r: 12px;
+        }
+
+        /* 彈跳視窗 (Modal) */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        .modal-box {
+            background: #fff;
+            padding: 20px 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            text-align: center;
+            min-width: 280px;
+        }
+        .modal-msg {
+            margin-bottom: 15px;
+            font-size: 16px;
+            color: #333;
+            font-weight: bold;
+        }
+        .modal-input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+            text-align: center;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="header">
+        <h1 id="main-title">W-03 常溫倉庫 互動式點位配置工具</h1>
+        <div style="color: #666; font-size: 14px;">請選擇各類配置模式後，點擊平面/立體圖進行配置。配置後可隨時「拖曳」微調位置。<br><strong>※ 所有物件選取後可按 Delete 刪除，或按 Ctrl+C / Ctrl+V 複製！</strong></div>
+    </div>
+
+    <!-- 互動控制列 -->
+    <div class="control-panel">
+        <div class="control-group" style="background-color: #fff3cd; border: 1px solid #ffeeba;">
+            <strong>📍 區域：</strong>
+            <button class="plan-btn active" id="btn-W03" onclick="switchPlan('W03')">W-03 常溫倉庫</button>
+            <button class="plan-btn" id="btn-W04_2D" onclick="switchPlan('W04_2D')">W-04 冷藏庫 (2D)</button>
+            <button class="plan-btn" id="btn-W04_3D" onclick="switchPlan('W04_3D')">W-04 冷藏庫 (3D)</button>
+        </div>
+
+        <div class="control-group">
+            <strong>1. 點位：</strong>
+            <button class="mode-btn" id="btn-T" onclick="setMode('T')">💗 T (Top)</button>
+            <button class="mode-btn" id="btn-M" onclick="setMode('M')">💜 M (Middle)</button>
+            <button class="mode-btn" id="btn-B" onclick="setMode('B')">💙 B (Bottom)</button>
+        </div>
+        
+        <div class="control-group">
+            <strong>2. 空調圖例：</strong>
+            <button class="mode-btn" id="btn-SUPPLY" onclick="setMode('SUPPLY')">🟦 SA (出風)</button>
+            <button class="mode-btn" id="btn-RETURN" onclick="setMode('RETURN')">🟧 RA (回風)</button>
+        </div>
+        
+        <div class="control-group">
+            <strong>3. 出風：</strong>
+            <button class="mode-btn" id="btn-S-DIR" onclick="setMode('S-DIR')">↗ SA方向</button>
+            <button class="mode-btn" id="btn-S-DOWN" onclick="setMode('S-DOWN')">⦻ SA-D</button>
+        </div>
+
+        <div class="control-group">
+            <strong>4. 回風：</strong>
+            <button class="mode-btn" id="btn-R-DIR" onclick="setMode('R-DIR')">↗ RA方向</button>
+            <button class="mode-btn" id="btn-R-UP" onclick="setMode('R-UP')">⦿ RA-U</button>
+        </div>
+
+        <div class="control-group">
+            <strong>5. 標註：</strong>
+            <button class="mode-btn" id="btn-DIM" onclick="setMode('DIM')">📏 尺寸</button>
+        </div>
+        
+        <div class="control-group">
+            <strong>6. 繪圖：</strong>
+            <button class="mode-btn" id="btn-DRAW_RECT" onclick="setMode('DRAW_RECT')">⬛ 方塊</button>
+            <button class="mode-btn" id="btn-DRAW_ARROW" onclick="setMode('DRAW_ARROW')">↗ 箭頭</button>
+            <input type="color" id="draw-color" value="#ff0000" title="選擇顏色" style="cursor: pointer; padding: 0; width: 28px; height: 28px; border: 1px solid #ced4da; border-radius: 4px; background: none;">
+        </div>
+
+        <div class="control-group" style="background-color: #fdf3e5; border: 1px solid #faebd7;">
+            <strong>7. 物件：</strong>
+            <button class="mode-btn" id="btn-PALLET" onclick="setMode('PALLET')">📦 棧板</button>
+            <button class="mode-btn" id="btn-PILLAR" onclick="setMode('PILLAR')">📏 立柱</button>
+            <select id="pillar-color" style="padding: 4px; border: 1px solid #ced4da; border-radius: 4px; font-size: 13px;">
+                <option value="green">綠色 (左貨架)</option>
+                <option value="blue">藍色 (右上貨架)</option>
+                <option value="yellow">黃色 (右下貨架)</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- 獨立貨架控制列 -->
+    <div class="control-panel" style="margin-top: -10px; background-color: #fff; border-color: #eee;">
+        
+        <!-- W-03 貨架設定 (2組) -->
+        <div id="w03-racks-config" style="display: flex; gap: 15px; width: 100%; justify-content: center; flex-wrap: wrap;">
+            <div class="control-group" style="flex-direction: column; align-items: flex-start; gap: 6px;">
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <strong>貨架 1:</strong>
+                    <input type="text" id="w03-r1-name" value="重量型貨架" class="name-input" style="color: #2b5e9c;" oninput="drawRacks()">
+                    <label style="font-size:13px; color:#666;">層數: <input type="number" id="w03-r1-tiers" value="3" min="2" max="8" class="tier-input" onchange="drawRacks()"></label>
+                    <label style="font-size:13px; color:#666;">M層: <select id="w03-r1-m" class="tier-input" style="width: 55px;" onchange="drawRacks()"></select></label>
+                </div>
+                <div id="inputs-w03-r1" class="dynamic-inputs"></div>
+            </div>
+
+            <div class="control-group" style="flex-direction: column; align-items: flex-start; gap: 6px;">
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <strong>貨架 2:</strong>
+                    <input type="text" id="w03-r2-name" value="中量型貨架" class="name-input" style="color: #6c757d;" oninput="drawRacks()">
+                    <label style="font-size:13px; color:#666;">層數: <input type="number" id="w03-r2-tiers" value="3" min="2" max="8" class="tier-input" onchange="drawRacks()"></label>
+                    <label style="font-size:13px; color:#666;">M層: <select id="w03-r2-m" class="tier-input" style="width: 55px;" onchange="drawRacks()"></select></label>
+                </div>
+                <div id="inputs-w03-r2" class="dynamic-inputs"></div>
+            </div>
+        </div>
+
+        <!-- W-04 貨架設定 (3組) -->
+        <div id="w04-racks-config" style="display: none; gap: 15px; width: 100%; justify-content: center; flex-wrap: wrap;">
+            <div class="control-group" style="flex-direction: column; align-items: flex-start; gap: 6px; border-left: 4px solid #28a745;">
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <strong>貨架(左):</strong>
+                    <input type="text" id="w04-r3-name" value="重型貨架(左)" class="name-input" style="color: #1e7e34;" oninput="drawRacks()">
+                    <label style="font-size:13px; color:#666;">層數: <input type="number" id="w04-r3-tiers" value="2" min="2" max="8" class="tier-input" onchange="drawRacks()"></label>
+                    <label style="font-size:13px; color:#666;">M層: <select id="w04-r3-m" class="tier-input" style="width: 55px;" onchange="drawRacks()"></select></label>
+                </div>
+                <div id="inputs-w04-r3" class="dynamic-inputs"></div>
+            </div>
+
+            <div class="control-group" style="flex-direction: column; align-items: flex-start; gap: 6px; border-left: 4px solid #007bff;">
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <strong>貨架(右上):</strong>
+                    <input type="text" id="w04-r1-name" value="重型貨架(右上)" class="name-input" style="color: #0056b3;" oninput="drawRacks()">
+                    <label style="font-size:13px; color:#666;">層數: <input type="number" id="w04-r1-tiers" value="5" min="2" max="8" class="tier-input" onchange="drawRacks()"></label>
+                    <label style="font-size:13px; color:#666;">M層: <select id="w04-r1-m" class="tier-input" style="width: 55px;" onchange="drawRacks()"></select></label>
+                </div>
+                <div id="inputs-w04-r1" class="dynamic-inputs"></div>
+            </div>
+
+            <div class="control-group" style="flex-direction: column; align-items: flex-start; gap: 6px; border-left: 4px solid #ffc107;">
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <strong>貨架(右下):</strong>
+                    <input type="text" id="w04-r2-name" value="中型貨架(右下)" class="name-input" style="color: #d39e00;" oninput="drawRacks()">
+                    <label style="font-size:13px; color:#666;">層數: <input type="number" id="w04-r2-tiers" value="4" min="2" max="8" class="tier-input" onchange="drawRacks()"></label>
+                    <label style="font-size:13px; color:#666;">M層: <select id="w04-r2-m" class="tier-input" style="width: 55px;" onchange="drawRacks()"></select></label>
+                </div>
+                <div id="inputs-w04-r2" class="dynamic-inputs"></div>
+            </div>
+        </div>
+        
+        <div class="control-group" style="height: 100%; margin-top: 10px; width: 100%; justify-content: center; background: none; box-shadow: none;">
+            <button class="action-btn" onclick="downloadImage()">📥 下載成圖片</button>
+            <button class="action-btn" onclick="undo()">↶ 復原 (Undo)</button>
+            <button class="action-btn clear" onclick="clearAll()">🗑️ 清除當前區域配置</button>
+        </div>
+    </div>
+
+    <!-- SVG 畫布區域 -->
+    <div class="svg-container">
+        <svg id="main-svg" width="1200" height="780" viewBox="0 0 1200 780" xmlns="http://www.w3.org/2000/svg">
+            
+            <!-- 共用定義 -->
+            <defs>
+                <g id="s-top">
+                    <circle cx="0" cy="0" r="10" fill="#ff66b2" stroke="#000" stroke-width="1"/>
+                    <text x="0" y="4" font-size="12" font-weight="bold" fill="#000" text-anchor="middle">T</text>
+                </g>
+                <g id="s-mid">
+                    <circle cx="0" cy="0" r="10" fill="#9c27b0" stroke="#000" stroke-width="1"/>
+                    <text x="0" y="4" font-size="12" font-weight="bold" fill="#fff" text-anchor="middle">M</text>
+                </g>
+                <g id="s-bot">
+                    <circle cx="0" cy="0" r="10" fill="#3366cc" stroke="#000" stroke-width="1"/>
+                    <text x="0" y="4" font-size="12" font-weight="bold" fill="#fff" text-anchor="middle">B</text>
+                </g>
+                <g id="label-bg">
+                    <circle cx="0" cy="0" r="8" fill="#fff" stroke="#999" stroke-width="1"/>
+                </g>
+
+                <g id="icon-supply">
+                    <rect x="-12" y="-12" width="24" height="24" fill="#cce5ff" stroke="#004085" stroke-width="2"/>
+                    <line x1="-12" y1="-12" x2="12" y2="12" stroke="#004085" stroke-width="2"/>
+                    <line x1="-12" y1="12" x2="12" y2="-12" stroke="#004085" stroke-width="2"/>
+                </g>
+                <g id="icon-return">
+                    <rect x="-12" y="-12" width="24" height="24" fill="#fff4e6" stroke="#fd7e14" stroke-width="2"/>
+                    <line x1="-12" y1="-12" x2="12" y2="12" stroke="#fd7e14" stroke-width="2"/>
+                </g>
+
+                <g id="legend-sa-dir">
+                    <line x1="0" y1="0" x2="30" y2="0" stroke="#007bff" stroke-width="2"/>
+                    <polygon points="30,0 20,-5 20,5" fill="#007bff"/>
+                    <text x="15" y="-8" font-size="12" font-weight="bold" fill="#007bff" text-anchor="middle" paint-order="stroke fill" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">SA</text>
+                </g>
+                <g id="legend-ra-dir">
+                    <line x1="0" y1="0" x2="30" y2="0" stroke="#fd7e14" stroke-width="2" stroke-dasharray="3,2"/>
+                    <polygon points="30,0 20,-5 20,5" fill="#fd7e14"/>
+                    <text x="15" y="-8" font-size="12" font-weight="bold" fill="#fd7e14" text-anchor="middle" paint-order="stroke fill" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">RA</text>
+                </g>
+
+                <g id="s-down">
+                    <circle cx="0" cy="0" r="10" fill="#e6f2ff" stroke="#007bff" stroke-width="2"/>
+                    <line x1="-7" y1="-7" x2="7" y2="7" stroke="#007bff" stroke-width="2"/>
+                    <line x1="-7" y1="7" x2="7" y2="-7" stroke="#007bff" stroke-width="2"/>
+                    <text x="0" y="-14" font-size="12" font-weight="bold" fill="#007bff" text-anchor="middle" paint-order="stroke fill" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">SA-D</text>
+                </g>
+
+                <g id="r-up">
+                    <circle cx="0" cy="0" r="10" fill="#fff4e6" stroke="#fd7e14" stroke-width="2" stroke-dasharray="3,2"/>
+                    <circle cx="0" cy="0" r="3" fill="#fd7e14"/>
+                    <text x="0" y="-14" font-size="12" font-weight="bold" fill="#fd7e14" text-anchor="middle" paint-order="stroke fill" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">RA-U</text>
+                </g>
+            </defs>
+
+            <!-- ================= W-03 版面配置 ================= -->
+            <g id="plan-W03">
+                <rect x="40" y="40" width="550" height="580" fill="#d9ead3" stroke="#000" stroke-width="4"/>
+                
+                <rect x="40" y="40" width="160" height="100" fill="#f0f4ea" stroke="#000" stroke-width="2"/>
+                <text x="120" y="110" font-size="16" text-anchor="middle" font-weight="bold">Platform</text>
+                <path d="M 40 40 L 100 40 A 60 60 0 0 1 40 100 Z" fill="none" stroke="#000" stroke-width="1.5"/>
+                <path d="M 200 40 L 140 40 A 60 60 0 0 0 200 100 Z" fill="none" stroke="#000" stroke-width="1.5"/>
+
+                <rect x="200" y="40" width="220" height="100" fill="#f0f4ea" stroke="#000" stroke-width="2"/>
+                <text x="310" y="85" font-size="16" text-anchor="middle" font-weight="bold">Ramp</text>
+                <text x="310" y="110" font-size="14" text-anchor="middle">8%</text>
+
+                <path d="M 340 620 L 340 550 L 480 550 L 480 620" fill="none" stroke="#000" stroke-dasharray="5,5" stroke-width="2"/>
+                <text x="410" y="580" font-size="14" font-weight="bold" text-anchor="middle">STACKER</text>
+                <text x="410" y="600" font-size="14" font-weight="bold" text-anchor="middle">CHARGING</text>
+
+                <!-- 動態生成的 W-03 2D 貨架 -->
+                <g id="w03-dynamic-racks" stroke="#000" stroke-width="1.5" fill="none"></g>
+
+                <rect x="70" y="470" width="60" height="60" fill="#fff" stroke="#000" stroke-width="4"/>
+                <rect x="80" y="480" width="40" height="40" fill="#fff" stroke="#000" stroke-width="1.5"/>
+
+                <g stroke="#000" stroke-width="1.5" fill="#fff">
+                    <rect x="40" y="570" width="70" height="45"/>
+                    <rect x="110" y="570" width="70" height="45"/>
+                    <rect x="180" y="570" width="70" height="45"/>
+                    <rect x="250" y="570" width="70" height="45"/>
+                </g>
+                <text x="315" y="640" font-size="14" text-anchor="middle">(圖 1) 常溫倉庫(W-03)平面配置圖</text>
+
+                <g transform="translate(50, 670)">
+                    <use href="#s-top" x="0" y="0"/> <text x="18" y="4" font-size="12" fill="#333">T: Top</text>
+                    <use href="#s-mid" x="0" y="25"/> <text x="18" y="29" font-size="12" fill="#333">M: Middle</text>
+                    <use href="#s-bot" x="0" y="50"/> <text x="18" y="54" font-size="12" fill="#333">B: Bottom</text>
+                    
+                    <use href="#icon-supply" x="120" y="0"/> <text x="140" y="4" font-size="12" fill="#333">SA: Supply Air</text>
+                    <use href="#icon-return" x="120" y="25"/> <text x="140" y="29" font-size="12" fill="#333">RA: Return Air</text>
+                    
+                    <use href="#legend-sa-dir" x="290" y="0"/> <text x="335" y="4" font-size="12" fill="#333">出風方向</text>
+                    <use href="#s-down" x="305" y="30"/> <text x="335" y="34" font-size="12" fill="#333">向地面出風</text>
+
+                    <use href="#legend-ra-dir" x="490" y="0"/> <text x="535" y="4" font-size="12" fill="#333">回風方向</text>
+                    <use href="#r-up" x="505" y="30"/> <text x="535" y="34" font-size="12" fill="#333">向上回風</text>
+                </g>
+
+                <g transform="translate(760, 40)">
+                    <text id="title-w03-r1" class="draggable-label-text" data-id="title-w03-r1" x="0" y="-10" font-size="18" font-weight="bold" fill="#2b5e9c">■ 重量型貨架</text>
+                    <g transform="scale(0.65)" id="w03-3d-rack1"></g>
+                </g>
+                <g transform="translate(760, 420)">
+                    <text id="title-w03-r2" class="draggable-label-text" data-id="title-w03-r2" x="0" y="-10" font-size="18" font-weight="bold" fill="#6c757d">■ 中量型貨架</text>
+                    <g transform="scale(0.65)" id="w03-3d-rack2"></g>
+                </g>
+
+                <g id="sensors-layer-W03"></g>
+            </g>
+
+            <!-- ================= W-04 版面配置 (平面圖 2D) ================= -->
+            <g id="plan-W04_2D" style="display: none;">
+                <g transform="translate(50, 40)">
+                    <text id="title-w04_2d-r3" class="draggable-label-text" data-id="title-w04_2d-r3" x="0" y="-10" font-size="18" font-weight="bold" fill="#28a745">■ 左側貨架</text>
+                    <g transform="scale(0.65)" id="w04_2d-3d-rack3"></g>
+                </g>
+
+                <g transform="translate(190, 0)">
+                    <path d="M 120 50 L 340 50 L 340 160 L 460 160 L 460 680 L 120 680 Z" fill="#f4f9f4" stroke="none"/>
+                    <path d="M 50 45 L 345 45" fill="none" stroke="#000" stroke-width="1.5"/>
+                    <path d="M 50 45 L 50 185 L 120 185" fill="none" stroke="#000" stroke-width="1.5"/>
+                    <path d="M 465 155 L 465 685 L 115 685" fill="none" stroke="#000" stroke-width="1.5"/>
+                    <path d="M 120 180 L 120 680 L 460 680 L 460 160 L 340 160 L 340 50 L 120 50" fill="none" stroke="#000" stroke-width="6" stroke-linejoin="miter"/>
+                    
+                    <path d="M 120 50 L 50 50 A 70 70 0 0 0 120 115" fill="none" stroke="#000" stroke-width="1.5"/>
+                    <path d="M 120 180 L 50 180 A 70 70 0 0 1 120 115" fill="none" stroke="#000" stroke-width="1.5"/>
+                    <line x1="120" y1="50" x2="120" y2="180" stroke="#000" stroke-width="1.5"/> 
+
+                    <g id="w04_2d-dynamic-racks" stroke="#000" stroke-width="1.5" fill="none"></g>
+
+                    <text x="290" y="720" font-size="14" text-anchor="middle">(圖 2) 冷藏庫(W-04)平面配置圖</text>
+                </g>
+
+                <g transform="translate(710, 40)">
+                    <text id="title-w04_2d-r1" class="draggable-label-text" data-id="title-w04_2d-r1" x="0" y="-10" font-size="18" font-weight="bold" fill="#007bff">■ 右側上段</text>
+                    <g transform="scale(0.65)" id="w04_2d-3d-rack1"></g>
+                </g>
+                <g transform="translate(710, 420)">
+                    <text id="title-w04_2d-r2" class="draggable-label-text" data-id="title-w04_2d-r2" x="0" y="-10" font-size="18" font-weight="bold" fill="#ffc107">■ 右側下段</text>
+                    <g transform="scale(0.65)" id="w04_2d-3d-rack2"></g>
+                </g>
+
+                <g transform="translate(940, 40)">
+                    <use href="#s-top" x="0" y="0"/> <text x="18" y="4" font-size="12" fill="#333">T: Top</text>
+                    <use href="#s-mid" x="0" y="35"/> <text x="18" y="39" font-size="12" fill="#333">M: Middle</text>
+                    <use href="#s-bot" x="0" y="70"/> <text x="18" y="74" font-size="12" fill="#333">B: Bottom</text>
+                    
+                    <use href="#icon-supply" x="0" y="120"/> <text x="20" y="124" font-size="12" fill="#333">SA: Supply Air</text>
+                    <use href="#icon-return" x="0" y="160"/> <text x="20" y="164" font-size="12" fill="#333">RA: Return Air</text>
+                    
+                    <use href="#legend-sa-dir" x="0" y="210"/> <text x="45" y="214" font-size="12" fill="#333">出風方向</text>
+                    <use href="#s-down" x="15" y="250"/> <text x="45" y="254" font-size="12" fill="#333">向地面出風</text>
+
+                    <use href="#legend-ra-dir" x="0" y="300"/> <text x="45" y="304" font-size="12" fill="#333">回風方向</text>
+                    <use href="#r-up" x="15" y="340"/> <text x="45" y="344" font-size="12" fill="#333">向上回風</text>
+                </g>
+                
+                <g id="sensors-layer-W04_2D"></g>
+            </g>
+
+            <!-- ================= W-04 版面配置 (全場景 3D Isometric) ================= -->
+            <g id="plan-W04_3D" style="display: none;">
+                
+                <g id="w04_3d-dynamic-racks" stroke="#000" stroke-width="1.5" fill="none"></g>
+
+                <g transform="translate(1020, 40)">
+                    <use href="#s-top" x="0" y="0"/> <text x="18" y="4" font-size="12" fill="#333">T: Top</text>
+                    <use href="#s-mid" x="0" y="35"/> <text x="18" y="39" font-size="12" fill="#333">M: Middle</text>
+                    <use href="#s-bot" x="0" y="70"/> <text x="18" y="74" font-size="12" fill="#333">B: Bottom</text>
+                    
+                    <use href="#icon-supply" x="0" y="120"/> <text x="20" y="124" font-size="12" fill="#333">SA: Supply Air</text>
+                    <use href="#icon-return" x="0" y="160"/> <text x="20" y="164" font-size="12" fill="#333">RA: Return Air</text>
+                    
+                    <use href="#legend-sa-dir" x="0" y="210"/> <text x="45" y="214" font-size="12" fill="#333">出風方向</text>
+                    <use href="#s-down" x="15" y="250"/> <text x="45" y="254" font-size="12" fill="#333">向地面出風</text>
+
+                    <use href="#legend-ra-dir" x="0" y="300"/> <text x="45" y="304" font-size="12" fill="#333">回風方向</text>
+                    <use href="#r-up" x="15" y="340"/> <text x="45" y="344" font-size="12" fill="#333">向上回風</text>
+                </g>
+
+                <g id="sensors-layer-W04_3D"></g>
+            </g>
+
+        </svg>
+    </div>
+</div>
+
+<!-- 自訂彈跳視窗 Modal -->
+<div id="modal-overlay" class="modal-overlay" style="display: none;">
+    <div class="modal-box">
+        <div id="modal-msg" class="modal-msg"></div>
+        <input type="text" id="modal-input" class="modal-input" style="display: none;">
+        <div class="modal-buttons">
+            <button id="btn-modal-cancel" class="action-btn" style="display: none;">取消</button>
+            <button id="btn-modal-ok" class="action-btn btn-primary">確定</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentPlan = 'W03';
+    let currentMode = null; 
+    let sensorCounts = { W03: 1, 'W04_2D': 1, 'W04_3D': 1 };
+    let historyStacks = { W03: [], 'W04_2D': [], 'W04_3D': [] };
+
+    let rackHeights = {
+        'w03-r1': {0: 280, 1: 140, 2: 15},
+        'w03-r2': {0: 160, 1: 90, 2: 20},
+        'w04-r3': {0: 140, 1: 20},
+        'w04-r1': {0: 200, 1: 150, 2: 110, 3: 75, 4: 20},
+        'w04-r2': {0: 160, 1: 120, 2: 80, 3: 10}
+    };
+    
+    let rackMIndex = {
+        'w03-r1': 1, 'w03-r2': 1, 'w04-r3': -1, 'w04-r1': 2, 'w04-r2': 1
+    };
+    
+    let customLabelPositions = {}; 
+    let selectedElement = null;
+    let copiedElementNode = null;
+    let lastMouseSvgP = null;
+
+    function switchPlan(plan) {
+        currentPlan = plan;
+        
+        document.getElementById('btn-W03').classList.remove('active');
+        document.getElementById('btn-W04_2D').classList.remove('active');
+        document.getElementById('btn-W04_3D').classList.remove('active');
+        document.getElementById('btn-' + plan).classList.add('active');
+        
+        if (plan === 'W03') {
+            document.getElementById('main-title').textContent = 'W-03 常溫倉庫 互動式點位配置工具';
+        } else if (plan === 'W04_2D') {
+            document.getElementById('main-title').textContent = 'W-04 冷藏庫 互動式點位配置工具 (平面 2D)';
+        } else {
+            document.getElementById('main-title').textContent = 'W-04 冷藏庫 互動式點位配置工具 (等角 3D)';
+        }
+            
+        document.getElementById('w03-racks-config').style.display = plan === 'W03' ? 'flex' : 'none';
+        document.getElementById('w04-racks-config').style.display = plan.startsWith('W04') ? 'flex' : 'none';
+
+        document.getElementById('plan-W03').style.display = plan === 'W03' ? 'block' : 'none';
+        document.getElementById('plan-W04_2D').style.display = plan === 'W04_2D' ? 'block' : 'none';
+        document.getElementById('plan-W04_3D').style.display = plan === 'W04_3D' ? 'block' : 'none';
+        
+        if (dimDrawing) cancelDimDrawing();
+        if (shapeDrawing) cancelShapeDrawing();
+        
+        if (selectedElement) {
+            selectedElement.classList.remove('selected');
+            selectedElement = null;
+        }
+    }
+
+    function updateMSelect(prefix, tiers) {
+        let sel = document.getElementById(`${prefix}-m`);
+        if (!sel) return;
+        let oldVal = parseInt(sel.value);
+        
+        sel.innerHTML = '';
+        if (tiers <= 2) {
+            sel.innerHTML = '<option value="-1">無</option>';
+            sel.disabled = true;
+            rackMIndex[prefix] = -1;
+        } else {
+            sel.disabled = false;
+            for (let i = 1; i < tiers - 1; i++) {
+                let opt = document.createElement('option');
+                opt.value = i;
+                opt.textContent = `第 ${i+1} 層`; 
+                sel.appendChild(opt);
+            }
+            if (isNaN(oldVal) || oldVal < 1 || oldVal >= tiers - 1) {
+                oldVal = Math.floor((tiers - 1) / 2);
+            }
+            sel.value = oldVal;
+            rackMIndex[prefix] = oldVal;
+        }
+    }
+
+    function renderHeightInputs(prefix, tiers) {
+        const container = document.getElementById(`inputs-${prefix}`);
+        if (!container) return;
+        container.innerHTML = '';
+
+        let mIndex = rackMIndex[prefix];
+        if (mIndex === undefined || mIndex < 0) mIndex = -1;
+
+        for (let i = 0; i < tiers; i++) {
+            let shortName = "", levelName = "";
+            if (i === 0) { shortName = "T"; levelName = "Top"; }
+            else if (i === tiers - 1) { shortName = "B"; levelName = "Bottom"; }
+            else if (i === mIndex) { shortName = "M"; levelName = "Middle"; }
+            else { shortName = "L" + (tiers - i); levelName = "Level " + (tiers - i); }
+
+            if (rackHeights[prefix][i] === undefined) rackHeights[prefix][i] = 0; 
+
+            let lbl = document.createElement('label');
+            lbl.title = levelName; 
+            lbl.textContent = shortName + ':';
+            
+            let inp = document.createElement('input');
+            inp.type = 'number';
+            inp.value = rackHeights[prefix][i];
+            inp.oninput = function() {
+                rackHeights[prefix][i] = this.value;
+                let textEl = document.getElementById(`text-${prefix}-${i}`);
+                if (textEl) textEl.textContent = `${levelName} (${this.value} cm)`;
+                
+                // 動態連線：W-04 平面與 W-04 3D 皆可能有多個對應前綴 (w04_2d, w04_3d)
+                let possiblePrefixes = [prefix];
+                if(prefix.startsWith('w04')) {
+                    let suffix = prefix.split('-')[1]; // r1, r2, r3
+                    possiblePrefixes.push(`w04_2d-${suffix}`);
+                    possiblePrefixes.push(`w04_3d-${suffix}`);
+                }
+                
+                possiblePrefixes.forEach(pfx => {
+                    let tEl = document.getElementById(`text-iso-${pfx}-${i}`);
+                    if (tEl) tEl.textContent = `${levelName} (${this.value} cm)`;
+                });
+            };
+            
+            lbl.appendChild(inp);
+            container.appendChild(lbl);
+        }
+    }
+
+    let dimDrawing = false, shapeDrawing = false;
+    let shapeStartX = 0, shapeStartY = 0;
+    let dimTempGroup = null, shapeTempGroup = null;
+
+    function cancelDimDrawing() {
+        dimDrawing = false;
+        if (dimTempGroup) { dimTempGroup.remove(); dimTempGroup = null; }
+    }
+
+    function cancelShapeDrawing() {
+        shapeDrawing = false;
+        if (shapeTempGroup) { shapeTempGroup.remove(); shapeTempGroup = null; }
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (modalOverlay.style.display === 'flex') return;
+        
+        if (e.target.tagName.toLowerCase() === 'input' || e.target.tagName.toLowerCase() === 'select') {
+            return;
+        }
+
+        if (e.key === 'Escape') {
+            if (dimDrawing) cancelDimDrawing();
+            if (shapeDrawing) cancelShapeDrawing();
+            if (selectedElement) {
+                selectedElement.classList.remove('selected');
+                selectedElement = null;
+            }
+        }
+        
+        if (e.ctrlKey && (e.key === 'c' || e.key === 'C')) {
+            if (selectedElement && selectedElement.classList.contains('sensor-group')) {
+                copiedElementNode = selectedElement.cloneNode(true);
+                copiedElementNode.classList.remove('selected');
+            }
+        }
+        
+        if (e.ctrlKey && (e.key === 'v' || e.key === 'V')) {
+            if (copiedElementNode) {
+                let pasteClone = copiedElementNode.cloneNode(true);
+                let cx, cy;
+                if (lastMouseSvgP) { cx = lastMouseSvgP.x; cy = lastMouseSvgP.y; } 
+                else { cx = parseFloat(copiedElementNode.dataset.x) + 20; cy = parseFloat(copiedElementNode.dataset.y) + 20; }
+                
+                pasteClone.dataset.x = cx; pasteClone.dataset.y = cy;
+                pasteClone.setAttribute('transform', `translate(${cx}, ${cy})`);
+                copiedElementNode.dataset.x = cx + 20; copiedElementNode.dataset.y = cy + 20;
+
+                document.getElementById('sensors-layer-' + currentPlan).appendChild(pasteClone);
+                historyStacks[currentPlan].push(pasteClone);
+                
+                if (selectedElement) selectedElement.classList.remove('selected');
+                selectedElement = pasteClone;
+                selectedElement.classList.add('selected');
+            }
+        }
+
+        if (e.key === 'Delete' || e.key === 'Backspace') {
+            if (selectedElement && selectedElement.classList.contains('sensor-group')) {
+                selectedElement.remove();
+                
+                let stack = historyStacks[currentPlan];
+                let idx = stack.indexOf(selectedElement);
+                if (idx > -1) {
+                    stack.splice(idx, 1);
+                }
+                
+                selectedElement = null;
+                if (isResizing) {
+                    isResizing = false;
+                    resizeHandle = null;
+                    resizeGroup = null;
+                }
+            }
+        }
+    });
+
+    const modalOverlay = document.getElementById('modal-overlay');
+    const modalMsg = document.getElementById('modal-msg');
+    const modalInput = document.getElementById('modal-input');
+    const btnModalCancel = document.getElementById('btn-modal-cancel');
+    const btnModalOk = document.getElementById('btn-modal-ok');
+    let modalCallback = null;
+
+    function showModal(type, msg, callback) {
+        modalMsg.textContent = msg;
+        modalCallback = callback;
+        modalOverlay.style.display = 'flex';
+        
+        if (type === 'alert') {
+            modalInput.style.display = 'none';
+            btnModalCancel.style.display = 'none';
+            btnModalOk.textContent = '確定';
+            btnModalOk.focus();
+        } else if (type === 'confirm') {
+            modalInput.style.display = 'none';
+            btnModalCancel.style.display = 'inline-block';
+            btnModalOk.textContent = '確定';
+        } else if (type === 'prompt') {
+            modalInput.style.display = 'block';
+            modalInput.value = '';
+            btnModalCancel.style.display = 'inline-block';
+            btnModalOk.textContent = '確定';
+            setTimeout(() => modalInput.focus(), 50);
+        }
+    }
+
+    function closeModal() {
+        modalOverlay.style.display = 'none';
+        modalCallback = null;
+    }
+
+    btnModalOk.onclick = () => {
+        const cb = modalCallback;
+        const val = modalInput.value;
+        const isPrompt = modalInput.style.display !== 'none';
+        const isConfirm = btnModalCancel.style.display !== 'none' && !isPrompt;
+        closeModal();
+        if (cb) {
+            if (isPrompt) cb(val);
+            else if (isConfirm) cb(true);
+            else cb();
+        }
+    };
+
+    btnModalCancel.onclick = () => {
+        const cb = modalCallback;
+        const isPrompt = modalInput.style.display !== 'none';
+        closeModal();
+        if (cb) {
+            if (isPrompt) cb(null);
+            else cb(false);
+        }
+    };
+
+    modalInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') btnModalOk.click(); });
+
+    function setMode(mode) {
+        if (dimDrawing) cancelDimDrawing();
+        if (shapeDrawing) cancelShapeDrawing();
+        currentMode = mode;
+        document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+        let btn = document.getElementById('btn-' + mode);
+        if(btn) btn.classList.add('active');
+        if (selectedElement) {
+            selectedElement.classList.remove('selected');
+            selectedElement = null;
+        }
+    }
+
+    function renderObjectShape(g) {
+        let type = g.dataset.objType;
+        let scaleX = parseFloat(g.dataset.scaleX) || 1;
+        let scaleY = parseFloat(g.dataset.scaleY) || 1;
+        let is3D = g.dataset.is3d === "true";
+        let pColor = g.dataset.color || "green";
+        
+        const NS = "http://www.w3.org/2000/svg";
+        let htmlStr = "";
+        let s = 0.9; 
+        let ptIso = (x, y, z) => `${(-x * 0.866 + y * 0.866) * s},${(x * 0.5 + y * 0.5 - z) * s}`;
+        
+        let handleX = 0, handleY = 0;
+
+        if (!is3D) {
+            if (type === 'PALLET') {
+                let w = 66 * scaleX, h = 72 * scaleY;
+                htmlStr += `<rect x="${-w/2}" y="${-h/2}" width="${w}" height="${h}" fill="rgba(230, 194, 128, 0.35)" stroke="#8b5a2b" stroke-width="2"/>`;
+                htmlStr += `<line x1="${-w/2}" y1="${-h/2 + h*0.28}" x2="${w/2}" y2="${-h/2 + h*0.28}" stroke="rgba(139, 90, 43, 0.5)" stroke-width="1"/>`;
+                htmlStr += `<line x1="${-w/2}" y1="${h/2 - h*0.28}" x2="${w/2}" y2="${h/2 - h*0.28}" stroke="rgba(139, 90, 43, 0.5)" stroke-width="1"/>`;
+                handleX = w/2; handleY = h/2;
+            } else {
+                let strokeC = pColor === 'green' ? '#1e7e34' : pColor === 'blue' ? '#0056b3' : '#d39e00';
+                let w = 10 * scaleX, h = 60 * scaleY;
+                htmlStr += `<rect x="${-w/2}" y="${-h/2}" width="${w}" height="${h}" fill="transparent" stroke="${strokeC}" stroke-width="2"/>`;
+                htmlStr += `<line x1="${-w/2}" y1="${-h/2}" x2="${w/2}" y2="${h/2}" stroke="${strokeC}" stroke-width="1"/>`;
+                htmlStr += `<line x1="${w/2}" y1="${-h/2}" x2="${-w/2}" y2="${h/2}" stroke="${strokeC}" stroke-width="1"/>`;
+                handleX = w/2; handleY = h/2;
+            }
+        } else {
+            if (type === 'PALLET') {
+                let w = 72 * scaleX, l = 66 * scaleY, h = 9; 
+                htmlStr += `<path d="M ${ptIso(0,0,h)} L ${ptIso(w,0,h)} L ${ptIso(w,l,h)} L ${ptIso(0,l,h)} Z" fill="rgba(230, 194, 128, 0.35)" stroke="#8b5a2b" stroke-width="1" stroke-linejoin="round"/>`;
+                htmlStr += `<path d="M ${ptIso(w,0,0)} L ${ptIso(w,l,0)} L ${ptIso(w,l,h)} L ${ptIso(w,0,h)} Z" fill="rgba(212, 163, 89, 0.35)" stroke="#8b5a2b" stroke-width="1" stroke-linejoin="round"/>`;
+                htmlStr += `<path d="M ${ptIso(0,l,0)} L ${ptIso(w,l,0)} L ${ptIso(w,l,h)} L ${ptIso(0,l,h)} Z" fill="rgba(194, 140, 70, 0.35)" stroke="#8b5a2b" stroke-width="1" stroke-linejoin="round"/>`;
+                
+                htmlStr += `<polygon points="${ptIso(w, 10*scaleY, 0)} ${ptIso(w, 25*scaleY, 0)} ${ptIso(w, 25*scaleY, 6)} ${ptIso(w, 10*scaleY, 6)}" fill="rgba(101, 67, 33, 0.4)"/>`;
+                htmlStr += `<polygon points="${ptIso(w, 41*scaleY, 0)} ${ptIso(w, 56*scaleY, 0)} ${ptIso(w, 56*scaleY, 6)} ${ptIso(w, 41*scaleY, 6)}" fill="rgba(101, 67, 33, 0.4)"/>`;
+                htmlStr += `<polygon points="${ptIso(12*scaleX, l, 0)} ${ptIso(28*scaleX, l, 0)} ${ptIso(28*scaleX, l, 6)} ${ptIso(12*scaleX, l, 6)}" fill="rgba(101, 67, 33, 0.4)"/>`;
+                htmlStr += `<polygon points="${ptIso(44*scaleX, l, 0)} ${ptIso(60*scaleX, l, 0)} ${ptIso(60*scaleX, l, 6)} ${ptIso(44*scaleX, l, 6)}" fill="rgba(101, 67, 33, 0.4)"/>`;
+                
+                let lowestPt = ptIso(w, l, 0).split(',');
+                handleX = parseFloat(lowestPt[0]); handleY = parseFloat(lowestPt[1]);
+            } else if (type === 'PILLAR') {
+                let strokeC = pColor === 'green' ? '#1e7e34' : pColor === 'blue' ? '#0056b3' : '#d39e00';
+                let w = 60 * scaleX, l = 6 * scaleX, h = 120 * scaleY; 
+                
+                htmlStr += `<line x1="${ptIso(0,0,0).split(',')[0]}" y1="${ptIso(0,0,0).split(',')[1]}" x2="${ptIso(0,0,h).split(',')[0]}" y2="${ptIso(0,0,h).split(',')[1]}" stroke="${strokeC}" stroke-width="1.5"/>`;
+                htmlStr += `<line x1="${ptIso(w,0,0).split(',')[0]}" y1="${ptIso(w,0,0).split(',')[1]}" x2="${ptIso(w,0,h).split(',')[0]}" y2="${ptIso(w,0,h).split(',')[1]}" stroke="${strokeC}" stroke-width="1.5"/>`;
+                htmlStr += `<line x1="${ptIso(0,l,0).split(',')[0]}" y1="${ptIso(0,l,0).split(',')[1]}" x2="${ptIso(0,l,h).split(',')[0]}" y2="${ptIso(0,l,h).split(',')[1]}" stroke="${strokeC}" stroke-width="1.5"/>`;
+                htmlStr += `<line x1="${ptIso(w,l,0).split(',')[0]}" y1="${ptIso(w,l,0).split(',')[1]}" x2="${ptIso(w,l,h).split(',')[0]}" y2="${ptIso(w,l,h).split(',')[1]}" stroke="${strokeC}" stroke-width="1.5"/>`;
+                
+                htmlStr += `<path d="M ${ptIso(0,0,h)} L ${ptIso(w,0,h)} L ${ptIso(w,l,h)} L ${ptIso(0,l,h)} Z" fill="none" stroke="${strokeC}" stroke-width="1.5" stroke-linejoin="round"/>`;
+                htmlStr += `<path d="M ${ptIso(0,0,0)} L ${ptIso(w,0,0)} L ${ptIso(w,l,0)} L ${ptIso(0,l,0)} Z" fill="none" stroke="${strokeC}" stroke-width="1.5" stroke-linejoin="round"/>`;
+                
+                htmlStr += `<path d="M ${ptIso(0,0,h)} L ${ptIso(w,0,h)} L ${ptIso(w,l,0)} L ${ptIso(0,l,0)} Z" fill="transparent" stroke="transparent" stroke-width="15"/>`;
+
+                let topPt = ptIso(w, l, h).split(',');
+                handleX = parseFloat(topPt[0]); handleY = parseFloat(topPt[1]);
+            }
+        }
+        
+        if (!g.dataset.baseHx) {
+            g.dataset.baseHx = handleX / scaleX;
+            g.dataset.baseHy = handleY / scaleY;
+        }
+
+        htmlStr += `<circle class="resize-handle obj-handle" cx="${handleX}" cy="${handleY}" r="12"></circle>`;
+        g.innerHTML = htmlStr;
+    }
+
+    let isDragging = false, isResizing = false, isDraggingLabel = false;
+    let draggedElement = null, resizeHandle = null, resizeGroup = null, draggedLabel = null;
+    let dragStartX, dragStartY, labelDragStartX, labelDragStartY, labelInitialX, labelInitialY;
+    let dragMoved = false, resizeMoved = false;
+    const svg = document.getElementById('main-svg');
+
+    svg.addEventListener('mousedown', function(e) {
+        let labelNode = e.target.closest('.draggable-label-text');
+        if (labelNode) {
+            isDraggingLabel = true;
+            draggedLabel = labelNode;
+            
+            let pt = svg.createSVGPoint();
+            pt.x = e.clientX; pt.y = e.clientY;
+            let svgP = pt.matrixTransform(svg.getScreenCTM().inverse());
+            
+            labelDragStartX = svgP.x;
+            labelDragStartY = svgP.y;
+            labelInitialX = parseFloat(draggedLabel.getAttribute('x'));
+            labelInitialY = parseFloat(draggedLabel.getAttribute('y'));
+            e.preventDefault();
+            return;
+        }
+
+        let handle = e.target.closest('.resize-handle');
+        if (handle) {
+            isResizing = true;
+            resizeMoved = false;
+            resizeHandle = handle;
+            resizeGroup = handle.closest('.sensor-group');
+            
+            if (selectedElement) selectedElement.classList.remove('selected');
+            selectedElement = resizeGroup;
+            selectedElement.classList.add('selected');
+            return;
+        }
+
+        let targetGroup = e.target.closest('.sensor-group');
+        if (targetGroup) {
+            if (selectedElement) selectedElement.classList.remove('selected');
+            selectedElement = targetGroup;
+            selectedElement.classList.add('selected');
+
+            if (e.ctrlKey) {
+                let clone = targetGroup.cloneNode(true);
+                document.getElementById('sensors-layer-' + currentPlan).appendChild(clone);
+                historyStacks[currentPlan].push(clone);
+                
+                selectedElement.classList.remove('selected');
+                selectedElement = clone;
+                selectedElement.classList.add('selected');
+                draggedElement = clone;
+            } else {
+                draggedElement = targetGroup;
+            }
+
+            isDragging = true;
+            dragMoved = false;
+            
+            let pt = svg.createSVGPoint();
+            pt.x = e.clientX; pt.y = e.clientY;
+            let svgP = pt.matrixTransform(svg.getScreenCTM().inverse());
+            
+            dragStartX = svgP.x - parseFloat(draggedElement.dataset.x);
+            dragStartY = svgP.y - parseFloat(draggedElement.dataset.y);
+            
+            document.getElementById('sensors-layer-' + currentPlan).appendChild(draggedElement);
+        } else {
+            if (selectedElement) {
+                selectedElement.classList.remove('selected');
+                selectedElement = null;
+            }
+        }
+    });
+
+    svg.addEventListener('mousemove', function(e) {
+        let pt = svg.createSVGPoint();
+        pt.x = e.clientX; pt.y = e.clientY;
+        let svgP = pt.matrixTransform(svg.getScreenCTM().inverse());
+        lastMouseSvgP = svgP;
+
+        if (isDraggingLabel && draggedLabel) {
+            let newX = labelInitialX + (svgP.x - labelDragStartX);
+            let newY = labelInitialY + (svgP.y - labelDragStartY);
+            
+            draggedLabel.setAttribute('x', newX);
+            draggedLabel.setAttribute('y', newY);
+            
+            let lineId = draggedLabel.getAttribute('data-line-id');
+            if (lineId) {
+                let line = document.getElementById(lineId);
+                if (line) {
+                    let align = draggedLabel.getAttribute('text-anchor');
+                    let lx = newX;
+                    if (align === 'start') lx -= 5;
+                    else if (align === 'end') lx += 5;
+                    
+                    let ly = newY - 4;
+                    if (align === 'middle') ly = newY - 14; 
+                    
+                    line.setAttribute('x2', lx);
+                    line.setAttribute('y2', ly);
+                }
+            }
+            return;
+        }
+
+        if (dimDrawing && dimTempGroup) {
+            let tempLine = dimTempGroup.querySelector('line.main-line');
+            if (tempLine) { tempLine.setAttribute('x2', svgP.x); tempLine.setAttribute('y2', svgP.y); }
+        }
+        if (shapeDrawing && shapeTempGroup) {
+            let endX = svgP.x; let endY = svgP.y;
+            if (currentMode === 'DRAW_RECT') {
+                let rect = shapeTempGroup.querySelector('rect.main-shape');
+                if (rect) {
+                    rect.setAttribute('x', Math.min(shapeStartX, endX));
+                    rect.setAttribute('y', Math.min(shapeStartY, endY));
+                    rect.setAttribute('width', Math.abs(endX - shapeStartX));
+                    rect.setAttribute('height', Math.abs(endY - shapeStartY));
+                }
+            } else if (currentMode === 'DRAW_ARROW' || currentMode === 'S-DIR' || currentMode === 'R-DIR') {
+                let line = shapeTempGroup.querySelector('line.main-line');
+                let head = shapeTempGroup.querySelector('polygon.arrow-head');
+                if (line && head) {
+                    line.setAttribute('x2', endX); line.setAttribute('y2', endY);
+                    let angle = Math.atan2(endY - shapeStartY, endX - shapeStartX);
+                    let headLen = 14;
+                    let pt1X = endX - headLen * Math.cos(angle - Math.PI / 6);
+                    let pt1Y = endY - headLen * Math.sin(angle - Math.PI / 6);
+                    let pt2X = endX - headLen * Math.cos(angle + Math.PI / 6);
+                    let pt2Y = endY - headLen * Math.sin(angle + Math.PI / 6);
+                    head.setAttribute('points', `${endX},${endY} ${pt1X},${pt1Y} ${pt2X},${pt2Y}`);
+                }
+            }
+        }
+
+        if (isResizing && resizeGroup && resizeHandle) {
+            resizeMoved = true;
+            let localX = svgP.x - parseFloat(resizeGroup.dataset.x);
+            let localY = svgP.y - parseFloat(resizeGroup.dataset.y);
+
+            if (resizeHandle.classList.contains('obj-handle')) {
+                let type = resizeGroup.dataset.objType;
+                let is3D = resizeGroup.dataset.is3d === "true";
+                
+                if (!is3D) {
+                    let baseW = type === 'PALLET' ? 66 : 10;
+                    let baseH = type === 'PALLET' ? 72 : 60;
+                    resizeGroup.dataset.scaleX = Math.max(0.2, (localX * 2) / baseW);
+                    resizeGroup.dataset.scaleY = Math.max(0.2, (localY * 2) / baseH);
+                } else {
+                    let s = 0.9;
+                    if (type === 'PALLET') {
+                        let l_new = 0.5 * (localY / (0.5 * s) + localX / (0.866 * s));
+                        let w_new = 0.5 * (localY / (0.5 * s) - localX / (0.866 * s));
+                        resizeGroup.dataset.scaleX = Math.max(0.2, w_new / 72);
+                        resizeGroup.dataset.scaleY = Math.max(0.2, l_new / 66);
+                    } else if (type === 'PILLAR') {
+                        let targetScaleX = localX / (-46.764 * s);
+                        targetScaleX = Math.max(0.2, targetScaleX);
+                        let targetScaleY = (33 * targetScaleX - localY / s) / 120;
+                        targetScaleY = Math.max(0.2, targetScaleY);
+                        
+                        resizeGroup.dataset.scaleX = targetScaleX;
+                        resizeGroup.dataset.scaleY = targetScaleY;
+                    }
+                }
+                renderObjectShape(resizeGroup);
+
+            } else if (resizeHandle.classList.contains('rect-handle')) {
+                localX = Math.max(10, localX); localY = Math.max(10, localY);
+                let mainRect = resizeGroup.querySelector('.main-shape');
+                let grabRect = resizeGroup.querySelector('rect[stroke="transparent"]');
+                if (mainRect) { mainRect.setAttribute('width', localX); mainRect.setAttribute('height', localY); }
+                if (grabRect) { grabRect.setAttribute('width', localX); grabRect.setAttribute('height', localY); }
+                resizeHandle.setAttribute('cx', localX); resizeHandle.setAttribute('cy', localY);
+                
+            } else if (resizeHandle.classList.contains('arrow-handle')) {
+                let mainLine = resizeGroup.querySelector('.main-line');
+                let grabLine = resizeGroup.querySelector('line[stroke="transparent"]');
+                let head = resizeGroup.querySelector('.arrow-head');
+                let dirText = resizeGroup.querySelector('.dir-text');
+                
+                if (mainLine) { mainLine.setAttribute('x2', localX); mainLine.setAttribute('y2', localY); }
+                if (grabLine) { grabLine.setAttribute('x2', localX); grabLine.setAttribute('y2', localY); }
+                
+                let angle = Math.atan2(localY, localX);
+                if (head) {
+                    let headLen = 14;
+                    let pt1X = localX - headLen * Math.cos(angle - Math.PI / 6);
+                    let pt1Y = localY - headLen * Math.sin(angle - Math.PI / 6);
+                    let pt2X = localX - headLen * Math.cos(angle + Math.PI / 6);
+                    let pt2Y = localY - headLen * Math.sin(angle + Math.PI / 6);
+                    head.setAttribute('points', `${localX},${localY} ${pt1X},${pt1Y} ${pt2X},${pt2Y}`);
+                }
+                if (dirText) {
+                    dirText.setAttribute('x', localX / 2); dirText.setAttribute('y', localY / 2 - 8);
+                    let deg = angle * 180 / Math.PI;
+                    if (deg > 90 || deg < -90) deg += 180;
+                    dirText.setAttribute("transform", `rotate(${deg}, ${localX/2}, ${localY/2})`);
+                }
+                resizeHandle.setAttribute('cx', localX); resizeHandle.setAttribute('cy', localY);
+                
+            } else if (resizeHandle.classList.contains('dim-handle')) {
+                let mainLine = resizeGroup.querySelector('.main-line');
+                let grabLine = resizeGroup.querySelector('line[stroke="transparent"]');
+                if (mainLine) { mainLine.setAttribute('x2', localX); mainLine.setAttribute('y2', localY); }
+                if (grabLine) { grabLine.setAttribute('x2', localX); grabLine.setAttribute('y2', localY); }
+                
+                let angle = Math.atan2(localY, localX);
+                let tickLen = 8;
+                let dxTick = Math.cos(angle + Math.PI/2) * tickLen;
+                let dyTick = Math.sin(angle + Math.PI/2) * tickLen;
+                
+                let ticks = resizeGroup.querySelectorAll('.dim-tick');
+                if (ticks.length >= 2) {
+                    ticks[0].setAttribute('x1', dxTick); ticks[0].setAttribute('y1', dyTick);
+                    ticks[0].setAttribute('x2', -dxTick); ticks[0].setAttribute('y2', -dyTick);
+                    ticks[1].setAttribute('x1', localX + dxTick); ticks[1].setAttribute('y1', localY + dyTick);
+                    ticks[1].setAttribute('x2', localX - dxTick); ticks[1].setAttribute('y2', localY - dyTick);
+                }
+                
+                let text = resizeGroup.querySelector('text');
+                if (text) {
+                    text.setAttribute('x', localX / 2); text.setAttribute('y', localY / 2 - 8);
+                    let deg = angle * 180 / Math.PI;
+                    if (deg > 90 || deg < -90) deg += 180;
+                    text.setAttribute("transform", `rotate(${deg}, ${localX/2}, ${localY/2})`);
+                }
+                resizeHandle.setAttribute('cx', localX); resizeHandle.setAttribute('cy', localY);
+            }
+            return;
+        }
+
+        if (isDragging && draggedElement) {
+            dragMoved = true;
+            let newX = svgP.x - dragStartX; let newY = svgP.y - dragStartY;
+            draggedElement.dataset.x = newX; draggedElement.dataset.y = newY;
+            draggedElement.setAttribute('transform', `translate(${newX}, ${newY})`);
+        }
+    });
+
+    svg.addEventListener('mouseup', function() {
+        if (isDraggingLabel && draggedLabel) {
+            let id = draggedLabel.getAttribute('data-id');
+            customLabelPositions[id] = {
+                x: parseFloat(draggedLabel.getAttribute('x')),
+                y: parseFloat(draggedLabel.getAttribute('y'))
+            };
+            isDraggingLabel = false; draggedLabel = null;
+        }
+        if (isDragging) { isDragging = false; draggedElement = null; }
+        if (isResizing) { isResizing = false; resizeHandle = null; resizeGroup = null; }
+    });
+
+    svg.addEventListener('mouseleave', function() {
+        if (isDraggingLabel) { isDraggingLabel = false; draggedLabel = null; }
+        if (isDragging) { isDragging = false; draggedElement = null; }
+        if (isResizing) { isResizing = false; resizeHandle = null; resizeGroup = null; }
+    });
+
+    svg.addEventListener('click', function(e) {
+        if (dragMoved || resizeMoved) { dragMoved = false; resizeMoved = false; return; }
+        if (e.ctrlKey) return; 
+        if (e.target.closest('.draggable-label-text')) return; 
+        
+        let isSpecialMode = ['DIM', 'DRAW_RECT', 'DRAW_ARROW', 'S-DIR', 'R-DIR', 'PALLET', 'PILLAR'].includes(currentMode);
+        if (e.target.closest('.sensor-group') && !isSpecialMode) return;
+        
+        if (!currentMode) { showModal('alert', '請先在上方選擇要配置的模式與物件！'); return; }
+
+        let pt = this.createSVGPoint();
+        pt.x = e.clientX; pt.y = e.clientY;
+        let svgP = pt.matrixTransform(this.getScreenCTM().inverse());
+
+        let maxPlanX = currentPlan === 'W03' ? 620 : 1000;
+        if (svgP.x > maxPlanX && !isSpecialMode) {
+            if (dimDrawing) cancelDimDrawing();
+            if (shapeDrawing) cancelShapeDrawing();
+            showModal('alert', '請將點位物件放置於平面圖或 3D 貨架區域內喔！\n(若是尺寸、繪圖或立體物件則不受此限制)');
+            return;
+        }
+
+        const NS = "http://www.w3.org/2000/svg";
+        const currentLayer = document.getElementById('sensors-layer-' + currentPlan);
+
+        if (['PALLET', 'PILLAR'].includes(currentMode)) {
+            let g = document.createElementNS(NS, "g");
+            g.setAttribute("class", "sensor-group selected");
+            if (selectedElement) selectedElement.classList.remove('selected');
+            selectedElement = g;
+            
+            g.dataset.x = svgP.x; g.dataset.y = svgP.y;
+            g.setAttribute("transform", `translate(${svgP.x}, ${svgP.y})`);
+            g.dataset.objType = currentMode;
+            g.dataset.scaleX = "1";
+            g.dataset.scaleY = "1";
+            g.dataset.is3d = (currentPlan === 'W04_3D') ? "true" : "false";
+            g.dataset.color = document.getElementById('pillar-color').value;
+
+            renderObjectShape(g);
+
+            currentLayer.appendChild(g);
+            historyStacks[currentPlan].push(g);
+            return;
+        }
+
+        if (['DRAW_RECT', 'DRAW_ARROW', 'S-DIR', 'R-DIR'].includes(currentMode)) {
+            let color = '#ff0000';
+            if (currentMode === 'S-DIR') color = '#007bff';
+            if (currentMode === 'R-DIR') color = '#fd7e14';
+            if (currentMode === 'DRAW_RECT' || currentMode === 'DRAW_ARROW') color = document.getElementById('draw-color').value;
+            
+            if (!shapeDrawing) {
+                shapeDrawing = true; shapeStartX = svgP.x; shapeStartY = svgP.y;
+                shapeTempGroup = document.createElementNS(NS, "g");
+                shapeTempGroup.style.pointerEvents = "none";
+                
+                if (currentMode === 'DRAW_RECT') {
+                    let r = document.createElementNS(NS, "rect");
+                    r.setAttribute('class', 'main-shape');
+                    r.setAttribute('stroke', color); r.setAttribute('stroke-width', '3');
+                    r.setAttribute('fill', 'none'); r.setAttribute('stroke-dasharray', '5,5');
+                    shapeTempGroup.appendChild(r);
+                } else {
+                    let l = document.createElementNS(NS, "line");
+                    l.setAttribute('class', 'main-line');
+                    l.setAttribute('x1', shapeStartX); l.setAttribute('y1', shapeStartY);
+                    l.setAttribute('x2', shapeStartX); l.setAttribute('y2', shapeStartY);
+                    l.setAttribute('stroke', color); l.setAttribute('stroke-width', '3');
+                    if (currentMode === 'R-DIR') l.setAttribute('stroke-dasharray', '3,2');
+                    else if (currentMode === 'DRAW_ARROW') l.setAttribute('stroke-dasharray', '5,5');
+                    
+                    let poly = document.createElementNS(NS, "polygon");
+                    poly.setAttribute('class', 'arrow-head'); poly.setAttribute('fill', color);
+                    shapeTempGroup.appendChild(l); shapeTempGroup.appendChild(poly);
+                }
+                svg.appendChild(shapeTempGroup);
+            } else {
+                let endX = svgP.x; let endY = svgP.y;
+                cancelShapeDrawing();
+                if (Math.hypot(endX - shapeStartX, endY - shapeStartY) < 5) return;
+
+                let g = document.createElementNS(NS, "g");
+                g.setAttribute("class", "sensor-group selected");
+                if (selectedElement) selectedElement.classList.remove('selected');
+                selectedElement = g;
+                
+                let dx = endX - shapeStartX; let dy = endY - shapeStartY;
+
+                if (currentMode === 'DRAW_RECT') {
+                    let minX = Math.min(shapeStartX, endX); let minY = Math.min(shapeStartY, endY);
+                    let w = Math.abs(endX - shapeStartX); let h = Math.abs(endY - shapeStartY);
+
+                    g.dataset.x = minX; g.dataset.y = minY;
+                    g.setAttribute("transform", `translate(${minX}, ${minY})`);
+
+                    let grabR = document.createElementNS(NS, "rect");
+                    grabR.setAttribute("x", 0); grabR.setAttribute("y", 0);
+                    grabR.setAttribute("width", w); grabR.setAttribute("height", h);
+                    grabR.setAttribute("stroke", "transparent"); grabR.setAttribute("stroke-width", "15");
+                    grabR.setAttribute("fill", "none"); g.appendChild(grabR);
+
+                    let r = document.createElementNS(NS, "rect");
+                    r.setAttribute('class', 'main-shape');
+                    r.setAttribute("x", 0); r.setAttribute("y", 0);
+                    r.setAttribute("width", w); r.setAttribute("height", h);
+                    r.setAttribute("stroke", color); r.setAttribute("stroke-width", "3");
+                    r.setAttribute("fill", "none"); g.appendChild(r);
+                    
+                    let handle = document.createElementNS(NS, "circle");
+                    handle.setAttribute("class", "resize-handle rect-handle");
+                    handle.setAttribute("cx", w); handle.setAttribute("cy", h);
+                    handle.setAttribute("r", "12"); g.appendChild(handle);
+                } else {
+                    g.dataset.x = shapeStartX; g.dataset.y = shapeStartY;
+                    g.setAttribute("transform", `translate(${shapeStartX}, ${shapeStartY})`);
+
+                    let grabLine = document.createElementNS(NS, "line");
+                    grabLine.setAttribute("x1", 0); grabLine.setAttribute("y1", 0);
+                    grabLine.setAttribute("x2", dx); grabLine.setAttribute("y2", dy);
+                    grabLine.setAttribute("stroke", "transparent"); grabLine.setAttribute("stroke-width", "20");
+                    g.appendChild(grabLine);
+
+                    let line = document.createElementNS(NS, "line");
+                    line.setAttribute('class', 'main-line');
+                    line.setAttribute("x1", 0); line.setAttribute("y1", 0);
+                    line.setAttribute("x2", dx); line.setAttribute("y2", dy);
+                    line.setAttribute("stroke", color); line.setAttribute("stroke-width", "3");
+                    if (currentMode === 'R-DIR') line.setAttribute('stroke-dasharray', '3,2');
+                    g.appendChild(line);
+
+                    let angle = Math.atan2(dy, dx);
+                    let headLen = 14;
+                    let pt1X = dx - headLen * Math.cos(angle - Math.PI / 6);
+                    let pt1Y = dy - headLen * Math.sin(angle - Math.PI / 6);
+                    let pt2X = dx - headLen * Math.cos(angle + Math.PI / 6);
+                    let pt2Y = dy - headLen * Math.sin(angle + Math.PI / 6);
+                    
+                    let poly = document.createElementNS(NS, "polygon");
+                    poly.setAttribute('class', 'arrow-head');
+                    poly.setAttribute('points', `${dx},${dy} ${pt1X},${pt1Y} ${pt2X},${pt2Y}`);
+                    poly.setAttribute('fill', color); g.appendChild(poly);
+                    
+                    if (currentMode === 'S-DIR' || currentMode === 'R-DIR') {
+                        let dirText = document.createElementNS(NS, "text");
+                        dirText.setAttribute('class', 'dir-text');
+                        dirText.textContent = currentMode === 'S-DIR' ? "SA" : "RA";
+                        dirText.setAttribute("x", dx / 2); dirText.setAttribute("y", dy / 2 - 8);
+                        dirText.setAttribute("text-anchor", "middle"); dirText.setAttribute("fill", color);
+                        dirText.setAttribute("font-weight", "bold"); dirText.setAttribute("font-size", "14");
+                        dirText.setAttribute("paint-order", "stroke fill"); dirText.setAttribute("stroke", "#fff");
+                        dirText.setAttribute("stroke-width", "4"); dirText.setAttribute("stroke-linecap", "round");
+                        dirText.setAttribute("stroke-linejoin", "round"); dirText.style.cursor = "grab";
+
+                        let deg = angle * 180 / Math.PI;
+                        if (deg > 90 || deg < -90) deg += 180;
+                        dirText.setAttribute("transform", `rotate(${deg}, ${dx/2}, ${dy/2})`);
+                        g.appendChild(dirText);
+                    }
+                    
+                    let handle = document.createElementNS(NS, "circle");
+                    handle.setAttribute("class", "resize-handle arrow-handle");
+                    handle.setAttribute("cx", dx); handle.setAttribute("cy", dy);
+                    handle.setAttribute("r", "12"); g.appendChild(handle);
+                }
+                currentLayer.appendChild(g);
+                historyStacks[currentPlan].push(g);
+            }
+            return;
+        }
+
+        if (currentMode === 'DIM') {
+            if (!dimDrawing) {
+                dimDrawing = true; dimStartX = svgP.x; dimStartY = svgP.y;
+                dimTempGroup = document.createElementNS(NS, "g");
+                dimTempGroup.style.pointerEvents = "none";
+                let l = document.createElementNS(NS, "line");
+                l.setAttribute('class', 'main-line');
+                l.setAttribute('x1', dimStartX); l.setAttribute('y1', dimStartY);
+                l.setAttribute('x2', dimStartX); l.setAttribute('y2', dimStartY);
+                l.setAttribute('stroke', '#dc3545'); l.setAttribute('stroke-width', '2'); l.setAttribute('stroke-dasharray', '5,5');
+                dimTempGroup.appendChild(l); svg.appendChild(dimTempGroup);
+            } else {
+                let endX = svgP.x; let endY = svgP.y;
+                cancelDimDrawing();
+                if (Math.hypot(endX - dimStartX, endY - dimStartY) < 10) return;
+
+                showModal('prompt', '請輸入尺寸或備註 (例如: 1.5 M):', (val) => {
+                    if (val === null || val.trim() === "") return;
+                    let g = document.createElementNS(NS, "g");
+                    g.setAttribute("class", "sensor-group selected");
+                    if (selectedElement) selectedElement.classList.remove('selected');
+                    selectedElement = g;
+                    
+                    g.dataset.x = dimStartX; g.dataset.y = dimStartY;
+                    g.setAttribute("transform", `translate(${dimStartX}, ${dimStartY})`);
+                    let dx = endX - dimStartX; let dy = endY - dimStartY;
+
+                    let grabLine = document.createElementNS(NS, "line");
+                    grabLine.setAttribute("x1", 0); grabLine.setAttribute("y1", 0);
+                    grabLine.setAttribute("x2", dx); grabLine.setAttribute("y2", dy);
+                    grabLine.setAttribute("stroke", "transparent"); grabLine.setAttribute("stroke-width", "20");
+                    g.appendChild(grabLine);
+
+                    let line = document.createElementNS(NS, "line");
+                    line.setAttribute('class', 'main-line');
+                    line.setAttribute("x1", 0); line.setAttribute("y1", 0);
+                    line.setAttribute("x2", dx); line.setAttribute("y2", dy);
+                    line.setAttribute("stroke", "#dc3545"); line.setAttribute("stroke-width", "2");
+                    g.appendChild(line);
+
+                    let angle = Math.atan2(dy, dx);
+                    let tickLen = 8;
+                    let dxTick = Math.cos(angle + Math.PI/2) * tickLen;
+                    let dyTick = Math.sin(angle + Math.PI/2) * tickLen;
+
+                    let tick1 = document.createElementNS(NS, "line");
+                    tick1.setAttribute('class', 'dim-tick');
+                    tick1.setAttribute("x1", dxTick); tick1.setAttribute("y1", dyTick);
+                    tick1.setAttribute("x2", -dxTick); tick1.setAttribute("y2", -dyTick);
+                    tick1.setAttribute("stroke", "#dc3545"); tick1.setAttribute("stroke-width", "2");
+                    g.appendChild(tick1);
+
+                    let tick2 = document.createElementNS(NS, "line");
+                    tick2.setAttribute('class', 'dim-tick');
+                    tick2.setAttribute("x1", dx + dxTick); tick2.setAttribute("y1", dy + dyTick);
+                    tick2.setAttribute("x2", dx - dxTick); tick2.setAttribute("y2", dy - dyTick);
+                    tick2.setAttribute("stroke", "#dc3545"); tick2.setAttribute("stroke-width", "2");
+                    g.appendChild(tick2);
+
+                    let text = document.createElementNS(NS, "text");
+                    text.textContent = val;
+                    text.setAttribute("x", dx / 2); text.setAttribute("y", dy / 2 - 8);
+                    text.setAttribute("text-anchor", "middle"); text.setAttribute("fill", "#dc3545");
+                    text.setAttribute("font-weight", "bold"); text.setAttribute("font-size", "14");
+                    text.setAttribute("paint-order", "stroke fill"); text.setAttribute("stroke", "#fff");
+                    text.setAttribute("stroke-width", "4"); text.setAttribute("stroke-linecap", "round");
+                    text.setAttribute("stroke-linejoin", "round"); text.style.cursor = "grab";
+
+                    let deg = angle * 180 / Math.PI;
+                    if (deg > 90 || deg < -90) deg += 180;
+                    text.setAttribute("transform", `rotate(${deg}, ${dx/2}, ${dy/2})`);
+                    g.appendChild(text);
+                    
+                    let handle = document.createElementNS(NS, "circle");
+                    handle.setAttribute("class", "resize-handle dim-handle");
+                    handle.setAttribute("cx", dx); handle.setAttribute("cy", dy);
+                    handle.setAttribute("r", "12"); 
+                    g.appendChild(handle);
+                    
+                    currentLayer.appendChild(g);
+                    historyStacks[currentPlan].push(g);
+                });
+            }
+            return;
+        }
+
+        let g = document.createElementNS(NS, "g");
+        g.setAttribute("class", "sensor-group selected");
+        if (selectedElement) selectedElement.classList.remove('selected');
+        selectedElement = g;
+        
+        g.dataset.x = svgP.x; g.dataset.y = svgP.y;
+        g.setAttribute("transform", `translate(${svgP.x}, ${svgP.y})`);
+
+        if (['T', 'M', 'B'].includes(currentMode)) {
+            let useSensor = document.createElementNS(NS, "use");
+            useSensor.setAttribute("href", currentMode === 'T' ? '#s-top' : currentMode === 'M' ? '#s-mid' : '#s-bot');
+            let useBg = document.createElementNS(NS, "use");
+            useBg.setAttribute("href", "#label-bg"); useBg.setAttribute("x", "15"); useBg.setAttribute("y", "-10");
+            let text = document.createElementNS(NS, "text");
+            text.setAttribute("x", "15"); text.setAttribute("y", "-6");
+            text.setAttribute("font-size", "10"); text.setAttribute("text-anchor", "middle");
+            text.style.pointerEvents = "none";
+            text.textContent = sensorCounts[currentPlan];
+
+            g.appendChild(useSensor); g.appendChild(useBg); g.appendChild(text);
+            sensorCounts[currentPlan]++;
+            currentLayer.appendChild(g);
+            historyStacks[currentPlan].push(g);
+        } else {
+            let useId = "#" + currentMode.toLowerCase();
+            if(currentMode === 'SUPPLY') useId = "#icon-supply";
+            if(currentMode === 'RETURN') useId = "#icon-return";
+            let use = document.createElementNS(NS, "use");
+            use.setAttribute("href", useId);
+            g.appendChild(use);
+            currentLayer.appendChild(g);
+            historyStacks[currentPlan].push(g);
+        }
+    });
+
+    function undo() {
+        if (historyStacks[currentPlan].length > 0) {
+            let lastSensor = historyStacks[currentPlan].pop();
+            if (lastSensor.querySelector('use[href^="#s-top"], use[href^="#s-mid"], use[href^="#s-bot"]')) {
+                sensorCounts[currentPlan]--;
+            }
+            if (selectedElement === lastSensor) selectedElement = null;
+            lastSensor.remove();
+        } else {
+            showModal('alert', '當前區域已經沒有配置可以復原了！');
+        }
+    }
+
+    function clearAll() {
+        showModal('confirm', `確定要清除「${currentPlan}」畫布上的所有配置嗎？`, (res) => {
+            if (res) {
+                const layer = document.getElementById('sensors-layer-' + currentPlan);
+                while (layer.firstChild) layer.removeChild(layer.firstChild);
+                historyStacks[currentPlan] = [];
+                sensorCounts[currentPlan] = 1;
+                selectedElement = null;
+            }
+        });
+    }
+
+    function drawRacks() {
+        let w03_r1Tiers = parseInt(document.getElementById('w03-r1-tiers').value) || 3;
+        let w03_r2Tiers = parseInt(document.getElementById('w03-r2-tiers').value) || 3;
+        let w03_r1Name = document.getElementById('w03-r1-name').value || "貨架 1";
+        let w03_r2Name = document.getElementById('w03-r2-name').value || "貨架 2";
+
+        let w04_r3Tiers = parseInt(document.getElementById('w04-r3-tiers').value) || 2; 
+        let w04_r1Tiers = parseInt(document.getElementById('w04-r1-tiers').value) || 5; 
+        let w04_r2Tiers = parseInt(document.getElementById('w04-r2-tiers').value) || 4; 
+        let w04_r3Name = document.getElementById('w04-r3-name').value || "重型貨架(左)";
+        let w04_r1Name = document.getElementById('w04-r1-name').value || "重型貨架(右上)";
+        let w04_r2Name = document.getElementById('w04-r2-name').value || "中型貨架(右下)";
+
+        const NS = "http://www.w3.org/2000/svg";
+
+        updateMSelect('w03-r1', w03_r1Tiers);
+        updateMSelect('w03-r2', w03_r2Tiers);
+        updateMSelect('w04-r3', w04_r3Tiers);
+        updateMSelect('w04-r1', w04_r1Tiers);
+        updateMSelect('w04-r2', w04_r2Tiers);
+
+        let tW03r1 = document.getElementById('title-w03-r1');
+        if (tW03r1) tW03r1.textContent = `■ ${w03_r1Name}`;
+        let tW03r2 = document.getElementById('title-w03-r2');
+        if (tW03r2) tW03r2.textContent = `■ ${w03_r2Name}`;
+        
+        let tW04_2dr3 = document.getElementById('title-w04_2d-r3');
+        if (tW04_2dr3) tW04_2dr3.textContent = `■ ${w04_r3Name}`;
+        let tW04_2dr1 = document.getElementById('title-w04_2d-r1');
+        if (tW04_2dr1) tW04_2dr1.textContent = `■ ${w04_r1Name}`;
+        let tW04_2dr2 = document.getElementById('title-w04_2d-r2');
+        if (tW04_2dr2) tW04_2dr2.textContent = `■ ${w04_r2Name}`;
+
+        renderHeightInputs('w03-r1', w03_r1Tiers);
+        renderHeightInputs('w03-r2', w03_r2Tiers);
+        renderHeightInputs('w04-r3', w04_r3Tiers);
+        renderHeightInputs('w04-r1', w04_r1Tiers);
+        renderHeightInputs('w04-r2', w04_r2Tiers);
+
+        // ================= W-03 =================
+        const g2dW03 = document.getElementById('w03-dynamic-racks');
+        g2dW03.innerHTML = '';
+        [50, 240, 320].forEach((sx, index) => {
+            const group = document.createElementNS(NS, "g");
+            group.setAttribute('transform', `translate(${sx}, 140)`);
+            for(let i=0; i<5; i++) {
+                let y = i * 60;
+                let rect = document.createElementNS(NS, "rect");
+                rect.setAttribute('x', '0'); rect.setAttribute('y', y);
+                rect.setAttribute('width', '80'); rect.setAttribute('height', '60');
+                group.appendChild(rect);
+                let l1 = document.createElementNS(NS, "line");
+                l1.setAttribute('x1', '0'); l1.setAttribute('y1', y); l1.setAttribute('x2', '80'); l1.setAttribute('y2', y + 60);
+                group.appendChild(l1);
+                let l2 = document.createElementNS(NS, "line");
+                l2.setAttribute('x1', '80'); l2.setAttribute('y1', y); l2.setAttribute('x2', '0'); l2.setAttribute('y2', y + 60);
+                group.appendChild(l2);
+            }
+            let text = document.createElementNS(NS, "text");
+            if (index === 2) {
+                text.setAttribute('x', '90'); text.setAttribute('y', '150');
+                text.setAttribute('transform', 'rotate(-90, 90, 150)');
+            } else {
+                text.setAttribute('x', '-10'); text.setAttribute('y', '150');
+                text.setAttribute('transform', 'rotate(-90, -10, 150)');
+            }
+            text.setAttribute('font-size', '12'); text.setAttribute('fill', '#333'); text.setAttribute('stroke', 'none');
+            text.textContent = `${w03_r1Tiers} tier Rack`; 
+            group.appendChild(text);
+            g2dW03.appendChild(group);
+        });
+
+        draw3DRack('w03-3d-rack1', 'w03-r1', w03_r1Name, w03_r1Tiers, '#2b5e9c', '#c76a16', '#fff9c4');
+        draw3DRack('w03-3d-rack2', 'w03-r2', w03_r2Name, w03_r2Tiers, '#6c757d', '#5e5e5e', '#f8f9fa');
+        
+        // ================= W-04 (2D 平面) =================
+        const g2dW04 = document.getElementById('w04_2d-dynamic-racks');
+        if (g2dW04) {
+            g2dW04.innerHTML = '';
+            
+            let gW04Left = document.createElementNS(NS, "g");
+            gW04Left.setAttribute('transform', `translate(140, 180)`);
+            for(let i=0; i<6; i++) {
+                let y = i * 78;
+                let rect = document.createElementNS(NS, "rect");
+                rect.setAttribute('x', '0'); rect.setAttribute('y', y);
+                rect.setAttribute('width', '90'); rect.setAttribute('height', '78');
+                gW04Left.appendChild(rect);
+                let l1 = document.createElementNS(NS, "line");
+                l1.setAttribute('x1', '0'); l1.setAttribute('y1', y); l1.setAttribute('x2', '90'); l1.setAttribute('y2', y + 78);
+                gW04Left.appendChild(l1);
+                let l2 = document.createElementNS(NS, "line");
+                l2.setAttribute('x1', '90'); l2.setAttribute('y1', y); l2.setAttribute('x2', '0'); l2.setAttribute('y2', y + 78);
+                gW04Left.appendChild(l2);
+            }
+            g2dW04.appendChild(gW04Left);
+
+            let gW04RightTop = document.createElementNS(NS, "g");
+            gW04RightTop.setAttribute('transform', `translate(350, 180)`);
+            for(let i=0; i<4; i++) {
+                let y = i * 78;
+                let rect = document.createElementNS(NS, "rect");
+                rect.setAttribute('x', '0'); rect.setAttribute('y', y);
+                rect.setAttribute('width', '90'); rect.setAttribute('height', '78');
+                gW04RightTop.appendChild(rect);
+                let l1 = document.createElementNS(NS, "line");
+                l1.setAttribute('x1', '0'); l1.setAttribute('y1', y); l1.setAttribute('x2', '90'); l1.setAttribute('y2', y + 78);
+                gW04RightTop.appendChild(l1);
+                let l2 = document.createElementNS(NS, "line");
+                l2.setAttribute('x1', '90'); l2.setAttribute('y1', y); l2.setAttribute('x2', '0'); l2.setAttribute('y2', y + 78);
+                gW04RightTop.appendChild(l2);
+            }
+            g2dW04.appendChild(gW04RightTop);
+
+            let gW04RightBot = document.createElementNS(NS, "g");
+            gW04RightBot.setAttribute('transform', `translate(350, 492)`); 
+            for(let i=0; i<2; i++) {
+                let y = i * 78;
+                let rect = document.createElementNS(NS, "rect");
+                rect.setAttribute('x', '0'); rect.setAttribute('y', y);
+                rect.setAttribute('width', '90'); rect.setAttribute('height', '78');
+                gW04RightBot.appendChild(rect);
+                let l1 = document.createElementNS(NS, "line");
+                l1.setAttribute('x1', '0'); l1.setAttribute('y1', y); l1.setAttribute('x2', '90'); l1.setAttribute('y2', y + 78);
+                gW04RightBot.appendChild(l1);
+                let l2 = document.createElementNS(NS, "line");
+                l2.setAttribute('x1', '90'); l2.setAttribute('y1', y); l2.setAttribute('x2', '0'); l2.setAttribute('y2', y + 78);
+                gW04RightBot.appendChild(l2);
+            }
+            g2dW04.appendChild(gW04RightBot);
+
+            draw3DRack('w04_2d-3d-rack3', 'w04-r3', w04_r3Name, w04_r3Tiers, '#28a745', '#1e7e34', '#d4edda'); 
+            draw3DRack('w04_2d-3d-rack1', 'w04-r1', w04_r1Name, w04_r1Tiers, '#007bff', '#0056b3', '#cce5ff'); 
+            draw3DRack('w04_2d-3d-rack2', 'w04-r2', w04_r2Name, w04_r2Tiers, '#ffc107', '#d39e00', '#fff3cd'); 
+        }
+
+        // ================= W-04 (全視角 3D Isometric) =================
+        const gW04 = document.getElementById('w04_3d-dynamic-racks');
+        if (gW04) {
+            gW04.innerHTML = '';
+            
+            const ox = 500, oy = 280, s = 0.9;
+            function iso(x, y, z) {
+                return { x: ox + (-x * 0.866 + y * 0.866) * s, y: oy + (x * 0.5 + y * 0.5 - z) * s };
+            }
+            function pt(x, y, z) { let p = iso(x, y, z); return `${p.x},${p.y}`; }
+            
+            function poly(pts, fill, stroke, width, dash='') {
+                let el = document.createElementNS(NS, 'path');
+                el.setAttribute('d', `M ${pts[0]} ` + pts.slice(1).map(p => `L ${p}`).join(' ') + ' Z');
+                el.setAttribute('fill', fill); el.setAttribute('stroke', stroke);
+                el.setAttribute('stroke-width', width); el.setAttribute('stroke-linejoin', 'round');
+                if(dash) el.setAttribute('stroke-dasharray', dash);
+                gW04.appendChild(el);
+            }
+            function line(p1, p2, stroke, width, dash='') {
+                let el = document.createElementNS(NS, 'line');
+                el.setAttribute('x1', p1.split(',')[0]); el.setAttribute('y1', p1.split(',')[1]);
+                el.setAttribute('x2', p2.split(',')[0]); el.setAttribute('y2', p2.split(',')[1]);
+                el.setAttribute('stroke', stroke); el.setAttribute('stroke-width', width);
+                if(dash) el.setAttribute('stroke-dasharray', dash);
+                gW04.appendChild(el);
+            }
+            function drawText(txt, x, y, fill, anchor, size, weight='normal') {
+                let el = document.createElementNS(NS, 'text');
+                el.setAttribute('x', x); el.setAttribute('y', y);
+                el.setAttribute('fill', fill); el.setAttribute('font-size', size);
+                el.setAttribute('font-weight', weight); el.setAttribute('text-anchor', anchor);
+                el.textContent = txt;
+                gW04.appendChild(el);
+                return el;
+            }
+
+            poly([pt(0,0,0), pt(350,0,0), pt(350,600,0), pt(0,600,0)], '#f4f9f4', '#000', 2); // Floor
+            poly([pt(0,0,0), pt(350,0,0), pt(350,0,250), pt(0,0,250)], '#eef5ee', '#000', 2); // Left Wall
+            poly([pt(0,0,0), pt(0,600,0), pt(0,600,250), pt(0,0,250)], '#eef5ee', '#000', 2); // Right Wall
+            
+            poly([pt(350,20,0), pt(350,120,0), pt(350,120,180), pt(350,20,180)], '#fff', '#000', 1.5);
+            line(pt(350,70,0), pt(350,70,180), '#000', 1);
+            poly([pt(350,35,100), pt(350,55,100), pt(350,55,140), pt(350,35,140)], '#e6f2ff', '#000', 1); 
+            poly([pt(350,85,100), pt(350,105,100), pt(350,105,140), pt(350,85,140)], '#e6f2ff', '#000', 1); 
+            
+            let dp = iso(350, 70, 210);
+            drawText("DOOR", dp.x - 30, dp.y, '#333', 'end', 14, 'bold');
+            drawText("(FRONT)", dp.x - 30, dp.y + 15, '#333', 'end', 12);
+            line(pt(350,70,180), `${dp.x-25},${dp.y+5}`, '#999', 1, '3,3');
+
+            function drawIsoRackObj(containerId, inputPrefix, name, tiers, x, y, w, l, maxZ, strokeColor, planeColor) {
+                line(pt(x,y,0), pt(x,y,maxZ), strokeColor, 2);
+                line(pt(x+w,y,0), pt(x+w,y,maxZ), strokeColor, 2);
+                line(pt(x,y+l,0), pt(x,y+l,maxZ), strokeColor, 2);
+                line(pt(x+w,y+l,0), pt(x+w,y+l,maxZ), strokeColor, 2);
+
+                const gap = maxZ / (tiers - 1);
+                const mIndex = rackMIndex[inputPrefix] !== undefined ? rackMIndex[inputPrefix] : Math.floor((tiers - 1) / 2);
+
+                for(let i = tiers - 1; i >= 0; i--) { 
+                    let z = maxZ - (i * gap);
+                    let pColor = (i === 0) ? '#fff' : planeColor;
+                    poly([pt(x,y,z), pt(x+w,y,z), pt(x+w,y+l,z), pt(x,y+l,z)], pColor, strokeColor, 1.5);
+                    
+                    let levelName = "";
+                    if (i === 0) levelName = "Top";
+                    else if (i === tiers - 1) levelName = "Bottom";
+                    else if (i === mIndex) levelName = "Middle";
+                    else levelName = "Level " + (tiers - i);
+
+                    let currentVal = rackHeights[inputPrefix] && rackHeights[inputPrefix][i] !== undefined ? rackHeights[inputPrefix][i] : 0;
+                    
+                    let cp, txtPos, align;
+                    if (inputPrefix === 'w04-r3') { // 左側貨架
+                        let edgeIso = iso(x+w, y, z);
+                        cp = `${edgeIso.x},${edgeIso.y}`;
+                        txtPos = { x: edgeIso.x - 40, y: edgeIso.y - 10 };
+                        align = 'end';
+                    } else if (inputPrefix === 'w04-r1') { // 右上貨架
+                        let edgeIso = iso(x+w, y, z);
+                        cp = `${edgeIso.x},${edgeIso.y}`;
+                        txtPos = { x: edgeIso.x - 40, y: edgeIso.y - 10 };
+                        align = 'end';
+                    } else { // 右下貨架
+                        let edgeIso = iso(x, y+l, z);
+                        cp = `${edgeIso.x},${edgeIso.y}`;
+                        txtPos = { x: edgeIso.x + 40, y: edgeIso.y - 10 };
+                        align = 'start';
+                    }
+
+                    let labelId = `text-iso-${inputPrefix}-${i}`; 
+                    let textX = customLabelPositions[labelId] ? customLabelPositions[labelId].x : txtPos.x;
+                    let textY = customLabelPositions[labelId] ? customLabelPositions[labelId].y : txtPos.y;
+
+                    let lineId = `line-${labelId}`;
+                    let lineEl = document.createElementNS(NS, 'line');
+                    lineEl.setAttribute('id', lineId);
+                    lineEl.setAttribute('x1', cp.split(',')[0]);
+                    lineEl.setAttribute('y1', cp.split(',')[1]);
+                    lineEl.setAttribute('x2', textX + (align === 'end' ? 5 : -5));
+                    lineEl.setAttribute('y2', textY - 4);
+                    lineEl.setAttribute('stroke', strokeColor);
+                    lineEl.setAttribute('stroke-width', '1');
+                    lineEl.setAttribute('stroke-dasharray', '2,2');
+                    gW04.appendChild(lineEl);
+
+                    let t = document.createElementNS(NS, 'text');
+                    t.setAttribute('id', labelId);
+                    t.setAttribute('class', 'draggable-label-text');
+                    t.setAttribute('data-id', labelId);
+                    t.setAttribute('data-line-id', lineId);
+                    t.setAttribute('x', textX);
+                    t.setAttribute('y', textY);
+                    t.setAttribute('fill', '#000');
+                    t.setAttribute('font-size', '12');
+                    t.setAttribute('text-anchor', align);
+                    t.setAttribute('paint-order', 'stroke fill');
+                    t.setAttribute('stroke', '#fff');
+                    t.setAttribute('stroke-width', '3');
+                    t.setAttribute('stroke-linecap', 'round');
+                    t.setAttribute('stroke-linejoin', 'round');
+                    t.textContent = `${levelName} (${currentVal}cm)`;
+                    gW04.appendChild(t);
+                }
+                
+                let np;
+                if (inputPrefix === 'w04-r3' || inputPrefix === 'w04-r1') {
+                    np = iso(x+w, y, maxZ + 30); 
+                } else {
+                    np = iso(x, y+l, maxZ + 30); 
+                }
+                let titleId = `title-iso-${containerId}`;
+                let titleX = customLabelPositions[titleId] ? customLabelPositions[titleId].x : np.x;
+                let titleY = customLabelPositions[titleId] ? customLabelPositions[titleId].y : np.y;
+                
+                let tTitle = document.createElementNS(NS, 'text');
+                tTitle.setAttribute('id', titleId);
+                tTitle.setAttribute('class', 'draggable-label-text');
+                tTitle.setAttribute('data-id', titleId);
+                tTitle.setAttribute('x', titleX);
+                tTitle.setAttribute('y', titleY);
+                tTitle.setAttribute('fill', strokeColor);
+                tTitle.setAttribute('font-size', '14');
+                tTitle.setAttribute('font-weight', 'bold');
+                tTitle.setAttribute('text-anchor', (inputPrefix === 'w04-r3' || inputPrefix === 'w04-r1') ? 'end' : 'start');
+                tTitle.setAttribute('paint-order', 'stroke fill');
+                tTitle.setAttribute('stroke', '#fff');
+                tTitle.setAttribute('stroke-width', '3');
+                tTitle.textContent = name;
+                gW04.appendChild(tTitle);
+            }
+
+            drawIsoRackObj('w04_3d-rack2', 'w04-r2', w04_r2Name, w04_r2Tiers, 20, 360, 60, 200, 160, '#d39e00', '#fff3cd'); 
+            drawIsoRackObj('w04_3d-rack1', 'w04-r1', w04_r1Name, w04_r1Tiers, 20, 60, 60, 260, 220, '#0056b3', '#cce5ff'); 
+            drawIsoRackObj('w04_3d-rack3', 'w04-r3', w04_r3Name, w04_r3Tiers, 270, 160, 60, 400, 180, '#1e7e34', '#d4edda'); 
+        }
+    }
+
+    function draw3DRack(containerId, inputPrefix, name, tiers, boxColor, strokeColor, planeColor) {
+        const g3d = document.getElementById(containerId);
+        if(!g3d) return;
+        g3d.innerHTML = '';
+        const NS = "http://www.w3.org/2000/svg";
+
+        let border = document.createElementNS(NS, "rect");
+        border.setAttribute('x', '-10'); border.setAttribute('y', '-10');
+        border.setAttribute('width', '280'); border.setAttribute('height', '550');
+        border.setAttribute('fill', 'none'); border.setAttribute('stroke', boxColor);
+        border.setAttribute('stroke-dasharray', '5,5'); border.setAttribute('stroke-width', '2');
+        g3d.appendChild(border);
+
+        let frame = document.createElementNS(NS, "g");
+        frame.setAttribute('stroke', strokeColor); frame.setAttribute('stroke-width', '4');
+        frame.setAttribute('fill', 'none'); frame.setAttribute('stroke-linejoin', 'round');
+
+        [[30,0,30,450], [170,0,170,450], [0,40,0,490], [140,40,140,490]].forEach(pts => {
+            let l = document.createElementNS(NS, "line");
+            l.setAttribute('x1', pts[0]); l.setAttribute('y1', pts[1]);
+            l.setAttribute('x2', pts[2]); l.setAttribute('y2', pts[3]);
+            frame.appendChild(l);
+        });
+
+        const gap = 450 / (tiers - 1);
+        const mIndex = rackMIndex[inputPrefix] !== undefined ? rackMIndex[inputPrefix] : Math.floor((tiers - 1) / 2);
+
+        for(let i=0; i<tiers; i++) {
+            let y = i * gap;
+            let poly = document.createElementNS(NS, "polygon");
+            poly.setAttribute('points', `30,${y} 170,${y} 140,${y+40} 0,${y+40}`);
+            poly.setAttribute('fill', i === 0 ? '#fff' : planeColor);
+            frame.appendChild(poly);
+
+            let levelName = "", sensorColor = "", sensorShadow = "";
+            
+            if (i === 0) { 
+                levelName = "Top";
+                sensorColor = "#ff66b2"; sensorShadow = "#cc3380"; 
+            } 
+            else if (i === tiers - 1) { 
+                levelName = "Bottom";
+                sensorColor = "#6baed6"; sensorShadow = "#428bca"; 
+            } 
+            else if (i === mIndex) { 
+                levelName = "Middle";
+                sensorColor = "#9c27b0"; sensorShadow = "#6a1b9a"; 
+            } 
+            else { 
+                levelName = "Level " + (tiers - i);
+                sensorColor = "#ffcc00"; sensorShadow = "#cca300"; 
+            }
+
+            let lt = document.createElementNS(NS, "text");
+            lt.setAttribute('x', '180'); lt.setAttribute('y', y + 10);
+            lt.setAttribute('font-size', '20'); lt.setAttribute('fill', '#000'); lt.setAttribute('stroke', 'none');
+            lt.textContent = levelName + " Plane";
+            frame.appendChild(lt);
+
+            let currentVal = rackHeights[inputPrefix] && rackHeights[inputPrefix][i] !== undefined ? rackHeights[inputPrefix][i] : 0;
+            let cy = y + 20;
+
+            let labelId = `text-${inputPrefix}-${i}`; 
+            let defTextX = 85;
+            let defTextY = y + 65;
+            let textX = customLabelPositions[labelId] ? customLabelPositions[labelId].x : defTextX;
+            let textY = customLabelPositions[labelId] ? customLabelPositions[labelId].y : defTextY;
+
+            let lineId = `line-${labelId}`;
+            let lineEl = document.createElementNS(NS, 'line');
+            lineEl.setAttribute('id', lineId);
+            lineEl.setAttribute('x1', 85);
+            lineEl.setAttribute('y1', cy);
+            lineEl.setAttribute('x2', textX);
+            lineEl.setAttribute('y2', textY - 14); 
+            lineEl.setAttribute('stroke', '#999');
+            lineEl.setAttribute('stroke-width', '1');
+            lineEl.setAttribute('stroke-dasharray', '2,2');
+            frame.appendChild(lineEl);
+
+            let ht = document.createElementNS(NS, "text");
+            ht.setAttribute('id', labelId);
+            ht.setAttribute('class', 'draggable-label-text');
+            ht.setAttribute('data-id', labelId);
+            ht.setAttribute('data-line-id', lineId);
+            ht.setAttribute('x', textX);
+            ht.setAttribute('y', textY);
+            ht.setAttribute('font-size', '18');
+            ht.setAttribute('fill', '#000');
+            ht.setAttribute('text-anchor', 'middle');
+            ht.setAttribute('paint-order', 'stroke fill');
+            ht.setAttribute('stroke', '#fff');
+            ht.setAttribute('stroke-width', '3');
+            ht.setAttribute('stroke-linecap', 'round');
+            ht.setAttribute('stroke-linejoin', 'round');
+            ht.textContent = `${levelName} (${currentVal} cm)`;
+            frame.appendChild(ht);
+
+            let ell = document.createElementNS(NS, "ellipse");
+            ell.setAttribute('cx', '85'); ell.setAttribute('cy', cy); ell.setAttribute('rx', '15'); ell.setAttribute('ry', '6');
+            ell.setAttribute('fill', sensorColor); ell.setAttribute('stroke', '#000'); ell.setAttribute('stroke-width', '1');
+            
+            let path = document.createElementNS(NS, "path");
+            path.setAttribute('d', `M 70 ${cy} L 70 ${cy+5} A 15 6 0 0 0 100 ${cy+5} L 100 ${cy} Z`);
+            path.setAttribute('fill', sensorShadow); path.setAttribute('stroke', '#000'); path.setAttribute('stroke-width', '1');
+
+            frame.appendChild(ell); frame.appendChild(path);
+        }
+        g3d.appendChild(frame);
+    }
+
+    function downloadImage() {
+        const svgElement = document.getElementById('main-svg');
+        
+        if (selectedElement) selectedElement.classList.remove('selected');
+        const handles = svgElement.querySelectorAll('.resize-handle');
+        handles.forEach(h => h.style.display = 'none');
+        
+        const serializer = new XMLSerializer();
+        let svgString = serializer.serializeToString(svgElement);
+        
+        handles.forEach(h => h.style.display = '');
+        if (selectedElement) selectedElement.classList.add('selected');
+
+        if (!svgString.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) {
+            svgString = svgString.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+        }
+
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        canvas.width = 1200; canvas.height = 780;
+
+        const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(svgBlob);
+
+        img.onload = function () {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0);
+
+            const pngUrl = canvas.toDataURL('image/png');
+            const downloadLink = document.createElement('a');
+            downloadLink.href = pngUrl;
+            downloadLink.download = `${currentPlan}_點位配置圖.png`;
+            
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+            URL.revokeObjectURL(url);
+        };
+        img.src = url;
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        drawRacks();
+    });
+
+</script>
+
+</body>
+</html>

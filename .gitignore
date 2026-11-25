@@ -1,0 +1,22 @@
+# Logs & local runtime artifacts
+_agy.log
+_agy_err.log
+*.log
+
+# Node & test outputs
+node_modules/
+test-results/
+playwright-report/
+tmp/
+.tmp/
+
+# Secrets & local clasp credentials (NEVER commit credentials!)
+.clasprc.json
+.env
+.env.*
+*.pem
+*.key
+
+# OS artifacts
+.DS_Store
+Thumbs.db
