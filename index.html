@@ -571,6 +571,69 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
+    /* Segmented 2D/3D Toggle */
+    .seg-toggle {
+      display: inline-flex;
+      border: 1px solid var(--border-strong);
+      border-radius: 6px;
+      overflow: hidden;
+      background: #f1f5f9;
+    }
+    .seg-toggle button {
+      border: none;
+      background: transparent;
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .seg-toggle button.active {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    /* Custom Legend Editor Rows */
+    .legend-row {
+      display: grid;
+      grid-template-columns: 22px 58px 1fr 34px 28px;
+      gap: 6px;
+      align-items: center;
+      padding: 6px 8px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: #f8fafc;
+      margin-bottom: 6px;
+    }
+    .legend-row input[type="checkbox"] {
+      width: 15px;
+      height: 15px;
+      cursor: pointer;
+    }
+    .ttl-notice {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 10px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 6px;
+      font-size: 12px;
+      color: #1e40af;
+      margin-bottom: 10px;
+    }
+    .ttl-badge {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: #fef3c7;
+      color: #92400e;
+      font-size: 10.5px;
+      font-weight: 700;
+      margin-left: 4px;
+    }
+
     /* Mobile responsive */
     .mobile-only { display: none; }
     .mobile-dock-backdrop { display: none; }
@@ -629,12 +692,12 @@
       <button type="button" class="btn btn-sm" id="btn-layer-back" data-testid="btn-layer-back" title="移至最下層">⬇️ 最下</button>
       <button type="button" class="btn btn-sm btn-danger" id="btn-delete" data-testid="btn-delete" title="刪除選取物件 (Delete)">🗑️ 刪除</button>
       <span class="divider-v"></span>
-      <button type="button" class="btn btn-sm" id="btn-export-json" data-testid="btn-export-json" title="匯出完整專案設定檔 (.json)">💾 匯出 JSON</button>
-      <label class="btn btn-sm" title="匯入專案設定檔 (.json)" style="margin:0;">
-        📥 匯入 JSON
+      <button type="button" class="btn btn-sm" id="btn-export-json" data-testid="btn-export-json" title="儲存完整專案檔至本機 (.json)">💾 儲存專案</button>
+      <label class="btn btn-sm" title="從本機開啟先前儲存的專案檔 (.json)" style="margin:0;">
+        📂 開啟專案
         <input type="file" id="input-import-json" data-testid="input-import-json" accept=".json,application/json" style="display:none;">
       </label>
-      <button type="button" class="btn btn-sm" id="btn-cloud-modal" data-testid="btn-cloud-modal" title="雲端專案存取">☁️ 雲端</button>
+      <button type="button" class="btn btn-sm" id="btn-cloud-modal" data-testid="btn-cloud-modal" title="雲端暫存專案（固定保留 14 天自動刪除）">☁️ 雲端暫存</button>
       <button type="button" class="btn btn-sm btn-primary" id="btn-export-png" data-testid="btn-export-png" title="匯出高解析 PNG 圖片 (適合貼入 Word/簡報)">⬇️ 匯出 PNG</button>
       <span class="divider-v"></span>
       <button type="button" class="btn btn-sm btn-danger" id="btn-clear-canvas" data-testid="btn-clear-canvas" title="清除目前分頁上的物件">🧹 清除畫布</button>
@@ -653,12 +716,13 @@
         <input type="file" id="input-bg-upload" data-testid="input-bg-upload" accept="image/png,image/jpeg,image/webp,image/svg+xml,.svg" style="display:none;">
       </label>
       <select id="select-template" data-testid="select-template" class="select-input" title="選擇內建平面圖範本">
-        <option value="blank">空白畫布 (1200×800)</option>
-        <option value="office">通用辦公 / 診所平面範本</option>
-        <option value="facility">通用實驗室 / 空間平面範本</option>
-        <option value="warehouse2d">標準倉儲平面範本 (2D)</option>
-        <option value="storage2d">精簡儲位平面範本 (2D)</option>
-        <option value="isometric3d">等角立體空間範本 (3D)</option>
+        <option value="blank">1. 空白畫布 (1200×800)</option>
+        <option value="facility_full">2. 全廠區平面範本 (完整版)</option>
+        <option value="lab_yellow">3. 實驗室平面範本 (黃區)</option>
+        <option value="mfg_red">4. 製造區平面範本 (紅框區)</option>
+        <option value="wh_blue">5. 倉儲區平面範本 (藍框區)</option>
+        <option value="coldroom_2d">6. 冷藏庫平面範本 (2D)</option>
+        <option value="coldroom_3d">7. 冷藏庫等角立體空間範本 (3D)</option>
       </select>
       <button type="button" class="btn btn-sm" id="btn-apply-template" data-testid="btn-apply-template">套用範本</button>
       <span class="divider-v"></span>
@@ -705,32 +769,68 @@
         </div>
       </section>
 
-      <!-- 2. Masking & Labels -->
+      <!-- 2. Masking, Labels & Custom Legend -->
       <section class="dock-section">
         <div class="dock-section-title">
-          <span>2. 遮罩、標籤與圖例</span>
+          <span>2. 遮罩、標籤與自訂圖例</span>
         </div>
         <div class="grid-2" style="margin-bottom:6px;">
           <button type="button" class="btn btn-sm" data-tool="mask-rect" data-testid="tool-mask-rect" title="無框白色方形遮罩 (點擊或拖曳)">⬜ 白色方遮罩</button>
           <button type="button" class="btn btn-sm" data-tool="mask-circle" data-testid="tool-mask-circle" title="無框白色圓形遮罩 (點擊或拖曳)">⚪ 白色圓遮罩</button>
           <button type="button" class="btn btn-sm" data-tool="label" data-testid="tool-label" title="新增區域文字標籤 (永遠置頂)">📝 區域標籤</button>
-          <button type="button" class="btn btn-sm" data-tool="legend-flow" data-testid="tool-legend-flow" title="插入多色動線圖例">📋 動線圖例</button>
+          <button type="button" class="btn btn-sm" id="btn-open-legend-editor" data-testid="tool-legend-flow" title="自訂項目、代碼與顏色後放置動線圖例（雙擊可修改）">📋 自訂動線圖例</button>
           <button type="button" class="btn btn-sm" data-tool="legend-hvac" data-testid="tool-legend-hvac" title="插入點位與空調圖例">📋 點位圖例</button>
-          <button type="button" class="btn btn-sm" data-tool="draw-rect" data-testid="tool-draw-rect" title="繪製自訂外框方塊">🔲 自訂方框</button>
+          <button type="button" class="btn btn-sm" data-tool="free-arrow" data-testid="tool-free-arrow" title="拖曳繪製任意角度箭頭">↗ 自由箭頭</button>
         </div>
-        <div class="row-flex">
-          <button type="button" class="btn btn-sm" data-tool="free-arrow" data-testid="tool-free-arrow" style="flex:1;" title="拖曳繪製任意角度箭頭">↗ 自由箭頭</button>
+        <div class="row-flex" style="justify-content:space-between;">
           <label style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;">
-            繪圖色
+            自由箭頭色
             <input type="color" id="draw-custom-color" class="color-swatch" value="#e11d48">
           </label>
+          <span style="font-size:10.5px;color:var(--text-muted);">圖例可雙擊編輯與自由縮放</span>
         </div>
       </section>
 
-      <!-- 3. Mapping, HVAC & Equipment -->
+      <!-- 2B. Custom Shape & Label Blocks (2D / 3D) -->
       <section class="dock-section">
         <div class="dock-section-title">
-          <span>3. 點位、空調與尺寸標註</span>
+          <span>3. 自訂形狀與標註方塊</span>
+          <div class="seg-toggle" role="group" aria-label="2D/3D 形狀視角切換">
+            <button type="button" id="shape-mode-2d" data-testid="shape-mode-2d" class="active">2D 平面</button>
+            <button type="button" id="shape-mode-3d" data-testid="shape-mode-3d">3D 等角</button>
+          </div>
+        </div>
+        <div class="grid-2" style="margin-bottom:6px;">
+          <button type="button" class="btn btn-sm" data-tool="shape-rect" data-testid="tool-shape-rect" title="矩形方塊 (點擊或拖曳，雙擊編輯文字)">▭ 矩形方塊</button>
+          <button type="button" class="btn btn-sm" data-tool="shape-roundrect" data-testid="tool-shape-roundrect" title="圓角矩形方塊 (點擊或拖曳，雙擊編輯文字)">▢ 圓角矩形</button>
+          <button type="button" class="btn btn-sm" data-tool="shape-ellipse" data-testid="tool-shape-ellipse" title="圓形/橢圓方塊 (點擊或拖曳，雙擊編輯文字)">◯ 圓形/橢圓</button>
+          <button type="button" class="btn btn-sm" data-tool="shape-lshape" data-testid="tool-shape-lshape" title="L 型區塊 (點擊或拖曳，雙擊編輯文字)">┗ L 型區塊</button>
+        </div>
+        <div class="row-flex" style="margin-bottom:6px;justify-content:space-between;">
+          <label style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;">
+            填滿
+            <input type="color" id="shape-fill-color" data-testid="shape-fill-color" class="color-swatch" value="#dbeafe">
+          </label>
+          <label style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;">
+            框線
+            <input type="color" id="shape-stroke-color" data-testid="shape-stroke-color" class="color-swatch" value="#2563eb">
+          </label>
+          <label style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;flex:1;justify-content:flex-end;">
+            透明度 <strong id="shape-opacity-val">85%</strong>
+          </label>
+        </div>
+        <div class="row-flex" style="margin-bottom:6px;">
+          <input type="range" id="shape-opacity" data-testid="shape-opacity" min="15" max="100" value="85" style="width:100%;">
+        </div>
+        <div class="row-flex">
+          <input type="text" id="shape-default-label" data-testid="shape-default-label" class="text-input" value="區域方塊" maxlength="36" placeholder="置中文字標籤（可留空，放置後雙擊編輯）" style="width:100%;">
+        </div>
+      </section>
+
+      <!-- 4. Mapping, HVAC & Equipment -->
+      <section class="dock-section">
+        <div class="dock-section-title">
+          <span>4. 點位、空調與尺寸標註</span>
         </div>
         <div class="grid-3" style="margin-bottom:6px;">
           <button type="button" class="btn btn-sm marker-btn-T" data-tool="marker-T" data-testid="tool-marker-T" title="上層點位 (自動編號)">💗 T 點位</button>
@@ -780,10 +880,10 @@
         </div>
       </section>
 
-      <!-- 4. Multi-Tier Rack / Shelf Diagram Generator -->
+      <!-- 5. Multi-Tier Rack / Shelf Diagram Generator -->
       <section class="dock-section">
         <div class="dock-section-title">
-          <span>4. 多層貨架 / 層架圖產生器</span>
+          <span>5. 多層貨架 / 層架圖產生器</span>
           <button type="button" class="btn btn-xs" id="btn-toggle-racks" data-testid="btn-toggle-racks" title="顯示或隱藏畫布上的貨架圖">👁️ 顯隱</button>
         </div>
         <div class="row-flex" style="margin-bottom:6px;">
@@ -818,10 +918,10 @@
         </div>
       </section>
 
-      <!-- 5. Selected Object Inspector -->
+      <!-- 6. Selected Object Inspector -->
       <section class="dock-section">
         <div class="dock-section-title">
-          <span>5. 選取物件屬性</span>
+          <span>6. 選取物件屬性</span>
         </div>
         <div class="inspector-box" id="inspector-box" data-testid="inspector-box">
           <div style="color:var(--text-muted);font-size:11.5px;">尚未選取物件。點擊畫布上任一物件即可拖曳、縮放、旋轉或調整屬性。</div>
@@ -860,13 +960,13 @@
     <button type="button" class="btn btn-xs" id="btn-close-help" data-testid="btn-close-help" title="關閉">✕</button>
   </h3>
   <ul>
-    <li><strong>更換底圖：</strong>支援上傳任意 PNG / JPG / SVG 平面圖，或直接套用內建通用/倉儲/立體範本。</li>
+    <li><strong>更換底圖與範本：</strong>支援上傳任意 PNG / JPG / SVG 平面圖，或直接套用 7 種內建廠區、實驗室、製造區、倉儲區與冷藏庫 2D/3D 範本。</li>
     <li><strong>多分頁管理：</strong>上方分頁列可新增、雙擊重新命名、複製或刪除不同樓層/區域平面。</li>
-    <li><strong>放置物件：</strong>點選左側工具後，在畫布上<strong>點擊或拖曳</strong>；按 <span class="kbd">Esc</span> 回到選取模式。</li>
+    <li><strong>自訂動線圖例：</strong>放置前可勾選項目、修改代碼/名稱/顏色或新增自訂項目；放置後可自由拖曳縮放，<strong>雙擊</strong>即可再次編輯。</li>
+    <li><strong>2D/3D 自訂形狀方塊：</strong>支援矩形、圓角矩形、圓形/橢圓、L 型區塊，可自由調整填滿色、框線色、透明度與 2D/3D 等角視角，<strong>雙擊</strong>即可修改置中標籤文字。</li>
     <li><strong>文字正向箭頭：</strong>P / M / W 與自訂動線箭頭支援 6 種方向，旋轉時文字仍保持水平正向。</li>
-    <li><strong>快速複製：</strong>按住 <span class="kbd">Ctrl</span> 拖曳物件即可原位複製，或使用 <span class="kbd">Ctrl+C</span> / <span class="kbd">Ctrl+V</span>。</li>
-    <li><strong>復原與刪除：</strong><span class="kbd">Ctrl+Z</span> 復原、<span class="kbd">Ctrl+Y</span> 重做、<span class="kbd">Delete</span> / <span class="kbd">Backspace</span> 刪除。</li>
-    <li><strong>雙擊編輯：</strong>雙擊文字標籤、圖例、T/M/B 點位編號或尺寸線，皆可直接修改內容。</li>
+    <li><strong>快速複製與復原：</strong>按住 <span class="kbd">Ctrl</span> 拖曳複製，或使用 <span class="kbd">Ctrl+C</span> / <span class="kbd">Ctrl+V</span>、<span class="kbd">Ctrl+Z</span> 復原、<span class="kbd">Ctrl+Y</span> 重做、<span class="kbd">Delete</span> 刪除。</li>
+    <li><strong>專案保存與雲端暫存：</strong>「儲存專案 / 開啟專案」可本機備份；「雲端暫存」固定保留 <strong>14 天</strong>，到期將自動清除。</li>
     <li><strong>高解析輸出：</strong>點選「匯出 PNG」會輸出 2 倍解析度純淨無框線圖片，適合直接貼入 Word 或簡報。</li>
   </ul>
 </aside>
@@ -884,18 +984,47 @@
   </div>
 </div>
 
-<!-- Cloud Presets Modal -->
-<div class="modal-backdrop" id="cloud-modal" data-testid="cloud-modal" role="dialog" aria-modal="true">
-  <div class="modal-card" style="max-width:480px;">
-    <h3 class="modal-title">☁️ 雲端專案存取 (GAS PropertiesService)</h3>
-    <p class="modal-desc" id="cloud-mode-desc">可將整個多區域工作區壓縮儲存至雲端，隨時載入共用。</p>
-    <div id="cloud-save-row" class="row-flex" style="margin-bottom:12px;">
-      <input type="text" id="cloud-preset-name" class="text-input" placeholder="輸入專案名稱（例如：A棟1F動線配置）" style="flex:1;padding:6px 9px;">
-      <button type="button" class="btn btn-primary" id="btn-cloud-save">儲存目前專案</button>
+<!-- Custom Flow Legend Editor Modal -->
+<div class="modal-backdrop" id="legend-modal" data-testid="legend-modal" role="dialog" aria-modal="true">
+  <div class="modal-card" style="max-width:540px;">
+    <h3 class="modal-title" id="legend-modal-title">📋 自訂動線圖例設定</h3>
+    <p class="modal-desc">勾選要顯示的項目，可自由修改代碼、名稱與顏色，或新增自訂動線項目。放置於畫布後可自由縮放並雙擊修改。</p>
+    <div class="row-flex" style="margin-bottom:10px;">
+      <label style="font-size:12px;font-weight:700;color:var(--text-muted);white-space:nowrap;">圖例標題：</label>
+      <input type="text" id="legend-title-input" data-testid="legend-title-input" class="text-input" value="【動線圖例 Legend】" style="flex:1;padding:6px 8px;">
     </div>
-    <div id="cloud-presets-list" style="max-height:240px;overflow-y:auto;"></div>
+    <div style="display:grid;grid-template-columns:22px 58px 1fr 34px 28px;gap:6px;padding:0 8px 4px;font-size:11px;font-weight:700;color:var(--text-muted);">
+      <span>顯</span><span>代碼</span><span>名稱說明</span><span>色</span><span></span>
+    </div>
+    <div id="legend-items-editor" data-testid="legend-items-editor" style="max-height:240px;overflow-y:auto;"></div>
+    <div class="row-flex" style="margin-top:8px;">
+      <button type="button" class="btn btn-sm" id="btn-legend-add-item" data-testid="btn-legend-add-item">＋ 新增自訂項目</button>
+      <button type="button" class="btn btn-sm" id="btn-legend-reset-default" data-testid="btn-legend-reset-default">↺ 恢復預設 P/M/W</button>
+    </div>
     <div class="modal-footer">
-      <button type="button" class="btn" id="btn-cloud-close">關閉</button>
+      <button type="button" class="btn" id="btn-legend-cancel" data-testid="btn-legend-cancel">取消</button>
+      <button type="button" class="btn" id="btn-legend-place-click" data-testid="btn-legend-place-click">📍 點擊畫布放置</button>
+      <button type="button" class="btn btn-primary" id="btn-legend-confirm" data-testid="btn-legend-confirm">確定並插入畫布</button>
+    </div>
+  </div>
+</div>
+
+<!-- Cloud Temp Storage Modal (Fixed 14 Days Auto-Delete, NO User Dropdown) -->
+<div class="modal-backdrop" id="cloud-modal" data-testid="cloud-modal" role="dialog" aria-modal="true">
+  <div class="modal-card" style="max-width:500px;">
+    <h3 class="modal-title">☁️ 雲端暫存</h3>
+    <div class="ttl-notice" id="cloud-ttl-notice" data-testid="cloud-ttl-notice">
+      <span>⏳</span>
+      <span><strong>固定保留 14 天自動刪除：</strong>暫存專案將於儲存後第 14 天自動清除，長期保存請使用「儲存專案」下載備份。</span>
+    </div>
+    <p class="modal-desc" id="cloud-mode-desc">可將目前多區域工作區暫存至雲端，方便跨裝置臨時開啟。</p>
+    <div id="cloud-save-row" class="row-flex" style="margin-bottom:12px;">
+      <input type="text" id="cloud-preset-name" data-testid="cloud-preset-name" class="text-input" placeholder="輸入暫存名稱（例如：全廠區動線草稿）" style="flex:1;padding:6px 9px;">
+      <button type="button" class="btn btn-primary" id="btn-cloud-save" data-testid="btn-cloud-save">儲存至雲端暫存</button>
+    </div>
+    <div id="cloud-presets-list" data-testid="cloud-presets-list" style="max-height:240px;overflow-y:auto;"></div>
+    <div class="modal-footer">
+      <button type="button" class="btn" id="btn-cloud-close" data-testid="btn-cloud-close">關閉</button>
     </div>
   </div>
 </div>
@@ -908,9 +1037,12 @@
   'use strict';
 
   const STORAGE_KEY = 'FPLS_WORKSPACE_V1';
+  const LOCAL_CLOUD_KEY = 'FPLS_LOCAL_CLOUD_TEMP_V2';
+  const CLOUD_TTL_DAYS = 14;
+  const CLOUD_TTL_MS = CLOUD_TTL_DAYS * 24 * 60 * 60 * 1000;
   const CUSTOM_PROPS = [
     'customType', 'isAlwaysTop', 'isMask', 'markerType', 'markerNumber',
-    'arrowMeta', 'dimMeta', 'rackConfig', 'equipMeta', 'objId'
+    'arrowMeta', 'dimMeta', 'rackConfig', 'equipMeta', 'legendConfig', 'shapeMeta', 'objId'
   ];
 
   const RACK_THEMES = {
@@ -920,6 +1052,17 @@
     slate:  { box: '#475569', stroke: '#334155', plane: '#e2e8f0', title: '#334155' },
     purple: { box: '#7c3aed', stroke: '#5b21b6', plane: '#ede9fe', title: '#5b21b6' }
   };
+
+  function getDefaultLegendConfig() {
+    return {
+      title: '【動線圖例 Legend】',
+      items: [
+        { enabled: true, code: 'P', name: '人流 (Personnel Flow)', color: '#2563eb' },
+        { enabled: true, code: 'M', name: '物流 (Material Flow)', color: '#16a34a' },
+        { enabled: true, code: 'W', name: '廢棄物流 (Waste Flow)', color: '#dc2626' }
+      ]
+    };
+  }
 
   // State
   let canvas = null;
@@ -936,6 +1079,11 @@
   let isDrawing = false;
   let drawStart = { x: 0, y: 0 };
   let previewObj = null;
+
+  // Custom Shape Block & Custom Legend state
+  let shapeViewMode = '2d';
+  let currentLegendDraft = getDefaultLegendConfig();
+  let editingLegendObj = null;
 
   // Clipboard & Ctrl+Drag state
   let clipboardObj = null;
@@ -1017,169 +1165,641 @@
     }
   }
 
-  // ==================== Built-in Templates (Inline SVG Data URLs, Zero External Deps) ====================
+  // ==================== Built-in 7 Templates (Inline SVG Data URLs, Zero External Deps) ====================
   function svgToDataUrl(svgStr) {
     return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgStr.trim());
   }
 
-  function getTemplateAsset(templateId) {
+  function normalizeTemplateId(templateId) {
+    const legacyMap = {
+      office: 'facility_full',
+      facility: 'lab_yellow',
+      warehouse2d: 'wh_blue',
+      storage2d: 'coldroom_2d',
+      isometric3d: 'coldroom_3d'
+    };
+    return legacyMap[templateId] || templateId || 'facility_full';
+  }
+
+  function getTemplateAsset(rawTemplateId) {
+    const templateId = normalizeTemplateId(rawTemplateId);
+
+    // 1. Blank Canvas 1200x800
     if (templateId === 'blank') {
       return { width: 1200, height: 800, dataUrl: null };
     }
-    if (templateId === 'office') {
+
+    // 2. Facility Floor Plan Template (Full) — green/orange/pink/blue/white/yellow with W-01..W-05, P-01..P-22, M-01..M-06, CH-01
+    if (templateId === 'facility_full') {
+      const svg = `
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900">
+  <rect width="1400" height="900" fill="#ffffff"/>
+  <rect x="24" y="24" width="1352" height="816" fill="#f8fafc" stroke="#0f172a" stroke-width="4"/>
+
+  <!-- Zone Frames -->
+  <!-- Yellow Lab Zone Frame -->
+  <rect x="36" y="38" width="290" height="632" fill="#fefce8" stroke="#ca8a04" stroke-width="3.5" stroke-dasharray="8,5"/>
+  <!-- Red Manufacturing Zone Frame -->
+  <rect x="336" y="38" width="584" height="786" fill="#ffffff" stroke="#dc2626" stroke-width="3.5" stroke-dasharray="8,5"/>
+  <!-- Blue Warehouse Zone Frame -->
+  <rect x="930" y="38" width="434" height="786" fill="#f8fafc" stroke="#2563eb" stroke-width="3.5" stroke-dasharray="8,5"/>
+
+  <!-- ===== YELLOW LABORATORY ZONE: M-01 .. M-06 ===== -->
+  <g stroke="#334155" stroke-width="2" font-family="sans-serif" text-anchor="middle">
+    <rect x="46" y="52" width="132" height="145" fill="#fef08a"/>
+    <text x="112" y="118" font-size="16" font-weight="bold" fill="#713f12">M-01</text>
+    <text x="112" y="138" font-size="11" fill="#854d0e">樣品前處理</text>
+
+    <rect x="178" y="52" width="138" height="145" fill="#fef9c3"/>
+    <text x="247" y="118" font-size="16" font-weight="bold" fill="#713f12">M-02</text>
+    <text x="247" y="138" font-size="11" fill="#854d0e">理化分析室</text>
+
+    <rect x="46" y="197" width="132" height="150" fill="#fef9c3"/>
+    <text x="112" y="266" font-size="16" font-weight="bold" fill="#713f12">M-03</text>
+    <text x="112" y="286" font-size="11" fill="#854d0e">精密儀器室</text>
+
+    <rect x="178" y="197" width="138" height="150" fill="#fef08a"/>
+    <text x="247" y="266" font-size="16" font-weight="bold" fill="#713f12">M-04</text>
+    <text x="247" y="286" font-size="11" fill="#854d0e">微生物檢測</text>
+
+    <rect x="46" y="347" width="270" height="56" fill="#ffffff"/>
+    <text x="181" y="380" font-size="12" font-weight="bold" fill="#64748b">實驗室走廊 (Lab Corridor)</text>
+
+    <rect x="46" y="403" width="132" height="130" fill="#fef08a"/>
+    <text x="112" y="464" font-size="16" font-weight="bold" fill="#713f12">M-05</text>
+    <text x="112" y="484" font-size="11" fill="#854d0e">試劑標準品</text>
+
+    <rect x="178" y="403" width="138" height="130" fill="#fef9c3"/>
+    <text x="247" y="464" font-size="16" font-weight="bold" fill="#713f12">M-06</text>
+    <text x="247" y="484" font-size="11" fill="#854d0e">清洗滅菌間</text>
+
+    <rect x="46" y="533" width="270" height="126" fill="#fefce8" stroke-dasharray="4,3"/>
+    <text x="181" y="592" font-size="13" font-weight="bold" fill="#854d0e">實驗辦公 / 紀錄區</text>
+    <text x="181" y="612" font-size="11" fill="#a16207">(黃色實驗區)</text>
+  </g>
+
+  <!-- ===== UTILITY / CHILLER ROOM: CH-01 ===== -->
+  <g stroke="#334155" stroke-width="2" font-family="sans-serif" text-anchor="middle">
+    <rect x="46" y="684" width="270" height="134" fill="#e0f2fe"/>
+    <rect x="64" y="704" width="76" height="44" fill="#bae6fd" stroke="#0284c7" stroke-width="1.5"/>
+    <rect x="154" y="704" width="76" height="44" fill="#bae6fd" stroke="#0284c7" stroke-width="1.5"/>
+    <text x="181" y="776" font-size="17" font-weight="bold" fill="#0369a1">CH-01</text>
+    <text x="181" y="796" font-size="11" fill="#075985">冰水 / 空調機械室</text>
+  </g>
+
+  <!-- ===== RED MANUFACTURING ZONE: P-01 .. P-17 (pink / blue / white) ===== -->
+  <g stroke="#334155" stroke-width="2" font-family="sans-serif" text-anchor="middle">
+    <!-- Top Row (Blue & White Airlocks / Preparation) -->
+    <rect x="348" y="52" width="110" height="118" fill="#dbeafe"/>
+    <text x="403" y="106" font-size="15" font-weight="bold" fill="#1e3a8a">P-01</text>
+    <text x="403" y="124" font-size="10.5" fill="#1e40af">更衣室 A</text>
+
+    <rect x="458" y="52" width="110" height="118" fill="#bfdbfe"/>
+    <text x="513" y="106" font-size="15" font-weight="bold" fill="#1e3a8a">P-02</text>
+    <text x="513" y="124" font-size="10.5" fill="#1e40af">人員緩衝</text>
+
+    <rect x="568" y="52" width="112" height="118" fill="#ffffff"/>
+    <text x="624" y="106" font-size="15" font-weight="bold" fill="#334155">P-03</text>
+    <text x="624" y="124" font-size="10.5" fill="#64748b">器具清洗</text>
+
+    <rect x="680" y="52" width="112" height="118" fill="#dbeafe"/>
+    <text x="736" y="106" font-size="15" font-weight="bold" fill="#1e3a8a">P-04</text>
+    <text x="736" y="124" font-size="10.5" fill="#1e40af">物料氣鎖</text>
+
+    <rect x="792" y="52" width="116" height="118" fill="#ffffff"/>
+    <text x="850" y="106" font-size="15" font-weight="bold" fill="#334155">P-05</text>
+    <text x="850" y="124" font-size="10.5" fill="#64748b">設備暫存</text>
+
+    <!-- Upper Corridor (White) -->
+    <rect x="348" y="170" width="560" height="58" fill="#ffffff"/>
+    <text x="628" y="204" font-size="13" font-weight="bold" fill="#475569">P-06 潔淨主走廊 (Corridor)</text>
+
+    <!-- Core Processing Row (Pink & Blue) -->
+    <rect x="348" y="228" width="140" height="156" fill="#fbcfe8"/>
+    <text x="418" y="302" font-size="16" font-weight="bold" fill="#831843">P-07</text>
+    <text x="418" y="322" font-size="11" fill="#9d174d">稱量配料室</text>
+
+    <rect x="488" y="228" width="142" height="156" fill="#fce7f3"/>
+    <text x="559" y="302" font-size="16" font-weight="bold" fill="#831843">P-08</text>
+    <text x="559" y="322" font-size="11" fill="#9d174d">核心製程室 A</text>
+
+    <rect x="630" y="228" width="140" height="156" fill="#fbcfe8"/>
+    <text x="700" y="302" font-size="16" font-weight="bold" fill="#831843">P-09</text>
+    <text x="700" y="322" font-size="11" fill="#9d174d">核心製程室 B</text>
+
+    <rect x="770" y="228" width="138" height="156" fill="#dbeafe"/>
+    <text x="839" y="302" font-size="16" font-weight="bold" fill="#1e3a8a">P-10</text>
+    <text x="839" y="322" font-size="11" fill="#1e40af">中間緩衝室</text>
+
+    <!-- Middle Processing Row (White & Pink) -->
+    <rect x="348" y="384" width="140" height="146" fill="#ffffff"/>
+    <text x="418" y="454" font-size="15" font-weight="bold" fill="#334155">P-11</text>
+    <text x="418" y="474" font-size="11" fill="#64748b">半成品暫存</text>
+
+    <rect x="488" y="384" width="142" height="146" fill="#fbcfe8"/>
+    <text x="559" y="454" font-size="15" font-weight="bold" fill="#831843">P-12</text>
+    <text x="559" y="474" font-size="11" fill="#9d174d">分裝作業室</text>
+
+    <rect x="630" y="384" width="140" height="146" fill="#fce7f3"/>
+    <text x="700" y="454" font-size="15" font-weight="bold" fill="#831843">P-13</text>
+    <text x="700" y="474" font-size="11" fill="#9d174d">內包裝室</text>
+
+    <rect x="770" y="384" width="138" height="146" fill="#bfdbfe"/>
+    <text x="839" y="454" font-size="15" font-weight="bold" fill="#1e3a8a">P-14</text>
+    <text x="839" y="474" font-size="11" fill="#1e40af">氣鎖傳遞間</text>
+
+    <!-- Lower Corridor (White) -->
+    <rect x="348" y="530" width="560" height="54" fill="#ffffff"/>
+    <text x="628" y="562" font-size="13" font-weight="bold" fill="#475569">P-15 物流通道 / 檢視走廊</text>
+
+    <!-- Bottom Row inside Red Frame (Blue, White, Pink) -->
+    <rect x="348" y="584" width="184" height="114" fill="#dbeafe"/>
+    <text x="440" y="638" font-size="15" font-weight="bold" fill="#1e3a8a">P-16</text>
+    <text x="440" y="658" font-size="11" fill="#1e40af">更衣室 B / 緩衝</text>
+
+    <rect x="532" y="584" width="188" height="114" fill="#ffffff"/>
+    <text x="626" y="638" font-size="15" font-weight="bold" fill="#334155">P-17</text>
+    <text x="626" y="658" font-size="11" fill="#64748b">工具清潔 / 乾燥室</text>
+
+    <rect x="720" y="584" width="188" height="114" fill="#fbcfe8"/>
+    <text x="814" y="638" font-size="15" font-weight="bold" fill="#831843">P-18</text>
+    <text x="814" y="658" font-size="11" fill="#9d174d">外包裝作業區</text>
+
+    <!-- Packing Bridge Edge P-19 .. P-22 -->
+    <rect x="348" y="698" width="140" height="116" fill="#fce7f3"/>
+    <text x="418" y="752" font-size="15" font-weight="bold" fill="#831843">P-19</text>
+    <text x="418" y="772" font-size="11" fill="#9d174d">貼標檢視區</text>
+
+    <rect x="488" y="698" width="140" height="116" fill="#fbcfe8"/>
+    <text x="558" y="752" font-size="15" font-weight="bold" fill="#831843">P-20</text>
+    <text x="558" y="772" font-size="11" fill="#9d174d">裝箱理貨區</text>
+
+    <rect x="628" y="698" width="140" height="116" fill="#fce7f3"/>
+    <text x="698" y="752" font-size="15" font-weight="bold" fill="#831843">P-21</text>
+    <text x="698" y="772" font-size="11" fill="#9d174d">成品緩衝區</text>
+
+    <rect x="768" y="698" width="140" height="116" fill="#fbcfe8"/>
+    <text x="838" y="752" font-size="15" font-weight="bold" fill="#831843">P-22</text>
+    <text x="838" y="772" font-size="11" fill="#9d174d">倉儲銜接氣鎖</text>
+  </g>
+
+  <!-- ===== BLUE WAREHOUSE ZONE: W-01 .. W-05 (Orange Racks + Green Cold Room) ===== -->
+  <g stroke="#334155" stroke-width="2" font-family="sans-serif" text-anchor="middle">
+    <!-- W-01 Receiving & W-02 Packaging Materials -->
+    <rect x="942" y="52" width="204" height="136" fill="#ffedd5"/>
+    <text x="1044" y="114" font-size="17" font-weight="bold" fill="#9a3412">W-01</text>
+    <text x="1044" y="136" font-size="11" fill="#c2410c">收貨 / 進料暫存區</text>
+
+    <rect x="1146" y="52" width="206" height="136" fill="#fed7aa"/>
+    <text x="1249" y="114" font-size="17" font-weight="bold" fill="#9a3412">W-02</text>
+    <text x="1249" y="136" font-size="11" fill="#c2410c">包材與原物料區</text>
+
+    <!-- W-03 Ambient Warehouse with Orange Pallet Racks -->
+    <rect x="942" y="188" width="410" height="332" fill="#fff7ed"/>
+    <!-- Orange Pallet Rack Bays -->
+    <g fill="#fdba74" stroke="#9a3412" stroke-width="1.4">
+      <rect x="962" y="214" width="66" height="58"/><rect x="962" y="272" width="66" height="58"/><rect x="962" y="330" width="66" height="58"/><rect x="962" y="388" width="66" height="58"/>
+      <rect x="1084" y="214" width="66" height="58"/><rect x="1084" y="272" width="66" height="58"/><rect x="1084" y="330" width="66" height="58"/><rect x="1084" y="388" width="66" height="58"/>
+      <rect x="1150" y="214" width="66" height="58"/><rect x="1150" y="272" width="66" height="58"/><rect x="1150" y="330" width="66" height="58"/><rect x="1150" y="388" width="66" height="58"/>
+      <rect x="1268" y="214" width="66" height="58"/><rect x="1268" y="272" width="66" height="58"/><rect x="1268" y="330" width="66" height="58"/><rect x="1268" y="388" width="66" height="58"/>
+    </g>
+    <rect x="1088" y="464" width="124" height="40" rx="6" fill="rgba(255,255,255,0.9)" stroke="#ea580c" stroke-width="1.5"/>
+    <text x="1150" y="489" font-size="16" font-weight="bold" fill="#9a3412">W-03 常溫倉庫</text>
+
+    <!-- W-04 Cold Room (Green) -->
+    <rect x="942" y="520" width="218" height="294" fill="#bbf7d0" stroke="#15803d" stroke-width="3.5"/>
+    <g fill="#dcfce7" stroke="#166534" stroke-width="1.3">
+      <rect x="958" y="544" width="52" height="52"/><rect x="958" y="596" width="52" height="52"/><rect x="958" y="648" width="52" height="52"/><rect x="958" y="700" width="52" height="52"/>
+      <rect x="1094" y="544" width="52" height="52"/><rect x="1094" y="596" width="52" height="52"/><rect x="1094" y="648" width="52" height="52"/><rect x="1094" y="700" width="52" height="52"/>
+    </g>
+    <rect x="1008" y="758" width="88" height="42" rx="6" fill="rgba(255,255,255,0.92)" stroke="#15803d" stroke-width="1.5"/>
+    <text x="1052" y="777" font-size="15" font-weight="bold" fill="#14532d">W-04</text>
+    <text x="1052" y="793" font-size="10.5" fill="#166534">冷藏庫</text>
+
+    <!-- W-05 Shipping & Dock -->
+    <rect x="1160" y="520" width="192" height="294" fill="#ffedd5"/>
+    <rect x="1186" y="698" width="140" height="86" fill="#ffffff" stroke="#64748b" stroke-dasharray="5,4"/>
+    <text x="1256" y="608" font-size="17" font-weight="bold" fill="#9a3412">W-05</text>
+    <text x="1256" y="630" font-size="11.5" fill="#c2410c">出貨理貨 / 裝卸區</text>
+    <text x="1256" y="746" font-size="12" font-weight="bold" fill="#475569">裝卸月台 Dock</text>
+  </g>
+
+  <!-- Bottom Color-Code Bar -->
+  <g font-family="sans-serif" font-size="12" font-weight="bold" fill="#334155">
+    <text x="36" y="874" font-size="14" fill="#0f172a">全廠區平面範本 (完整版)</text>
+    <rect x="240" y="861" width="16" height="16" fill="#fef08a" stroke="#ca8a04"/><text x="262" y="874">實驗室 (M-01~M-06)</text>
+    <rect x="415" y="861" width="16" height="16" fill="#fbcfe8" stroke="#be185d"/><text x="437" y="874">製程/包裝 (P-07~P-22)</text>
+    <rect x="605" y="861" width="16" height="16" fill="#dbeafe" stroke="#2563eb"/><text x="627" y="874">更衣/緩衝 (藍)</text>
+    <rect x="742" y="861" width="16" height="16" fill="#ffffff" stroke="#475569"/><text x="764" y="874">走道/清洗 (白)</text>
+    <rect x="875" y="861" width="16" height="16" fill="#fdba74" stroke="#c2410c"/><text x="897" y="874">常溫倉儲 (W-01~03,05)</text>
+    <rect x="1065" y="861" width="16" height="16" fill="#bbf7d0" stroke="#15803d"/><text x="1087" y="874">冷藏庫 (W-04)</text>
+    <rect x="1205" y="861" width="16" height="16" fill="#e0f2fe" stroke="#0284c7"/><text x="1227" y="874">機房 (CH-01)</text>
+  </g>
+</svg>`;
+      return { width: 1400, height: 900, dataUrl: svgToDataUrl(svg) };
+    }
+
+    // 3. Laboratory Floor Plan Template (Yellow) — M-01..M-06 & lab equipment
+    if (templateId === 'lab_yellow') {
       const svg = `
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
   <rect width="1200" height="800" fill="#ffffff"/>
-  <rect x="40" y="40" width="1120" height="720" fill="#f8fafc" stroke="#1e293b" stroke-width="5"/>
-  <!-- Reception & Entrance -->
-  <rect x="40" y="40" width="320" height="240" fill="#eff6ff" stroke="#334155" stroke-width="3"/>
-  <text x="200" y="165" font-family="sans-serif" font-size="20" font-weight="bold" fill="#475569" text-anchor="middle">入口接待區 / 櫃檯</text>
-  <!-- Meeting Room -->
-  <rect x="360" y="40" width="400" height="240" fill="#f0fdf4" stroke="#334155" stroke-width="3"/>
-  <rect x="460" y="110" width="200" height="90" rx="14" fill="#fff" stroke="#64748b" stroke-width="2"/>
-  <text x="560" y="162" font-family="sans-serif" font-size="18" font-weight="bold" fill="#475569" text-anchor="middle">會議室 / 諮詢室</text>
-  <!-- Service Room -->
-  <rect x="760" y="40" width="400" height="240" fill="#fefce8" stroke="#334155" stroke-width="3"/>
-  <text x="960" y="165" font-family="sans-serif" font-size="20" font-weight="bold" fill="#475569" text-anchor="middle">設備間 / 檔案室</text>
-  <!-- Central Corridor -->
-  <rect x="40" y="280" width="1120" height="140" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="8,6"/>
-  <text x="600" y="356" font-family="sans-serif" font-size="18" fill="#94a3b8" text-anchor="middle">主要通行走道 (Corridor)</text>
-  <!-- Open Workspace -->
-  <rect x="40" y="420" width="720" height="340" fill="#f8fafc" stroke="#334155" stroke-width="3"/>
-  <g fill="#fff" stroke="#94a3b8" stroke-width="1.5">
-    <rect x="90" y="470" width="160" height="70"/><rect x="280" y="470" width="160" height="70"/><rect x="470" y="470" width="160" height="70"/>
-    <rect x="90" y="610" width="160" height="70"/><rect x="280" y="610" width="160" height="70"/><rect x="470" y="610" width="160" height="70"/>
+  <rect x="34" y="34" width="1132" height="700" fill="#fefce8" stroke="#a16207" stroke-width="5"/>
+
+  <!-- Top Row Labs: M-01, M-02, M-03 -->
+  <g stroke="#334155" stroke-width="2.5" font-family="sans-serif">
+    <!-- M-01 Sample Prep -->
+    <rect x="44" y="44" width="356" height="278" fill="#fef08a"/>
+    <!-- Wall bench & sink -->
+    <rect x="60" y="60" width="210" height="44" fill="#ffffff" stroke="#64748b" stroke-width="1.5"/>
+    <rect x="285" y="60" width="95" height="44" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.5"/>
+    <text x="332" y="86" font-size="11" fill="#0369a1" text-anchor="middle">水槽 Sink</text>
+    <!-- Sample Fridge -->
+    <rect x="60" y="185" width="76" height="90" fill="#f1f5f9" stroke="#475569" stroke-width="1.5"/>
+    <text x="98" y="234" font-size="11" fill="#334155" text-anchor="middle">樣品冰箱</text>
+    <text x="235" y="218" font-size="22" font-weight="bold" fill="#713f12" text-anchor="middle">M-01</text>
+    <text x="235" y="242" font-size="13" fill="#854d0e" text-anchor="middle">樣品收檢與前處理室</text>
+
+    <!-- M-02 Physical-Chemical Lab -->
+    <rect x="400" y="44" width="380" height="278" fill="#fef9c3"/>
+    <!-- Central Island Lab Benches -->
+    <rect x="448" y="84" width="284" height="54" fill="#ffffff" stroke="#64748b" stroke-width="1.6"/>
+    <line x1="448" y1="111" x2="732" y2="111" stroke="#cbd5e1" stroke-width="1.2"/>
+    <rect x="448" y="206" width="180" height="54" fill="#ffffff" stroke="#64748b" stroke-width="1.6"/>
+    <!-- Fume Hood -->
+    <rect x="650" y="196" width="110" height="66" fill="#fed7aa" stroke="#c2410c" stroke-width="1.8"/>
+    <text x="705" y="233" font-size="11.5" font-weight="bold" fill="#9a3412" text-anchor="middle">排煙櫃 Hood</text>
+    <text x="590" y="176" font-size="22" font-weight="bold" fill="#713f12" text-anchor="middle">M-02 理化分析實驗室</text>
+
+    <!-- M-03 Analytical Instruments -->
+    <rect x="780" y="44" width="376" height="278" fill="#fef08a"/>
+    <g fill="#ffffff" stroke="#475569" stroke-width="1.5">
+      <rect x="804" y="64" width="102" height="52"/><rect x="920" y="64" width="102" height="52"/><rect x="1036" y="64" width="100" height="52"/>
+      <rect x="804" y="230" width="144" height="56"/><rect x="978" y="230" width="158" height="56"/>
+    </g>
+    <text x="855" y="94" font-size="11" fill="#334155" text-anchor="middle">HPLC-1</text>
+    <text x="971" y="94" font-size="11" fill="#334155" text-anchor="middle">HPLC-2</text>
+    <text x="1086" y="94" font-size="11" fill="#334155" text-anchor="middle">GC-MS</text>
+    <text x="876" y="262" font-size="11" fill="#334155" text-anchor="middle">天平 / 光譜儀</text>
+    <text x="1057" y="262" font-size="11" fill="#334155" text-anchor="middle">數據工作站</text>
+    <text x="968" y="178" font-size="22" font-weight="bold" fill="#713f12" text-anchor="middle">M-03 精密儀器室</text>
+
+    <!-- Central Lab Corridor -->
+    <rect x="44" y="322" width="1112" height="106" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+    <text x="600" y="381" font-size="17" font-weight="bold" fill="#64748b" text-anchor="middle">實驗室主走廊 (Main Lab Corridor)</text>
+    <!-- Emergency Eyewash -->
+    <circle cx="96" cy="375" r="18" fill="#dcfce7" stroke="#15803d" stroke-width="2"/>
+    <text x="96" y="379" font-size="10" font-weight="bold" fill="#166534" text-anchor="middle">沖眼</text>
+
+    <!-- Bottom Row Labs: M-04, M-05, M-06 -->
+    <!-- M-04 Microbiology / BSC -->
+    <rect x="44" y="428" width="380" height="296" fill="#fef9c3"/>
+    <rect x="66" y="454" width="136" height="62" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+    <text x="134" y="489" font-size="12" font-weight="bold" fill="#1e3a8a" text-anchor="middle">生物安全櫃 BSC</text>
+    <rect x="234" y="454" width="166" height="62" fill="#ffffff" stroke="#64748b" stroke-width="1.5"/>
+    <text x="317" y="489" font-size="11.5" fill="#475569" text-anchor="middle">培養箱 Incubator</text>
+    <rect x="66" y="624" width="334" height="58" fill="#ffffff" stroke="#64748b" stroke-width="1.5"/>
+    <text x="233" y="657" font-size="11.5" fill="#475569" text-anchor="middle">無菌操作實驗檯</text>
+    <text x="234" y="576" font-size="22" font-weight="bold" fill="#713f12" text-anchor="middle">M-04 微生物檢測室</text>
+
+    <!-- M-05 Reagents & Standards -->
+    <rect x="424" y="428" width="356" height="296" fill="#fef08a"/>
+    <g fill="#ffffff" stroke="#64748b" stroke-width="1.5">
+      <rect x="452" y="464" width="84" height="194"/>
+      <rect x="668" y="464" width="84" height="194"/>
+    </g>
+    <text x="494" y="564" font-size="11.5" fill="#334155" text-anchor="middle">防爆藥品櫃</text>
+    <text x="710" y="564" font-size="11.5" fill="#334155" text-anchor="middle">標準品儲存</text>
+    <text x="602" y="560" font-size="22" font-weight="bold" fill="#713f12" text-anchor="middle">M-05</text>
+    <text x="602" y="586" font-size="13" fill="#854d0e" text-anchor="middle">試劑與標準品室</text>
+
+    <!-- M-06 Washing & Autoclave -->
+    <rect x="780" y="428" width="376" height="296" fill="#fef9c3"/>
+    <rect x="808" y="458" width="140" height="72" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.8"/>
+    <text x="878" y="498" font-size="12" font-weight="bold" fill="#0369a1" text-anchor="middle">超音波清洗槽</text>
+    <rect x="984" y="458" width="144" height="72" fill="#fee2e2" stroke="#dc2626" stroke-width="1.8"/>
+    <text x="1056" y="498" font-size="12" font-weight="bold" fill="#991b1b" text-anchor="middle">高壓滅菌釜</text>
+    <rect x="808" y="636" width="320" height="54" fill="#ffffff" stroke="#64748b" stroke-width="1.5"/>
+    <text x="968" y="667" font-size="11.5" fill="#475569" text-anchor="middle">烘箱 / 器皿乾燥檯</text>
+    <text x="968" y="588" font-size="22" font-weight="bold" fill="#713f12" text-anchor="middle">M-06 清洗滅菌室</text>
   </g>
-  <text x="370" y="582" font-family="sans-serif" font-size="18" font-weight="bold" fill="#475569" text-anchor="middle">開放辦公 / 服務作業區</text>
-  <!-- Utility / Rest Area -->
-  <rect x="760" y="420" width="400" height="340" fill="#f1f5f9" stroke="#334155" stroke-width="3"/>
-  <text x="960" y="595" font-family="sans-serif" font-size="20" font-weight="bold" fill="#475569" text-anchor="middle">茶水休息 / 備品區</text>
-  <!-- Door Arcs -->
-  <path d="M 160 280 L 160 230 A 50 50 0 0 1 210 280" fill="none" stroke="#1e293b" stroke-width="2"/>
-  <path d="M 520 280 L 520 230 A 50 50 0 0 1 570 280" fill="none" stroke="#1e293b" stroke-width="2"/>
-  <path d="M 920 420 L 920 470 A 50 50 0 0 0 970 420" fill="none" stroke="#1e293b" stroke-width="2"/>
+
+  <!-- Door Swings -->
+  <g fill="none" stroke="#1e293b" stroke-width="2">
+    <path d="M 200 322 L 200 284 A 38 38 0 0 1 238 322"/>
+    <path d="M 570 322 L 570 284 A 38 38 0 0 1 608 322"/>
+    <path d="M 940 322 L 940 284 A 38 38 0 0 1 978 322"/>
+    <path d="M 200 428 L 200 466 A 38 38 0 0 0 238 428"/>
+    <path d="M 570 428 L 570 466 A 38 38 0 0 0 608 428"/>
+    <path d="M 940 428 L 940 466 A 38 38 0 0 0 978 428"/>
+  </g>
+  <text x="600" y="772" font-family="sans-serif" font-size="16" font-weight="bold" fill="#854d0e" text-anchor="middle">實驗室平面範本 (黃區 · M-01 ~ M-06 與儀器設備配置)</text>
 </svg>`;
       return { width: 1200, height: 800, dataUrl: svgToDataUrl(svg) };
     }
-    if (templateId === 'facility') {
+
+    // 4. Manufacturing Zone Floor Plan Template (Red Frame) — P-01..P-21 pink/blue/white zones
+    if (templateId === 'mfg_red') {
       const svg = `
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
   <rect width="1200" height="800" fill="#ffffff"/>
-  <rect x="40" y="40" width="1120" height="720" fill="#f8fafc" stroke="#0f172a" stroke-width="5"/>
-  <rect x="40" y="40" width="260" height="300" fill="#e0f2fe" stroke="#334155" stroke-width="3"/>
-  <text x="170" y="195" font-family="sans-serif" font-size="19" font-weight="bold" fill="#0369a1" text-anchor="middle">緩衝 / 更衣室</text>
-  <rect x="300" y="40" width="540" height="440" fill="#f0fdf4" stroke="#334155" stroke-width="3"/>
-  <rect x="380" y="140" width="380" height="80" fill="#fff" stroke="#64748b" stroke-width="2"/>
-  <rect x="380" y="290" width="380" height="80" fill="#fff" stroke="#64748b" stroke-width="2"/>
-  <text x="570" y="100" font-family="sans-serif" font-size="20" font-weight="bold" fill="#15803d" text-anchor="middle">核心作業 / 實驗室主區</text>
-  <rect x="840" y="40" width="320" height="440" fill="#fef3c7" stroke="#334155" stroke-width="3"/>
-  <text x="1000" y="265" font-family="sans-serif" font-size="19" font-weight="bold" fill="#92400e" text-anchor="middle">儀器 / 檢驗區</text>
-  <rect x="40" y="340" width="260" height="420" fill="#f1f5f9" stroke="#334155" stroke-width="3"/>
-  <text x="170" y="555" font-family="sans-serif" font-size="19" font-weight="bold" fill="#475569" text-anchor="middle">收發 / 暫存區</text>
-  <rect x="300" y="480" width="540" height="280" fill="#ffffff" stroke="#334155" stroke-width="3"/>
-  <text x="570" y="625" font-family="sans-serif" font-size="19" font-weight="bold" fill="#475569" text-anchor="middle">包裝 / 出貨準備區</text>
-  <rect x="840" y="480" width="320" height="280" fill="#fee2e2" stroke="#334155" stroke-width="3"/>
-  <text x="1000" y="625" font-family="sans-serif" font-size="19" font-weight="bold" fill="#991b1b" text-anchor="middle">廢棄物暫存 / 清洗間</text>
+  <!-- Prominent Red Frame -->
+  <rect x="28" y="28" width="1144" height="712" fill="#fff5f5" stroke="#dc2626" stroke-width="6"/>
+
+  <g stroke="#334155" stroke-width="2.2" font-family="sans-serif" text-anchor="middle">
+    <!-- Row 1: P-01..P-05 (Blue & White) -->
+    <rect x="44" y="44" width="222" height="122" fill="#dbeafe"/>
+    <text x="155" y="102" font-size="19" font-weight="bold" fill="#1e3a8a">P-01</text>
+    <text x="155" y="124" font-size="12" fill="#1e40af">更衣室 A (藍區)</text>
+
+    <rect x="266" y="44" width="222" height="122" fill="#bfdbfe"/>
+    <text x="377" y="102" font-size="19" font-weight="bold" fill="#1e3a8a">P-02</text>
+    <text x="377" y="124" font-size="12" fill="#1e40af">人員氣鎖緩衝 (藍區)</text>
+
+    <rect x="488" y="44" width="224" height="122" fill="#ffffff"/>
+    <text x="600" y="102" font-size="19" font-weight="bold" fill="#334155">P-03</text>
+    <text x="600" y="124" font-size="12" fill="#64748b">器具清洗室 (白區)</text>
+
+    <rect x="712" y="44" width="222" height="122" fill="#dbeafe"/>
+    <text x="823" y="102" font-size="19" font-weight="bold" fill="#1e3a8a">P-04</text>
+    <text x="823" y="124" font-size="12" fill="#1e40af">物料氣鎖室 (藍區)</text>
+
+    <rect x="934" y="44" width="222" height="122" fill="#ffffff"/>
+    <text x="1045" y="102" font-size="19" font-weight="bold" fill="#334155">P-05</text>
+    <text x="1045" y="124" font-size="12" fill="#64748b">設備暫存間 (白區)</text>
+
+    <!-- Upper Corridor: P-06 (White) -->
+    <rect x="44" y="166" width="1112" height="58" fill="#ffffff"/>
+    <text x="600" y="201" font-size="15" font-weight="bold" fill="#475569">P-06 潔淨製程主走廊 (White Corridor)</text>
+
+    <!-- Row 2: P-07..P-10 (Pink & Blue) -->
+    <rect x="44" y="224" width="278" height="156" fill="#fbcfe8"/>
+    <text x="183" y="298" font-size="20" font-weight="bold" fill="#831843">P-07</text>
+    <text x="183" y="322" font-size="12.5" fill="#9d174d">稱量與配料作業室</text>
+
+    <rect x="322" y="224" width="278" height="156" fill="#fce7f3"/>
+    <text x="461" y="298" font-size="20" font-weight="bold" fill="#831843">P-08</text>
+    <text x="461" y="322" font-size="12.5" fill="#9d174d">核心製程作業室 A</text>
+
+    <rect x="600" y="224" width="278" height="156" fill="#fbcfe8"/>
+    <text x="739" y="298" font-size="20" font-weight="bold" fill="#831843">P-09</text>
+    <text x="739" y="322" font-size="12.5" fill="#9d174d">核心製程作業室 B</text>
+
+    <rect x="878" y="224" width="278" height="156" fill="#dbeafe"/>
+    <text x="1017" y="298" font-size="20" font-weight="bold" fill="#1e3a8a">P-10</text>
+    <text x="1017" y="322" font-size="12.5" fill="#1e40af">製程中繼緩衝室</text>
+
+    <!-- Row 3: P-11..P-14 (White, Pink, Blue) -->
+    <rect x="44" y="380" width="278" height="142" fill="#ffffff"/>
+    <text x="183" y="446" font-size="19" font-weight="bold" fill="#334155">P-11</text>
+    <text x="183" y="468" font-size="12" fill="#64748b">半成品暫存區 (白區)</text>
+
+    <rect x="322" y="380" width="278" height="142" fill="#fbcfe8"/>
+    <text x="461" y="446" font-size="19" font-weight="bold" fill="#831843">P-12</text>
+    <text x="461" y="468" font-size="12" fill="#9d174d">分裝與充填作業室</text>
+
+    <rect x="600" y="380" width="278" height="142" fill="#fce7f3"/>
+    <text x="739" y="446" font-size="19" font-weight="bold" fill="#831843">P-13</text>
+    <text x="739" y="468" font-size="12" fill="#9d174d">內包裝作業室</text>
+
+    <rect x="878" y="380" width="278" height="142" fill="#bfdbfe"/>
+    <text x="1017" y="446" font-size="19" font-weight="bold" fill="#1e3a8a">P-14</text>
+    <text x="1017" y="468" font-size="12" fill="#1e40af">物料傳遞氣鎖間</text>
+
+    <!-- Lower Corridor: P-15 (White) -->
+    <rect x="44" y="522" width="1112" height="54" fill="#ffffff"/>
+    <text x="600" y="555" font-size="15" font-weight="bold" fill="#475569">P-15 出料與包裝物流走廊</text>
+
+    <!-- Row 4: P-16..P-21 (Blue, White, Pink) -->
+    <rect x="44" y="576" width="185" height="148" fill="#dbeafe"/>
+    <text x="136" y="646" font-size="18" font-weight="bold" fill="#1e3a8a">P-16</text>
+    <text x="136" y="668" font-size="11.5" fill="#1e40af">更衣室 B</text>
+
+    <rect x="229" y="576" width="185" height="148" fill="#ffffff"/>
+    <text x="321" y="646" font-size="18" font-weight="bold" fill="#334155">P-17</text>
+    <text x="321" y="668" font-size="11.5" fill="#64748b">工具清潔乾燥</text>
+
+    <rect x="414" y="576" width="185" height="148" fill="#fbcfe8"/>
+    <text x="506" y="646" font-size="18" font-weight="bold" fill="#831843">P-18</text>
+    <text x="506" y="668" font-size="11.5" fill="#9d174d">外包裝作業</text>
+
+    <rect x="599" y="576" width="185" height="148" fill="#fce7f3"/>
+    <text x="691" y="646" font-size="18" font-weight="bold" fill="#831843">P-19</text>
+    <text x="691" y="668" font-size="11.5" fill="#9d174d">貼標檢視區</text>
+
+    <rect x="784" y="576" width="186" height="148" fill="#fbcfe8"/>
+    <text x="877" y="646" font-size="18" font-weight="bold" fill="#831843">P-20</text>
+    <text x="877" y="668" font-size="11.5" fill="#9d174d">裝箱理貨區</text>
+
+    <rect x="970" y="576" width="186" height="148" fill="#fce7f3"/>
+    <text x="1063" y="646" font-size="18" font-weight="bold" fill="#831843">P-21</text>
+    <text x="1063" y="668" font-size="11.5" fill="#9d174d">成品出貨緩衝</text>
+  </g>
+  <text x="600" y="776" font-family="sans-serif" font-size="16" font-weight="bold" fill="#b91c1c" text-anchor="middle">製造區平面範本 (紅框區 · P-01 ~ P-21 粉 / 藍 / 白分區配置)</text>
 </svg>`;
       return { width: 1200, height: 800, dataUrl: svgToDataUrl(svg) };
     }
-    if (templateId === 'warehouse2d') {
+
+    // 5. Warehouse Zone Floor Plan Template (Blue Frame) — W-01..W-05, P-18..P-22, green cold room, orange pallet racks, pink packing edge
+    if (templateId === 'wh_blue') {
       const svg = `
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
   <rect width="1200" height="800" fill="#ffffff"/>
-  <rect x="50" y="45" width="760" height="690" fill="#eef6ee" stroke="#0f172a" stroke-width="4"/>
-  <!-- Loading Platform & Ramp -->
-  <rect x="50" y="45" width="200" height="110" fill="#f8fafc" stroke="#1e293b" stroke-width="2.5"/>
-  <text x="150" y="110" font-family="sans-serif" font-size="18" font-weight="bold" fill="#1e293b" text-anchor="middle">裝卸平台 Platform</text>
-  <path d="M 50 45 L 110 45 A 60 60 0 0 1 50 105 Z" fill="none" stroke="#1e293b" stroke-width="1.5"/>
-  <path d="M 250 45 L 190 45 A 60 60 0 0 0 250 105 Z" fill="none" stroke="#1e293b" stroke-width="1.5"/>
-  <rect x="250" y="45" width="240" height="110" fill="#f8fafc" stroke="#1e293b" stroke-width="2.5"/>
-  <text x="370" y="95" font-family="sans-serif" font-size="18" font-weight="bold" fill="#1e293b" text-anchor="middle">斜坡道 Ramp</text>
-  <text x="370" y="122" font-family="sans-serif" font-size="14" fill="#64748b" text-anchor="middle">8%</text>
-  <!-- Rack Bays -->
-  <g stroke="#334155" stroke-width="1.8" fill="#ffffff">
-    <rect x="75" y="185" width="90" height="80"/><line x1="75" y1="185" x2="165" y2="265"/><line x1="165" y1="185" x2="75" y2="265"/>
-    <rect x="75" y="265" width="90" height="80"/><line x1="75" y1="265" x2="165" y2="345"/><line x1="165" y1="265" x2="75" y2="345"/>
-    <rect x="75" y="345" width="90" height="80"/><line x1="75" y1="345" x2="165" y2="425"/><line x1="165" y1="345" x2="75" y2="425"/>
-    <rect x="75" y="425" width="90" height="80"/><line x1="75" y1="425" x2="165" y2="505"/><line x1="165" y1="425" x2="75" y2="505"/>
-    <rect x="300" y="185" width="90" height="80"/><line x1="300" y1="185" x2="390" y2="265"/><line x1="390" y1="185" x2="300" y2="265"/>
-    <rect x="300" y="265" width="90" height="80"/><line x1="300" y1="265" x2="390" y2="345"/><line x1="390" y1="265" x2="300" y2="345"/>
-    <rect x="300" y="345" width="90" height="80"/><line x1="300" y1="345" x2="390" y2="425"/><line x1="390" y1="345" x2="300" y2="425"/>
-    <rect x="300" y="425" width="90" height="80"/><line x1="300" y1="425" x2="390" y2="505"/><line x1="390" y1="425" x2="300" y2="505"/>
-    <rect x="390" y="185" width="90" height="80"/><line x1="390" y1="185" x2="480" y2="265"/><line x1="480" y1="185" x2="390" y2="265"/>
-    <rect x="390" y="265" width="90" height="80"/><line x1="390" y1="265" x2="480" y2="345"/><line x1="480" y1="265" x2="390" y2="345"/>
-    <rect x="390" y="345" width="90" height="80"/><line x1="390" y1="345" x2="480" y2="425"/><line x1="480" y1="345" x2="390" y2="425"/>
-    <rect x="390" y="425" width="90" height="80"/><line x1="390" y1="425" x2="480" y2="505"/><line x1="480" y1="425" x2="390" y2="505"/>
-    <rect x="650" y="185" width="110" height="75"/><line x1="650" y1="185" x2="760" y2="260"/><line x1="760" y1="185" x2="650" y2="260"/>
-    <rect x="650" y="260" width="110" height="75"/><line x1="650" y1="260" x2="760" y2="335"/><line x1="760" y1="260" x2="650" y2="335"/>
-    <rect x="650" y="335" width="110" height="75"/><line x1="650" y1="335" x2="760" y2="410"/><line x1="760" y1="335" x2="650" y2="410"/>
-    <rect x="650" y="410" width="110" height="75"/><line x1="650" y1="410" x2="760" y2="485"/><line x1="760" y1="410" x2="650" y2="485"/>
-    <rect x="650" y="485" width="110" height="75"/><line x1="650" y1="485" x2="760" y2="560"/><line x1="760" y1="485" x2="650" y2="560"/>
+  <!-- Prominent Blue Frame -->
+  <rect x="28" y="28" width="1144" height="712" fill="#f8fafc" stroke="#2563eb" stroke-width="6"/>
+
+  <!-- Left Pink Packing Edge: P-18 .. P-22 -->
+  <g stroke="#9d174d" stroke-width="2" font-family="sans-serif" text-anchor="middle">
+    <rect x="44" y="44" width="176" height="136" fill="#fbcfe8"/>
+    <text x="132" y="106" font-size="18" font-weight="bold" fill="#831843">P-18</text>
+    <text x="132" y="128" font-size="11.5" fill="#9d174d">外包裝銜接區</text>
+
+    <rect x="44" y="180" width="176" height="136" fill="#fce7f3"/>
+    <text x="132" y="242" font-size="18" font-weight="bold" fill="#831843">P-19</text>
+    <text x="132" y="264" font-size="11.5" fill="#9d174d">貼標檢驗區</text>
+
+    <rect x="44" y="316" width="176" height="136" fill="#fbcfe8"/>
+    <text x="132" y="378" font-size="18" font-weight="bold" fill="#831843">P-20</text>
+    <text x="132" y="400" font-size="11.5" fill="#9d174d">裝箱理貨區</text>
+
+    <rect x="44" y="452" width="176" height="136" fill="#fce7f3"/>
+    <text x="132" y="514" font-size="18" font-weight="bold" fill="#831843">P-21</text>
+    <text x="132" y="536" font-size="11.5" fill="#9d174d">成品緩衝暫存</text>
+
+    <rect x="44" y="588" width="176" height="136" fill="#fbcfe8"/>
+    <text x="132" y="650" font-size="18" font-weight="bold" fill="#831843">P-22</text>
+    <text x="132" y="672" font-size="11.5" fill="#9d174d">倉儲氣鎖通道</text>
   </g>
-  <!-- Bottom Staging & Charging -->
-  <path d="M 450 735 L 450 650 L 620 650 L 620 735" fill="none" stroke="#1e293b" stroke-dasharray="6,5" stroke-width="2"/>
-  <text x="535" y="688" font-family="sans-serif" font-size="14" font-weight="bold" fill="#334155" text-anchor="middle">EQUIPMENT /</text>
-  <text x="535" y="708" font-family="sans-serif" font-size="14" font-weight="bold" fill="#334155" text-anchor="middle">CHARGING</text>
-  <g stroke="#334155" stroke-width="1.5" fill="#fff">
-    <rect x="75" y="665" width="75" height="50"/><rect x="150" y="665" width="75" height="50"/>
-    <rect x="225" y="665" width="75" height="50"/><rect x="300" y="665" width="75" height="50"/>
+
+  <!-- Warehouse Core: W-01..W-05 -->
+  <g stroke="#334155" stroke-width="2.2" font-family="sans-serif" text-anchor="middle">
+    <!-- Top Row: W-01 Receiving & W-02 Packaging/Material Storage -->
+    <rect x="220" y="44" width="320" height="136" fill="#ffedd5"/>
+    <text x="380" y="106" font-size="20" font-weight="bold" fill="#9a3412">W-01</text>
+    <text x="380" y="130" font-size="12.5" fill="#c2410c">收貨進料 / 卸貨平台區</text>
+
+    <rect x="540" y="44" width="320" height="136" fill="#fed7aa"/>
+    <text x="700" y="106" font-size="20" font-weight="bold" fill="#9a3412">W-02</text>
+    <text x="700" y="130" font-size="12.5" fill="#c2410c">包材與原物料儲放區</text>
+
+    <!-- W-05 Right Side Shipping & Dock -->
+    <rect x="860" y="44" width="296" height="316" fill="#ffedd5"/>
+    <rect x="896" y="76" width="224" height="84" fill="#ffffff" stroke="#64748b" stroke-dasharray="6,4"/>
+    <text x="1008" y="122" font-size="13" font-weight="bold" fill="#475569">出貨斜坡 Ramp / Dock</text>
+    <text x="1008" y="232" font-size="22" font-weight="bold" fill="#9a3412">W-05</text>
+    <text x="1008" y="258" font-size="13" fill="#c2410c">出貨理貨與裝卸平台</text>
+
+    <!-- W-03 Ambient Warehouse with Orange Pallet Racks -->
+    <rect x="220" y="180" width="640" height="544" fill="#fff7ed"/>
+    <!-- Orange Pallet Rack Rows -->
+    <g fill="#fb923c" fill-opacity="0.45" stroke="#9a3412" stroke-width="1.6">
+      <!-- Row A -->
+      <rect x="248" y="210" width="90" height="72"/><line x1="248" y1="210" x2="338" y2="282"/><line x1="338" y1="210" x2="248" y2="282"/>
+      <rect x="248" y="282" width="90" height="72"/><line x1="248" y1="282" x2="338" y2="354"/><line x1="338" y1="282" x2="248" y2="354"/>
+      <rect x="248" y="354" width="90" height="72"/><line x1="248" y1="354" x2="338" y2="426"/><line x1="338" y1="354" x2="248" y2="426"/>
+      <rect x="248" y="426" width="90" height="72"/><line x1="248" y1="426" x2="338" y2="498"/><line x1="338" y1="426" x2="248" y2="498"/>
+      <rect x="248" y="498" width="90" height="72"/><line x1="248" y1="498" x2="338" y2="570"/><line x1="338" y1="498" x2="248" y2="570"/>
+      <!-- Row B (Double Back-to-Back) -->
+      <rect x="444" y="210" width="90" height="72"/><line x1="444" y1="210" x2="534" y2="282"/><line x1="534" y1="210" x2="444" y2="282"/>
+      <rect x="444" y="282" width="90" height="72"/><line x1="444" y1="282" x2="534" y2="354"/><line x1="534" y1="282" x2="444" y2="354"/>
+      <rect x="444" y="354" width="90" height="72"/><line x1="444" y1="354" x2="534" y2="426"/><line x1="534" y1="354" x2="444" y2="426"/>
+      <rect x="444" y="426" width="90" height="72"/><line x1="444" y1="426" x2="534" y2="498"/><line x1="534" y1="426" x2="444" y2="498"/>
+      <rect x="444" y="498" width="90" height="72"/><line x1="444" y1="498" x2="534" y2="570"/><line x1="534" y1="498" x2="444" y2="570"/>
+      <rect x="534" y="210" width="90" height="72"/><line x1="534" y1="210" x2="624" y2="282"/><line x1="624" y1="210" x2="534" y2="282"/>
+      <rect x="534" y="282" width="90" height="72"/><line x1="534" y1="282" x2="624" y2="354"/><line x1="624" y1="282" x2="534" y2="354"/>
+      <rect x="534" y="354" width="90" height="72"/><line x1="534" y1="354" x2="624" y2="426"/><line x1="624" y1="354" x2="534" y2="426"/>
+      <rect x="534" y="426" width="90" height="72"/><line x1="534" y1="426" x2="624" y2="498"/><line x1="624" y1="426" x2="534" y2="498"/>
+      <rect x="534" y="498" width="90" height="72"/><line x1="534" y1="498" x2="624" y2="570"/><line x1="624" y1="498" x2="534" y2="570"/>
+      <!-- Row C -->
+      <rect x="734" y="210" width="96" height="72"/><line x1="734" y1="210" x2="830" y2="282"/><line x1="830" y1="210" x2="734" y2="282"/>
+      <rect x="734" y="282" width="96" height="72"/><line x1="734" y1="282" x2="830" y2="354"/><line x1="830" y1="282" x2="734" y2="354"/>
+      <rect x="734" y="354" width="96" height="72"/><line x1="734" y1="354" x2="830" y2="426"/><line x1="830" y1="354" x2="734" y2="426"/>
+      <rect x="734" y="426" width="96" height="72"/><line x1="734" y1="426" x2="830" y2="498"/><line x1="830" y1="426" x2="734" y2="498"/>
+      <rect x="734" y="498" width="96" height="72"/><line x1="734" y1="498" x2="830" y2="570"/><line x1="830" y1="498" x2="734" y2="570"/>
+    </g>
+    <!-- Charging & Staging -->
+    <rect x="248" y="618" width="230" height="78" fill="#ffffff" stroke="#475569" stroke-dasharray="5,4"/>
+    <text x="363" y="662" font-size="13" font-weight="bold" fill="#475569">堆高機充電與理貨區</text>
+    <rect x="520" y="618" width="270" height="78" rx="8" fill="rgba(255,255,255,0.92)" stroke="#ea580c" stroke-width="2"/>
+    <text x="655" y="652" font-size="20" font-weight="bold" fill="#9a3412">W-03 常溫倉庫</text>
+    <text x="655" y="676" font-size="12" fill="#c2410c">橘色棧板貨架儲位區</text>
+
+    <!-- W-04 Green Cold Room (Bottom Right) -->
+    <rect x="860" y="360" width="296" height="364" fill="#bbf7d0" stroke="#15803d" stroke-width="4"/>
+    <g fill="#dcfce7" stroke="#166534" stroke-width="1.6">
+      <rect x="880" y="392" width="70" height="66"/><line x1="880" y1="392" x2="950" y2="458"/><line x1="950" y1="392" x2="880" y2="458"/>
+      <rect x="880" y="458" width="70" height="66"/><line x1="880" y1="458" x2="950" y2="524"/><line x1="950" y1="458" x2="880" y2="524"/>
+      <rect x="880" y="524" width="70" height="66"/><line x1="880" y1="524" x2="950" y2="590"/><line x1="950" y1="524" x2="880" y2="590"/>
+      <rect x="1066" y="392" width="70" height="66"/><line x1="1066" y1="392" x2="1136" y2="458"/><line x1="1136" y1="392" x2="1066" y2="458"/>
+      <rect x="1066" y="458" width="70" height="66"/><line x1="1066" y1="458" x2="1136" y2="524"/><line x1="1136" y1="458" x2="1066" y2="524"/>
+      <rect x="1066" y="524" width="70" height="66"/><line x1="1066" y1="524" x2="1136" y2="590"/><line x1="1136" y1="524" x2="1066" y2="590"/>
+    </g>
+    <rect x="928" y="624" width="160" height="72" rx="8" fill="rgba(255,255,255,0.92)" stroke="#15803d" stroke-width="2"/>
+    <text x="1008" y="656" font-size="20" font-weight="bold" fill="#14532d">W-04 冷藏庫</text>
+    <text x="1008" y="678" font-size="11.5" fill="#166534">2~8°C 綠色低溫倉</text>
   </g>
-  <rect x="850" y="45" width="310" height="690" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="6,5"/>
-  <text x="1005" y="80" font-family="sans-serif" font-size="15" font-weight="bold" fill="#64748b" text-anchor="middle">右側圖例 / 多層貨架圖放置區</text>
+  <text x="600" y="776" font-family="sans-serif" font-size="16" font-weight="bold" fill="#1d4ed8" text-anchor="middle">倉儲區平面範本 (藍框區 · W-01~W-05 綠冷藏庫 / 橘棧板架 / 粉包裝銜接邊 P-18~P-22)</text>
 </svg>`;
       return { width: 1200, height: 800, dataUrl: svgToDataUrl(svg) };
     }
-    if (templateId === 'storage2d') {
+
+    // 6. Cold Room Floor Plan Template (2D)
+    if (templateId === 'coldroom_2d') {
       const svg = `
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
   <rect width="1200" height="800" fill="#ffffff"/>
-  <path d="M 320 60 L 580 60 L 580 180 L 720 180 L 720 720 L 320 720 Z" fill="#f0f9ff" stroke="#0f172a" stroke-width="5"/>
-  <path d="M 320 60 L 250 60 A 70 70 0 0 0 320 125" fill="none" stroke="#1e293b" stroke-width="2"/>
-  <path d="M 320 190 L 250 190 A 70 70 0 0 1 320 125" fill="none" stroke="#1e293b" stroke-width="2"/>
-  <g stroke="#334155" stroke-width="1.8" fill="#fff">
-    <rect x="338" y="210" width="95" height="82"/><line x1="338" y1="210" x2="433" y2="292"/><line x1="433" y1="210" x2="338" y2="292"/>
-    <rect x="338" y="292" width="95" height="82"/><line x1="338" y1="292" x2="433" y2="374"/><line x1="433" y1="292" x2="338" y2="374"/>
-    <rect x="338" y="374" width="95" height="82"/><line x1="338" y1="374" x2="433" y2="456"/><line x1="433" y1="374" x2="338" y2="456"/>
-    <rect x="338" y="456" width="95" height="82"/><line x1="338" y1="456" x2="433" y2="538"/><line x1="433" y1="456" x2="338" y2="538"/>
-    <rect x="338" y="538" width="95" height="82"/><line x1="338" y1="538" x2="433" y2="620"/><line x1="433" y1="538" x2="338" y2="620"/>
-    <rect x="605" y="210" width="95" height="82"/><line x1="605" y1="210" x2="700" y2="292"/><line x1="700" y1="210" x2="605" y2="292"/>
-    <rect x="605" y="292" width="95" height="82"/><line x1="605" y1="292" x2="700" y2="374"/><line x1="700" y1="292" x2="605" y2="374"/>
-    <rect x="605" y="374" width="95" height="82"/><line x1="605" y1="374" x2="700" y2="456"/><line x1="700" y1="374" x2="605" y2="456"/>
-    <rect x="605" y="456" width="95" height="82"/><line x1="605" y1="456" x2="700" y2="538"/><line x1="700" y1="456" x2="605" y2="538"/>
-    <rect x="605" y="538" width="95" height="82"/><line x1="605" y1="538" x2="700" y2="620"/><line x1="700" y1="538" x2="605" y2="620"/>
+  <!-- Insulated Cold Room Shell (L-Stepped W-04 Profile) -->
+  <path d="M 280 56 L 560 56 L 560 176 L 730 176 L 730 716 L 280 716 Z" fill="#dcfce7" stroke="#0f172a" stroke-width="6" stroke-linejoin="miter"/>
+  <path d="M 272 48 L 568 48 L 568 168 L 738 168 L 738 724 L 272 724 Z" fill="none" stroke="#15803d" stroke-width="2" stroke-dasharray="6,4"/>
+  <!-- Double Swinging Insulated Doors -->
+  <path d="M 280 56 L 204 56 A 76 76 0 0 0 280 128" fill="none" stroke="#0f172a" stroke-width="2"/>
+  <path d="M 280 200 L 204 200 A 76 76 0 0 1 280 128" fill="none" stroke="#0f172a" stroke-width="2"/>
+  <line x1="280" y1="56" x2="280" y2="200" stroke="#0284c7" stroke-width="3"/>
+  <text x="195" y="132" font-family="sans-serif" font-size="13" font-weight="bold" fill="#0369a1" text-anchor="end">保溫雙開門</text>
+
+  <!-- Cooling / Evaporator Units (Ceiling Projection) -->
+  <rect x="440" y="76" width="96" height="32" rx="4" fill="#bae6fd" stroke="#0284c7" stroke-width="2"/>
+  <text x="488" y="97" font-family="sans-serif" font-size="11" font-weight="bold" fill="#0369a1" text-anchor="middle">冷風機 EVAP-1</text>
+  <rect x="592" y="196" width="114" height="30" rx="4" fill="#bae6fd" stroke="#0284c7" stroke-width="2"/>
+  <text x="649" y="216" font-family="sans-serif" font-size="11" font-weight="bold" fill="#0369a1" text-anchor="middle">冷風機 EVAP-2</text>
+
+  <!-- Left & Right Rack Bays -->
+  <g stroke="#166534" stroke-width="1.8" fill="#ffffff">
+    <rect x="300" y="232" width="106" height="84"/><line x1="300" y1="232" x2="406" y2="316"/><line x1="406" y1="232" x2="300" y2="316"/>
+    <rect x="300" y="316" width="106" height="84"/><line x1="300" y1="316" x2="406" y2="400"/><line x1="406" y1="316" x2="300" y2="400"/>
+    <rect x="300" y="400" width="106" height="84"/><line x1="300" y1="400" x2="406" y2="484"/><line x1="406" y1="400" x2="300" y2="484"/>
+    <rect x="300" y="484" width="106" height="84"/><line x1="300" y1="484" x2="406" y2="568"/><line x1="406" y1="484" x2="300" y2="568"/>
+    <rect x="300" y="568" width="106" height="84"/><line x1="300" y1="568" x2="406" y2="652"/><line x1="406" y1="568" x2="300" y2="652"/>
+
+    <rect x="602" y="246" width="106" height="84"/><line x1="602" y1="246" x2="708" y2="330"/><line x1="708" y1="246" x2="602" y2="330"/>
+    <rect x="602" y="330" width="106" height="84"/><line x1="602" y1="330" x2="708" y2="414"/><line x1="708" y1="330" x2="602" y2="414"/>
+    <rect x="602" y="414" width="106" height="84"/><line x1="602" y1="414" x2="708" y2="498"/><line x1="708" y1="414" x2="602" y2="498"/>
+    <rect x="602" y="498" width="106" height="84"/><line x1="602" y1="498" x2="708" y2="582"/><line x1="708" y1="498" x2="602" y2="582"/>
+    <rect x="602" y="582" width="106" height="84"/><line x1="602" y1="582" x2="708" y2="666"/><line x1="708" y1="582" x2="602" y2="666"/>
   </g>
-  <text x="520" y="758" font-family="sans-serif" font-size="16" font-weight="bold" fill="#334155" text-anchor="middle">精簡儲位空間平面配置 (2D)</text>
+  <text x="504" y="468" font-family="sans-serif" font-size="16" font-weight="bold" fill="#166534" text-anchor="middle">中央作業通道</text>
+  <text x="504" y="492" font-family="sans-serif" font-size="13" fill="#15803d" text-anchor="middle">(W-04 冷藏庫 2D)</text>
+
+  <!-- Right Side Space for Rack Diagrams & Legends -->
+  <rect x="790" y="56" width="366" height="660" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="6,5"/>
+  <text x="973" y="92" font-family="sans-serif" font-size="14" font-weight="bold" fill="#64748b" text-anchor="middle">多層貨架圖 / 點位圖例放置區</text>
+  <text x="600" y="768" font-family="sans-serif" font-size="16" font-weight="bold" fill="#14532d" text-anchor="middle">冷藏庫平面範本 (2D · W-04 Cold Room Floor Plan)</text>
 </svg>`;
       return { width: 1200, height: 800, dataUrl: svgToDataUrl(svg) };
     }
-    if (templateId === 'isometric3d') {
-      const ox = 540, oy = 290, s = 0.92;
+
+    // 7. Cold Room Isometric Space Template (3D)
+    if (templateId === 'coldroom_3d') {
+      const ox = 540, oy = 310, s = 0.88;
       const iso = (x, y, z) => `${(ox + (-x * 0.866 + y * 0.866) * s).toFixed(1)},${(oy + (x * 0.5 + y * 0.5 - z) * s).toFixed(1)}`;
+      const isoPt = (x, y, z) => iso(x, y, z).split(',');
+      let gridLines = '';
+      for (let gx = 80; gx < 380; gx += 80) {
+        const a = isoPt(gx, 0, 0), b = isoPt(gx, 560, 0);
+        gridLines += `<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="#86efac" stroke-width="1" stroke-dasharray="4,4"/>`;
+      }
+      for (let gy = 80; gy < 560; gy += 80) {
+        const a = isoPt(0, gy, 0), b = isoPt(380, gy, 0);
+        gridLines += `<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="#86efac" stroke-width="1" stroke-dasharray="4,4"/>`;
+      }
+      const dMid0 = isoPt(380, 95, 0), dMid1 = isoPt(380, 95, 190);
       const svg = `
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
   <rect width="1200" height="800" fill="#ffffff"/>
-  <polygon points="${iso(0,0,0)} ${iso(380,0,0)} ${iso(380,580,0)} ${iso(0,580,0)}" fill="#f0fdf4" stroke="#1e293b" stroke-width="2.5" stroke-linejoin="round"/>
-  <polygon points="${iso(0,0,0)} ${iso(380,0,0)} ${iso(380,0,260)} ${iso(0,0,260)}" fill="#e2e8f0" stroke="#1e293b" stroke-width="2.5" stroke-linejoin="round"/>
-  <polygon points="${iso(0,0,0)} ${iso(0,580,0)} ${iso(0,580,260)} ${iso(0,0,260)}" fill="#f1f5f9" stroke="#1e293b" stroke-width="2.5" stroke-linejoin="round"/>
-  <!-- Door -->
-  <polygon points="${iso(380,30,0)} ${iso(380,140,0)} ${iso(380,140,185)} ${iso(380,30,185)}" fill="#ffffff" stroke="#1e293b" stroke-width="2"/>
-  <line x1="${iso(380,85,0).split(',')[0]}" y1="${iso(380,85,0).split(',')[1]}" x2="${iso(380,85,185).split(',')[0]}" y2="${iso(380,85,185).split(',')[1]}" stroke="#1e293b" stroke-width="1.5"/>
-  <polygon points="${iso(380,45,105)} ${iso(380,70,105)} ${iso(380,70,145)} ${iso(380,45,145)}" fill="#dbeafe" stroke="#1e293b" stroke-width="1"/>
-  <polygon points="${iso(380,100,105)} ${iso(380,125,105)} ${iso(380,125,145)} ${iso(380,100,145)}" fill="#dbeafe" stroke="#1e293b" stroke-width="1"/>
-  <text x="600" y="758" font-family="sans-serif" font-size="16" font-weight="bold" fill="#334155" text-anchor="middle">等角立體空間範本 (3D Isometric)</text>
+  <!-- Floor -->
+  <polygon points="${iso(0,0,0)} ${iso(380,0,0)} ${iso(380,560,0)} ${iso(0,560,0)}" fill="#dcfce7" stroke="#14532d" stroke-width="2.6" stroke-linejoin="round"/>
+  ${gridLines}
+  <!-- Left Back Wall (Insulated Panel) -->
+  <polygon points="${iso(0,0,0)} ${iso(380,0,0)} ${iso(380,0,260)} ${iso(0,0,260)}" fill="#e2e8f0" stroke="#1e293b" stroke-width="2.6" stroke-linejoin="round"/>
+  <!-- Right Back Wall (Insulated Panel) -->
+  <polygon points="${iso(0,0,0)} ${iso(0,560,0)} ${iso(0,560,260)} ${iso(0,0,260)}" fill="#f1f5f9" stroke="#1e293b" stroke-width="2.6" stroke-linejoin="round"/>
+  <!-- Ceiling Cooling / Evaporator Box -->
+  <polygon points="${iso(20,160,210)} ${iso(95,160,210)} ${iso(95,300,210)} ${iso(20,300,210)}" fill="#bae6fd" stroke="#0284c7" stroke-width="1.8"/>
+  <polygon points="${iso(95,160,210)} ${iso(95,300,210)} ${iso(95,300,248)} ${iso(95,160,248)}" fill="#7dd3fc" stroke="#0284c7" stroke-width="1.8"/>
+  <polygon points="${iso(20,300,210)} ${iso(95,300,210)} ${iso(95,300,248)} ${iso(20,300,248)}" fill="#38bdf8" stroke="#0284c7" stroke-width="1.8"/>
+  <!-- Front-Left Insulated Double Door -->
+  <polygon points="${iso(380,30,0)} ${iso(380,160,0)} ${iso(380,160,190)} ${iso(380,30,190)}" fill="#ffffff" stroke="#0f172a" stroke-width="2.2"/>
+  <line x1="${dMid0[0]}" y1="${dMid0[1]}" x2="${dMid1[0]}" y2="${dMid1[1]}" stroke="#0f172a" stroke-width="1.8"/>
+  <polygon points="${iso(380,48,110)} ${iso(380,78,110)} ${iso(380,78,152)} ${iso(380,48,152)}" fill="#dbeafe" stroke="#0284c7" stroke-width="1.3"/>
+  <polygon points="${iso(380,112,110)} ${iso(380,142,110)} ${iso(380,142,152)} ${iso(380,112,152)}" fill="#dbeafe" stroke="#0284c7" stroke-width="1.3"/>
+  <!-- Subtle Top Edge Guide -->
+  <polyline points="${iso(380,0,260)} ${iso(380,560,260)} ${iso(0,560,260)}" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="6,5"/>
+  <text x="600" y="762" font-family="sans-serif" font-size="16" font-weight="bold" fill="#14532d" text-anchor="middle">冷藏庫等角立體空間範本 (3D Isometric · W-04 Cold Room)</text>
 </svg>`;
       return { width: 1200, height: 800, dataUrl: svgToDataUrl(svg) };
     }
+
     return { width: 1200, height: 800, dataUrl: null };
   }
 
   // ==================== Tab Management ====================
   function createDefaultTab(name, templateId) {
-    const tpl = getTemplateAsset(templateId || 'office');
+    const normTpl = normalizeTemplateId(templateId || 'facility_full');
+    const tpl = getTemplateAsset(normTpl);
     return {
       id: uid('tab'),
       name: name || '主區域 1',
-      templateId: templateId || 'office',
+      templateId: normTpl,
       bgDataUrl: tpl.dataUrl,
       virtualWidth: tpl.width,
       virtualHeight: tpl.height,
@@ -1282,7 +1902,11 @@
       canvas.renderAll();
 
       document.getElementById('next-marker-num').value = tab.sensorCounter;
-      document.getElementById('select-template').value = tab.templateId || 'blank';
+      const tplSel = document.getElementById('select-template');
+      const normTplId = normalizeTemplateId(tab.templateId || 'blank');
+      if (Array.from(tplSel.options).some(o => o.value === normTplId)) {
+        tplSel.value = normTplId;
+      }
       document.getElementById('status-tab').textContent = '分頁：' + tab.name;
       document.getElementById('status-size').textContent = `畫布：${tab.virtualWidth} × ${tab.virtualHeight}`;
 
@@ -1609,36 +2233,473 @@
     }
   }
 
-  function createFlowLegend(x, y) {
-    const text = '【動線圖例 Legend】\nP : 人流 (Personnel Flow)\nM : 物流 (Material Flow)\nW : 廢棄物流 (Waste Flow)';
-    const styles = { 1: {}, 2: {}, 3: {} };
-    for (let i = 0; i < 60; i++) {
-      styles[1][i] = { fill: '#2563eb' };
-      styles[2][i] = { fill: '#16a34a' };
-      styles[3][i] = { fill: '#dc2626' };
-    }
-    const tb = new fabric.Textbox(text, {
+  // ==================== Custom Flow Legend Builder & Editor ====================
+  function createCustomFlowLegendGroup(config, x, y) {
+    const cfg = config ? JSON.parse(JSON.stringify(config)) : getDefaultLegendConfig();
+    const title = (cfg.title || '【動線圖例 Legend】').trim();
+    const activeItems = (cfg.items || []).filter(it => it && it.enabled !== false);
+    const displayItems = activeItems.length ? activeItems : [{ enabled: true, code: '-', name: '(未勾選項目)', color: '#64748b' }];
+
+    const rowHeight = 28;
+    const padX = 16;
+    const padY = 14;
+    const headerH = 28;
+
+    // Estimate card width dynamically
+    let maxTextW = title.length * 14 + 32;
+    displayItems.forEach(it => {
+      const lineStr = `${it.code || ''} : ${it.name || ''}`;
+      let est = 52;
+      for (let i = 0; i < lineStr.length; i++) {
+        est += lineStr.charCodeAt(i) > 255 ? 15.5 : 9.2;
+      }
+      if (est > maxTextW) maxTextW = est;
+    });
+    const cardW = Math.max(250, Math.min(540, Math.round(maxTextW + padX * 2)));
+    const cardH = padY * 2 + headerH + 8 + displayItems.length * rowHeight;
+
+    const items = [];
+    // Card background
+    items.push(new fabric.Rect({
+      left: 0,
+      top: 0,
+      width: cardW,
+      height: cardH,
+      rx: 8,
+      ry: 8,
+      fill: 'rgba(255,255,255,0.97)',
+      stroke: '#64748b',
+      strokeWidth: 1.6,
+      shadow: new fabric.Shadow({ color: 'rgba(15,23,42,0.16)', blur: 8, offsetX: 2, offsetY: 3 })
+    }));
+
+    // Title
+    items.push(new fabric.Text(title, {
+      left: padX,
+      top: padY,
+      fontSize: 15,
+      fontWeight: 'bold',
+      fontFamily: 'sans-serif',
+      fill: '#0f172a'
+    }));
+
+    // Divider line
+    items.push(new fabric.Line([padX, padY + headerH, cardW - padX, padY + headerH], {
+      stroke: '#e2e8f0',
+      strokeWidth: 1.5
+    }));
+
+    // Enabled Legend Rows
+    displayItems.forEach((it, idx) => {
+      const rowY = padY + headerH + 10 + idx * rowHeight;
+      const color = it.color || '#2563eb';
+      const code = (it.code || '').trim();
+      const name = (it.name || '').trim();
+
+      // Colored arrow indicator
+      items.push(new fabric.Line([padX, rowY + 9, padX + 18, rowY + 9], {
+        stroke: color,
+        strokeWidth: 4,
+        strokeLineCap: 'round'
+      }));
+      items.push(new fabric.Triangle({
+        left: padX + 22,
+        top: rowY + 9,
+        width: 10,
+        height: 11,
+        fill: color,
+        angle: 90,
+        originX: 'center',
+        originY: 'center'
+      }));
+
+      // Text line
+      const txt = code ? `${code} : ${name}` : name;
+      items.push(new fabric.Text(txt, {
+        left: padX + 34,
+        top: rowY + 1,
+        fontSize: 14,
+        fontWeight: 'bold',
+        fontFamily: 'sans-serif',
+        fill: color
+      }));
+    });
+
+    return new fabric.Group(items, {
       left: x,
       top: y,
-      width: 270,
-      fontSize: 15,
-      fontFamily: 'sans-serif',
-      fontWeight: 'bold',
-      fill: '#0f172a',
-      backgroundColor: 'rgba(255,255,255,0.96)',
-      padding: 10,
-      lineHeight: 1.5,
       originX: 'center',
       originY: 'center',
       borderColor: '#64748b',
-      cornerColor: '#64748b',
-      styles: styles,
-      shadow: new fabric.Shadow({ color: 'rgba(15,23,42,0.16)', blur: 8, offsetX: 2, offsetY: 3 }),
-      customType: 'legend',
+      cornerColor: '#2563eb',
+      lockUniScaling: false,
+      customType: 'customFlowLegend',
       isAlwaysTop: true,
+      legendConfig: cfg,
       objId: uid('leg')
     });
-    return tb;
+  }
+
+  function renderLegendEditorRows(items) {
+    const container = document.getElementById('legend-items-editor');
+    container.innerHTML = '';
+    items.forEach((item, idx) => {
+      const row = document.createElement('div');
+      row.className = 'legend-row';
+      row.setAttribute('data-testid', `legend-row-${idx}`);
+
+      const chk = document.createElement('input');
+      chk.type = 'checkbox';
+      chk.checked = item.enabled !== false;
+      chk.setAttribute('data-testid', `legend-item-check-${idx}`);
+
+      const codeInp = document.createElement('input');
+      codeInp.type = 'text';
+      codeInp.className = 'text-input';
+      codeInp.value = item.code || '';
+      codeInp.maxLength = 10;
+      codeInp.placeholder = '代碼';
+      codeInp.setAttribute('data-testid', `legend-item-code-${idx}`);
+
+      const nameInp = document.createElement('input');
+      nameInp.type = 'text';
+      nameInp.className = 'text-input';
+      nameInp.value = item.name || '';
+      nameInp.maxLength = 48;
+      nameInp.placeholder = '項目名稱說明';
+      nameInp.setAttribute('data-testid', `legend-item-name-${idx}`);
+
+      const colorInp = document.createElement('input');
+      colorInp.type = 'color';
+      colorInp.className = 'color-swatch';
+      colorInp.value = item.color || '#2563eb';
+      colorInp.setAttribute('data-testid', `legend-item-color-${idx}`);
+
+      const delBtn = document.createElement('button');
+      delBtn.type = 'button';
+      delBtn.className = 'btn btn-xs btn-danger';
+      delBtn.textContent = '✕';
+      delBtn.title = '刪除此列';
+      delBtn.setAttribute('data-testid', `legend-item-del-${idx}`);
+      delBtn.onclick = () => {
+        const latest = readLegendConfigFromEditor();
+        if (latest.items.length <= 1) {
+          showToast('至少需保留一列圖例項目', 'warn');
+          return;
+        }
+        latest.items.splice(idx, 1);
+        renderLegendEditorRows(latest.items);
+      };
+
+      row.appendChild(chk);
+      row.appendChild(codeInp);
+      row.appendChild(nameInp);
+      row.appendChild(colorInp);
+      row.appendChild(delBtn);
+      container.appendChild(row);
+    });
+  }
+
+  function readLegendConfigFromEditor() {
+    const title = document.getElementById('legend-title-input').value.trim() || '【動線圖例 Legend】';
+    const rows = document.querySelectorAll('#legend-items-editor .legend-row');
+    const items = [];
+    rows.forEach(row => {
+      const inputs = row.querySelectorAll('input');
+      items.push({
+        enabled: inputs[0].checked,
+        code: inputs[1].value.trim(),
+        name: inputs[2].value.trim(),
+        color: inputs[3].value || '#2563eb'
+      });
+    });
+    return { title, items };
+  }
+
+  function openLegendModal(targetObj) {
+    editingLegendObj = targetObj || null;
+    const cfg = (editingLegendObj && editingLegendObj.legendConfig)
+      ? JSON.parse(JSON.stringify(editingLegendObj.legendConfig))
+      : JSON.parse(JSON.stringify(currentLegendDraft));
+
+    document.getElementById('legend-modal-title').textContent = editingLegendObj
+      ? '✏️ 編輯動線圖例（雙擊修改）'
+      : '📋 自訂動線圖例設定';
+    document.getElementById('legend-title-input').value = cfg.title || '【動線圖例 Legend】';
+    renderLegendEditorRows(cfg.items && cfg.items.length ? cfg.items : getDefaultLegendConfig().items);
+
+    const clickPlaceBtn = document.getElementById('btn-legend-place-click');
+    const confirmBtn = document.getElementById('btn-legend-confirm');
+    if (editingLegendObj) {
+      clickPlaceBtn.style.display = 'none';
+      confirmBtn.textContent = '儲存圖例變更';
+    } else {
+      clickPlaceBtn.style.display = 'inline-flex';
+      confirmBtn.textContent = '確定並插入畫布';
+    }
+    document.getElementById('legend-modal').classList.add('open');
+  }
+
+  function closeLegendModal() {
+    document.getElementById('legend-modal').classList.remove('open');
+    editingLegendObj = null;
+  }
+
+  function confirmLegendModal(placeByClick) {
+    const cfg = readLegendConfigFromEditor();
+    const enabledCount = cfg.items.filter(it => it.enabled).length;
+    if (enabledCount === 0) {
+      showToast('請至少勾選一項圖例項目', 'warn');
+      return;
+    }
+    currentLegendDraft = JSON.parse(JSON.stringify(cfg));
+
+    if (editingLegendObj) {
+      const target = editingLegendObj;
+      const updated = createCustomFlowLegendGroup(cfg, target.left, target.top);
+      updated.set({
+        scaleX: target.scaleX,
+        scaleY: target.scaleY,
+        angle: target.angle,
+        opacity: target.opacity
+      });
+      canvas.remove(target);
+      canvas.add(updated);
+      keepLabelsOnTop();
+      canvas.setActiveObject(updated);
+      canvas.renderAll();
+      pushUndoSnapshot();
+      updateInspector();
+      closeLegendModal();
+      showToast('已更新自訂動線圖例', 'success');
+      return;
+    }
+
+    closeLegendModal();
+    if (placeByClick) {
+      setPlacementMode('legend-flow');
+      showToast('請在畫布上點擊欲放置動線圖例的位置');
+    } else {
+      const tab = getActiveTab();
+      const x = Math.round((tab ? tab.virtualWidth : 1200) * 0.2);
+      const y = Math.round((tab ? tab.virtualHeight : 800) * 0.8);
+      const grp = createCustomFlowLegendGroup(cfg, x, y);
+      canvas.add(grp);
+      keepLabelsOnTop();
+      setPlacementMode(null);
+      canvas.setActiveObject(grp);
+      canvas.renderAll();
+      pushUndoSnapshot();
+      updateInspector();
+      showToast('已插入自訂動線圖例（可縮放或雙擊修改）', 'success');
+    }
+  }
+
+  // ==================== Custom Shape & Label Blocks (2D Planar & 3D Isometric) ====================
+  function shadeHex(hex, percent) {
+    const clean = String(hex || '#dbeafe').replace('#', '');
+    if (clean.length !== 6) return hex || '#dbeafe';
+    const num = parseInt(clean, 16);
+    const amt = Math.round(2.55 * percent);
+    const r = Math.max(0, Math.min(255, (num >> 16) + amt));
+    const g = Math.max(0, Math.min(255, ((num >> 8) & 0x00ff) + amt));
+    const b = Math.max(0, Math.min(255, (num & 0x0000ff) + amt));
+    return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+  }
+
+  function createCustomShapeBlockGroup(opts) {
+    const shapeType = opts.shapeType || 'rect'; // rect | roundrect | ellipse | lshape
+    const fillColor = opts.fillColor || '#dbeafe';
+    const strokeColor = opts.strokeColor || '#2563eb';
+    const opacity = typeof opts.opacity === 'number' ? Math.max(0.1, Math.min(1, opts.opacity)) : 0.85;
+    const viewMode = opts.viewMode === '3d' ? '3d' : '2d';
+    const label = opts.label !== undefined ? String(opts.label) : '區域方塊';
+    const w = Math.max(48, Math.round(opts.width || 160));
+    const h = Math.max(40, Math.round(opts.height || 104));
+
+    const items = [];
+    let labelX = 0;
+    let labelY = 0;
+
+    if (viewMode === '2d') {
+      if (shapeType === 'rect') {
+        items.push(new fabric.Rect({
+          left: 0, top: 0, width: w, height: h,
+          fill: fillColor, stroke: strokeColor, strokeWidth: 2.5,
+          originX: 'center', originY: 'center'
+        }));
+      } else if (shapeType === 'roundrect') {
+        const rad = Math.min(22, Math.round(Math.min(w, h) * 0.24));
+        items.push(new fabric.Rect({
+          left: 0, top: 0, width: w, height: h, rx: rad, ry: rad,
+          fill: fillColor, stroke: strokeColor, strokeWidth: 2.5,
+          originX: 'center', originY: 'center'
+        }));
+      } else if (shapeType === 'ellipse') {
+        items.push(new fabric.Ellipse({
+          left: 0, top: 0, rx: w / 2, ry: h / 2,
+          fill: fillColor, stroke: strokeColor, strokeWidth: 2.5,
+          originX: 'center', originY: 'center'
+        }));
+      } else if (shapeType === 'lshape') {
+        const hw = w / 2, hh = h / 2;
+        const armW = w * 0.42;
+        const armH = h * 0.42;
+        const pts = [
+          { x: -hw, y: -hh },
+          { x: -hw + armW, y: -hh },
+          { x: -hw + armW, y: hh - armH },
+          { x: hw, y: hh - armH },
+          { x: hw, y: hh },
+          { x: -hw, y: hh }
+        ];
+        items.push(new fabric.Polygon(pts, {
+          fill: fillColor, stroke: strokeColor, strokeWidth: 2.5, strokeLineJoin: 'round',
+          originX: 'center', originY: 'center'
+        }));
+        labelX = -w * 0.1;
+        labelY = h * 0.22;
+      }
+    } else {
+      // 3D Isometric Extruded Primitives
+      const topFill = fillColor;
+      const leftFill = shadeHex(fillColor, -14);
+      const rightFill = shadeHex(fillColor, -26);
+      const depth = Math.max(22, Math.min(54, Math.round(Math.min(w, h) * 0.34)));
+
+      if (shapeType === 'rect' || shapeType === 'roundrect') {
+        const iw = w * 0.64;
+        const il = h * 0.72;
+        const iso = (ix, iy, iz) => ({
+          x: (-ix * 0.866 + iy * 0.866),
+          y: (ix * 0.5 + iy * 0.5 - iz)
+        });
+        const t0 = iso(0, 0, depth), t1 = iso(iw, 0, depth), t2 = iso(iw, il, depth), t3 = iso(0, il, depth);
+        const b1 = iso(iw, 0, 0), b2 = iso(iw, il, 0), b3 = iso(0, il, 0);
+
+        // Left & Right visible vertical faces
+        items.push(new fabric.Polygon([t1, t2, b2, b1], {
+          fill: leftFill, stroke: strokeColor, strokeWidth: 2, strokeLineJoin: 'round'
+        }));
+        items.push(new fabric.Polygon([t2, t3, b3, b2], {
+          fill: rightFill, stroke: strokeColor, strokeWidth: 2, strokeLineJoin: 'round'
+        }));
+
+        if (shapeType === 'roundrect') {
+          // Isometric chamfered/rounded top face
+          const c = 0.18;
+          const lerp = (a, b, f) => ({ x: a.x + (b.x - a.x) * f, y: a.y + (b.y - a.y) * f });
+          const p0a = lerp(t0, t1, c), p0b = lerp(t1, t0, c);
+          const p1a = lerp(t1, t2, c), p1b = lerp(t2, t1, c);
+          const p2a = lerp(t2, t3, c), p2b = lerp(t3, t2, c);
+          const p3a = lerp(t3, t0, c), p3b = lerp(t0, t3, c);
+          const pathStr = `M ${p0a.x} ${p0a.y} L ${p0b.x} ${p0b.y} Q ${t1.x} ${t1.y} ${p1a.x} ${p1a.y} L ${p1b.x} ${p1b.y} Q ${t2.x} ${t2.y} ${p2a.x} ${p2a.y} L ${p2b.x} ${p2b.y} Q ${t3.x} ${t3.y} ${p3a.x} ${p3a.y} L ${p3b.x} ${p3b.y} Q ${t0.x} ${t0.y} ${p0a.x} ${p0a.y} Z`;
+          items.push(new fabric.Path(pathStr, {
+            fill: topFill, stroke: strokeColor, strokeWidth: 2.2, strokeLineJoin: 'round'
+          }));
+        } else {
+          items.push(new fabric.Polygon([t0, t1, t2, t3], {
+            fill: topFill, stroke: strokeColor, strokeWidth: 2.2, strokeLineJoin: 'round'
+          }));
+        }
+        labelX = (t0.x + t2.x) / 2;
+        labelY = (t0.y + t2.y) / 2;
+      } else if (shapeType === 'ellipse') {
+        // 3D Isometric Cylinder
+        const rx = w * 0.46;
+        const ry = Math.max(20, h * 0.28);
+        const topY = -depth / 2;
+        const botY = depth / 2;
+        // Cylinder side body
+        const bodyPath = `M ${-rx} ${topY} L ${-rx} ${botY} A ${rx} ${ry} 0 0 0 ${rx} ${botY} L ${rx} ${topY} Z`;
+        items.push(new fabric.Path(bodyPath, {
+          fill: leftFill, stroke: strokeColor, strokeWidth: 2.2, strokeLineJoin: 'round'
+        }));
+        // Top ellipse face
+        items.push(new fabric.Ellipse({
+          left: 0, top: topY, rx: rx, ry: ry,
+          fill: topFill, stroke: strokeColor, strokeWidth: 2.2,
+          originX: 'center', originY: 'center'
+        }));
+        labelX = 0;
+        labelY = topY;
+      } else if (shapeType === 'lshape') {
+        // True 3D Isometric L-Shaped Prism
+        const iw = w * 0.68;
+        const il = h * 0.78;
+        const aw = iw * 0.44;
+        const al = il * 0.44;
+        const iso = (ix, iy, iz) => ({
+          x: (-ix * 0.866 + iy * 0.866),
+          y: (ix * 0.5 + iy * 0.5 - iz)
+        });
+        const lPts2d = [
+          [0, 0], [aw, 0], [aw, il - al], [iw, il - al], [iw, il], [0, il]
+        ];
+        const topPts = lPts2d.map(([px, py]) => iso(px, py, depth));
+        const botPts = lPts2d.map(([px, py]) => iso(px, py, 0));
+
+        // Visible front-facing extruded faces: (1->2), (2->3), (3->4), (4->5)
+        items.push(new fabric.Polygon([topPts[1], topPts[2], botPts[2], botPts[1]], {
+          fill: leftFill, stroke: strokeColor, strokeWidth: 1.8, strokeLineJoin: 'round'
+        }));
+        items.push(new fabric.Polygon([topPts[2], topPts[3], botPts[3], botPts[2]], {
+          fill: rightFill, stroke: strokeColor, strokeWidth: 1.8, strokeLineJoin: 'round'
+        }));
+        items.push(new fabric.Polygon([topPts[3], topPts[4], botPts[4], botPts[3]], {
+          fill: leftFill, stroke: strokeColor, strokeWidth: 2, strokeLineJoin: 'round'
+        }));
+        items.push(new fabric.Polygon([topPts[4], topPts[5], botPts[5], botPts[4]], {
+          fill: rightFill, stroke: strokeColor, strokeWidth: 2, strokeLineJoin: 'round'
+        }));
+        // Top L face
+        items.push(new fabric.Polygon(topPts, {
+          fill: topFill, stroke: strokeColor, strokeWidth: 2.2, strokeLineJoin: 'round'
+        }));
+        const centerPt = iso(iw * 0.35, il * 0.72, depth);
+        labelX = centerPt.x;
+        labelY = centerPt.y;
+      }
+    }
+
+    if (label && label.trim() !== '') {
+      items.push(new fabric.Text(label.trim(), {
+        left: labelX,
+        top: labelY,
+        fontSize: Math.max(12, Math.min(18, Math.round(Math.min(w, h) * 0.16))),
+        fontWeight: 'bold',
+        fontFamily: 'sans-serif',
+        fill: '#0f172a',
+        backgroundColor: 'rgba(255,255,255,0.72)',
+        textAlign: 'center',
+        originX: 'center',
+        originY: 'center',
+        padding: 3
+      }));
+    }
+
+    return new fabric.Group(items, {
+      left: opts.x,
+      top: opts.y,
+      originX: 'center',
+      originY: 'center',
+      opacity: opacity,
+      borderColor: strokeColor,
+      cornerColor: strokeColor,
+      lockUniScaling: false,
+      customType: 'shapeBlock',
+      shapeMeta: {
+        shapeType,
+        fillColor,
+        strokeColor,
+        opacity,
+        viewMode,
+        label: label.trim(),
+        width: w,
+        height: h
+      },
+      objId: uid('shp')
+    });
   }
 
   function createHvacLegend(x, y) {
@@ -2201,9 +3262,12 @@
     'mask-rect': '白色方形遮罩 (點擊或拖曳)',
     'mask-circle': '白色圓形遮罩 (點擊或拖曳)',
     'label': '區域文字標籤',
-    'legend-flow': '動線圖例',
+    'legend-flow': '自訂動線圖例 (點擊畫布放置)',
     'legend-hvac': '點位/空調圖例',
-    'draw-rect': '自訂方框 (點擊或拖曳)',
+    'shape-rect': '矩形方塊 (點擊或拖曳)',
+    'shape-roundrect': '圓角矩形方塊 (點擊或拖曳)',
+    'shape-ellipse': '圓形/橢圓方塊 (點擊或拖曳)',
+    'shape-lshape': 'L 型區塊 (點擊或拖曳)',
     'free-arrow': '自由箭頭 (拖曳或點擊)',
     'marker-T': 'T 點位 (連續點擊放置)',
     'marker-M': 'M 點位 (連續點擊放置)',
@@ -2310,11 +3374,32 @@
       pushUndoSnapshot();
     });
 
-    // Double-click custom edit for markers & dimension lines
+    // Double-click custom edit for markers, dimension lines, custom flow legends, and shape blocks
     canvas.on('mouse:dblclick', async (opt) => {
       if (activeTool || !opt.target) return;
       const obj = opt.target;
-      if (obj.customType === 'marker') {
+      if (obj.customType === 'customFlowLegend') {
+        openLegendModal(obj);
+      } else if (obj.customType === 'shapeBlock' && obj.shapeMeta) {
+        const val = await openModal({
+          mode: 'prompt',
+          title: '編輯方塊置中標籤文字',
+          desc: '請輸入要顯示於方塊中央的標籤文字（留空可隱藏文字）：',
+          defaultValue: obj.shapeMeta.label || ''
+        });
+        if (val !== null) {
+          const nextMeta = Object.assign({}, obj.shapeMeta, { label: val.trim().slice(0, 36) });
+          const updated = createCustomShapeBlockGroup(Object.assign({}, nextMeta, { x: obj.left, y: obj.top }));
+          updated.set({ scaleX: obj.scaleX, scaleY: obj.scaleY, angle: obj.angle, opacity: obj.opacity });
+          canvas.remove(obj);
+          canvas.add(updated);
+          keepLabelsOnTop();
+          canvas.setActiveObject(updated);
+          canvas.renderAll();
+          pushUndoSnapshot();
+          updateInspector();
+        }
+      } else if (obj.customType === 'marker') {
         const val = await openModal({
           mode: 'prompt',
           title: `編輯 ${obj.markerType} 點位編號`,
@@ -2375,7 +3460,8 @@
       drawStart = { x: ptr.x, y: ptr.y };
 
       // Drag-capable tools
-      if (['mask-rect', 'mask-circle', 'draw-rect', 'free-arrow', 'sa-dir', 'ra-dir', 'dimension'].includes(activeTool)) {
+      const isShapeTool = activeTool.startsWith('shape-');
+      if (isShapeTool || ['mask-rect', 'mask-circle', 'free-arrow', 'sa-dir', 'ra-dir', 'dimension'].includes(activeTool)) {
         isDrawing = true;
         const drawColor = document.getElementById('draw-custom-color').value;
         if (activeTool === 'mask-rect') {
@@ -2390,10 +3476,12 @@
             fill: '#ffffff', stroke: '#cbd5e1', strokeWidth: 1, strokeDashArray: [4, 3],
             originX: 'center', originY: 'center', selectable: false, evented: false
           });
-        } else if (activeTool === 'draw-rect') {
+        } else if (isShapeTool) {
+          const sFill = document.getElementById('shape-fill-color').value;
+          const sStroke = document.getElementById('shape-stroke-color').value;
           previewObj = new fabric.Rect({
             left: ptr.x, top: ptr.y, width: 1, height: 1,
-            fill: 'transparent', stroke: drawColor, strokeWidth: 3, strokeDashArray: [5, 4],
+            fill: sFill, opacity: 0.45, stroke: sStroke, strokeWidth: 2, strokeDashArray: [5, 4],
             originX: 'center', originY: 'center', selectable: false, evented: false
           });
         } else {
@@ -2438,7 +3526,7 @@
         });
         exitAfter = true;
       } else if (activeTool === 'legend-flow') {
-        placed = createFlowLegend(ptr.x, ptr.y);
+        placed = createCustomFlowLegendGroup(currentLegendDraft, ptr.x, ptr.y);
         exitAfter = true;
       } else if (activeTool === 'legend-hvac') {
         placed = createHvacLegend(ptr.x, ptr.y);
@@ -2486,7 +3574,7 @@
       const midX = (drawStart.x + ptr.x) / 2;
       const midY = (drawStart.y + ptr.y) / 2;
 
-      if (activeTool === 'mask-rect' || activeTool === 'draw-rect') {
+      if (activeTool === 'mask-rect' || (activeTool && activeTool.startsWith('shape-'))) {
         previewObj.set({ left: midX, top: midY, width: Math.max(2, w), height: Math.max(2, h) });
       } else if (activeTool === 'mask-circle') {
         previewObj.set({ left: midX, top: midY, radius: Math.max(2, Math.hypot(w, h) / 2) });
@@ -2577,19 +3665,23 @@
           isMask: true,
           objId: uid('mc')
         });
-      } else if (activeTool === 'draw-rect') {
-        created = new fabric.Rect({
-          left: dist < 10 ? drawStart.x : midX,
-          top: dist < 10 ? drawStart.y : midY,
-          width: dist < 10 ? 120 : Math.max(16, w),
-          height: dist < 10 ? 80 : Math.max(16, h),
-          fill: 'transparent',
-          stroke: drawColor,
-          strokeWidth: 3,
-          originX: 'center',
-          originY: 'center',
-          customType: 'drawRect',
-          objId: uid('dr')
+      } else if (activeTool && activeTool.startsWith('shape-')) {
+        const shapeType = activeTool.replace('shape-', '');
+        const fillColor = document.getElementById('shape-fill-color').value || '#dbeafe';
+        const strokeColor = document.getElementById('shape-stroke-color').value || '#2563eb';
+        const opacity = (parseInt(document.getElementById('shape-opacity').value, 10) || 85) / 100;
+        const label = document.getElementById('shape-default-label').value;
+        created = createCustomShapeBlockGroup({
+          shapeType,
+          fillColor,
+          strokeColor,
+          opacity,
+          viewMode: shapeViewMode,
+          label,
+          width: dist < 12 ? 160 : Math.max(54, w),
+          height: dist < 12 ? 104 : Math.max(46, h),
+          x: dist < 12 ? drawStart.x : midX,
+          y: dist < 12 ? drawStart.y : midY
         });
       } else if (activeTool === 'sa-dir' || activeTool === 'ra-dir' || activeTool === 'free-arrow') {
         const x1 = dist < 12 ? drawStart.x - 55 : drawStart.x;
@@ -2648,12 +3740,17 @@
       populateRackUIFromConfig(obj.rackConfig);
     }
 
+    const shapeNames = { rect: '矩形', roundrect: '圓角矩形', ellipse: '圓形/橢圓', lshape: 'L 型區塊' };
     const typeNames = {
       flowArrow: '動線箭頭',
       maskRect: '白色方形遮罩',
       maskCircle: '白色圓形遮罩',
       label: '區域文字標籤 (置頂)',
       legend: '圖例卡片 (置頂)',
+      customFlowLegend: '自訂動線圖例 (置頂)',
+      shapeBlock: obj.shapeMeta
+        ? `自訂形狀：${shapeNames[obj.shapeMeta.shapeType] || '方塊'} (${obj.shapeMeta.viewMode === '3d' ? '3D 等角' : '2D 平面'})`
+        : '自訂形狀方塊',
       marker: `點位標記 (${obj.markerType || ''})`,
       'hvac-sa': 'SA 出風口',
       'hvac-ra': 'RA 回風口',
@@ -2671,6 +3768,31 @@
     const label = typeNames[obj.customType] || (obj.type === 'activeSelection' ? `多選物件 (${obj.getObjects().length})` : obj.type);
     const opacityPct = Math.round((obj.opacity !== undefined ? obj.opacity : 1) * 100);
 
+    let extraHtml = '';
+    if (obj.customType === 'customFlowLegend') {
+      extraHtml = `
+        <button type="button" class="btn btn-xs btn-primary" id="insp-edit-legend" data-testid="insp-edit-legend" style="width:100%;margin-top:6px;">✏️ 編輯圖例項目 / 顏色</button>
+        <div style="font-size:11px;color:#2563eb;margin-top:4px;">提示：可直接拖拉四角縮放，或雙擊圖例修改內容</div>
+      `;
+    } else if (obj.customType === 'shapeBlock' && obj.shapeMeta) {
+      const m = obj.shapeMeta;
+      extraHtml = `
+        <div class="row-flex" style="margin-top:6px;justify-content:space-between;">
+          <label style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;">
+            填滿 <input type="color" id="insp-shape-fill" class="color-swatch" value="${m.fillColor || '#dbeafe'}">
+          </label>
+          <label style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;">
+            框線 <input type="color" id="insp-shape-stroke" class="color-swatch" value="${m.strokeColor || '#2563eb'}">
+          </label>
+        </div>
+        <div class="grid-2" style="margin-top:6px;">
+          <button type="button" class="btn btn-xs" id="insp-toggle-shape-3d" data-testid="insp-toggle-shape-3d">${m.viewMode === '3d' ? '🔄 轉為 2D 平面' : '🔄 轉為 3D 等角'}</button>
+          <button type="button" class="btn btn-xs btn-primary" id="insp-edit-shape-label" data-testid="insp-edit-shape-label">✏️ 編輯文字</button>
+        </div>
+        <div style="font-size:11px;color:#2563eb;margin-top:4px;">提示：雙擊方塊可直接編輯置中標籤文字</div>
+      `;
+    }
+
     box.innerHTML = `
       <div style="font-weight:700;margin-bottom:6px;color:var(--text-main);">已選：${label}</div>
       <div class="row-flex" style="margin-bottom:6px;justify-content:space-between;">
@@ -2681,6 +3803,7 @@
         <button type="button" class="btn btn-xs" id="insp-fwd">↑ 上移一層</button>
         <button type="button" class="btn btn-xs" id="insp-bwd">↓ 下移一層</button>
       </div>
+      ${extraHtml}
       ${obj.customType === 'marker' ? `<div style="font-size:11px;color:#2563eb;margin-top:4px;">提示：雙擊點位可修改編號 (目前: ${obj.markerNumber})</div>` : ''}
       ${obj.customType === 'dimension' ? `<div style="font-size:11px;color:#2563eb;margin-top:4px;">提示：雙擊尺寸線可修改文字</div>` : ''}
       ${obj.customType === 'rackDiagram' ? `<div style="font-size:11px;color:#2563eb;margin-top:4px;">提示：可在上方「層架圖產生器」修改後點「更新已選」</div>` : ''}
@@ -2690,6 +3813,7 @@
       const v = parseInt(this.value, 10) / 100;
       document.getElementById('insp-op-val').textContent = this.value + '%';
       obj.set('opacity', v);
+      if (obj.shapeMeta) obj.shapeMeta.opacity = v;
       canvas.renderAll();
     };
     document.getElementById('insp-opacity').onchange = () => pushUndoSnapshot();
@@ -2705,6 +3829,45 @@
       canvas.renderAll();
       pushUndoSnapshot();
     };
+
+    if (obj.customType === 'customFlowLegend') {
+      document.getElementById('insp-edit-legend').onclick = () => openLegendModal(obj);
+    }
+
+    if (obj.customType === 'shapeBlock' && obj.shapeMeta) {
+      const rebuildSelectedShape = (patch) => {
+        const nextMeta = Object.assign({}, obj.shapeMeta, patch);
+        const updated = createCustomShapeBlockGroup(Object.assign({}, nextMeta, { x: obj.left, y: obj.top }));
+        updated.set({ scaleX: obj.scaleX, scaleY: obj.scaleY, angle: obj.angle, opacity: obj.opacity });
+        canvas.remove(obj);
+        canvas.add(updated);
+        keepLabelsOnTop();
+        canvas.setActiveObject(updated);
+        canvas.renderAll();
+        pushUndoSnapshot();
+        updateInspector();
+      };
+      document.getElementById('insp-shape-fill').onchange = function () {
+        rebuildSelectedShape({ fillColor: this.value });
+      };
+      document.getElementById('insp-shape-stroke').onchange = function () {
+        rebuildSelectedShape({ strokeColor: this.value });
+      };
+      document.getElementById('insp-toggle-shape-3d').onclick = () => {
+        rebuildSelectedShape({ viewMode: obj.shapeMeta.viewMode === '3d' ? '2d' : '3d' });
+      };
+      document.getElementById('insp-edit-shape-label').onclick = async () => {
+        const val = await openModal({
+          mode: 'prompt',
+          title: '編輯方塊置中標籤文字',
+          desc: '請輸入要顯示於方塊中央的標籤文字（留空可隱藏文字）：',
+          defaultValue: obj.shapeMeta.label || ''
+        });
+        if (val !== null) {
+          rebuildSelectedShape({ label: val.trim().slice(0, 36) });
+        }
+      };
+    }
   }
 
   // ==================== Edit Actions ====================
@@ -2882,7 +4045,7 @@
         localStorage.setItem(STORAGE_KEY, json);
         document.getElementById('status-save').textContent = '💾 已自動儲存於瀏覽器';
       } catch (err) {
-        document.getElementById('status-save').textContent = '⚠️ 底圖較大，請使用「匯出 JSON」保存';
+        document.getElementById('status-save').textContent = '⚠️ 底圖較大，請使用「儲存專案」下載保存';
       }
     }, 350);
   }
@@ -2899,7 +4062,7 @@
     a.click();
     document.body.removeChild(a);
     setTimeout(() => URL.revokeObjectURL(url), 1000);
-    showToast('已匯出專案設定檔 (.json)', 'success');
+    showToast('已儲存專案檔 (.json)', 'success');
   }
 
   function importWorkspaceJson(file) {
@@ -2909,9 +4072,9 @@
       try {
         const parsed = JSON.parse(ev.target.result);
         await restoreWorkspaceFromPayload(parsed);
-        showToast(`已成功匯入專案 (${tabs.length} 個分頁)`, 'success');
+        showToast(`已成功開啟專案 (${tabs.length} 個分頁)`, 'success');
       } catch (err) {
-        showToast('匯入失敗：' + (err.message || 'JSON 格式錯誤'), 'error');
+        showToast('開啟專案失敗：' + (err.message || '檔案格式錯誤'), 'error');
       }
     };
     reader.readAsText(file, 'utf-8');
@@ -2986,7 +4149,7 @@
     if (!ok) return;
     if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
     try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
-    tabs = [createDefaultTab('主區域 1', 'office')];
+    tabs = [createDefaultTab('主區域 1', 'facility_full')];
     activeTabId = tabs[0].id;
     renderTabsBar();
     await renderTabToCanvas(tabs[0]);
@@ -2996,68 +4159,153 @@
     showToast('工作區已完全重置', 'success');
   }
 
-  // ==================== GAS Cloud Presets ====================
+  // ==================== Cloud Temp Storage (Fixed 14-Day Auto-Delete, NO User Dropdown) ====================
+  function computeEntryExpiryMs(entry) {
+    if (entry && entry.expiresAt) {
+      const t = Date.parse(entry.expiresAt);
+      if (!isNaN(t)) return t;
+    }
+    const baseMs = Date.parse((entry && (entry.updatedAt || entry.createdAt)) || '');
+    if (!isNaN(baseMs)) return baseMs + CLOUD_TTL_MS;
+    return Date.now() + CLOUD_TTL_MS;
+  }
+
+  function cleanupLocalCloudStore() {
+    let raw = [];
+    try {
+      const str = localStorage.getItem(LOCAL_CLOUD_KEY);
+      raw = str ? JSON.parse(str) : [];
+      if (!Array.isArray(raw)) raw = [];
+    } catch (_) {
+      raw = [];
+    }
+    const nowMs = Date.now();
+    const kept = [];
+    let purgedCount = 0;
+    raw.forEach(item => {
+      if (!item || !item.id) {
+        purgedCount++;
+        return;
+      }
+      const expMs = computeEntryExpiryMs(item);
+      if (nowMs >= expMs) {
+        purgedCount++;
+      } else {
+        if (!item.expiresAt) item.expiresAt = new Date(expMs).toISOString();
+        item.ttlDays = CLOUD_TTL_DAYS;
+        kept.push(item);
+      }
+    });
+    if (purgedCount > 0) {
+      try { localStorage.setItem(LOCAL_CLOUD_KEY, JSON.stringify(kept)); } catch (_) {}
+    }
+    return { presets: kept, purgedCount };
+  }
+
+  function renderCloudPresetsList(presets, purgedCount) {
+    const listEl = document.getElementById('cloud-presets-list');
+    listEl.innerHTML = '';
+
+    if (purgedCount > 0) {
+      const infoBar = document.createElement('div');
+      infoBar.setAttribute('data-testid', 'cloud-purged-notice');
+      infoBar.style.cssText = 'padding:6px 10px;margin-bottom:8px;border-radius:6px;background:#fef3c7;color:#92400e;font-size:11.5px;font-weight:600;';
+      infoBar.textContent = `🧹 已自動清除 ${purgedCount} 筆超過 14 天保留期限的過期暫存專案。`;
+      listEl.appendChild(infoBar);
+    }
+
+    if (!presets || !presets.length) {
+      const empty = document.createElement('div');
+      empty.style.cssText = 'padding:12px;text-align:center;color:var(--text-muted);background:#f8fafc;border-radius:6px;';
+      empty.textContent = '目前尚未建立任何雲端暫存專案。';
+      listEl.appendChild(empty);
+      return;
+    }
+
+    presets.forEach((p) => {
+      const row = document.createElement('div');
+      row.className = 'preset-item';
+      row.setAttribute('data-testid', 'cloud-preset-item');
+
+      const info = document.createElement('div');
+      const dt = p.updatedAt ? new Date(p.updatedAt).toLocaleString('zh-TW') : '';
+      const expMs = computeEntryExpiryMs(p);
+      const remainDays = Math.max(1, Math.ceil((expMs - Date.now()) / (24 * 60 * 60 * 1000)));
+      const expDateStr = new Date(expMs).toLocaleDateString('zh-TW');
+      const kb = Math.max(1, Math.ceil(((p.compressedBytes || p.rawBytes || 0)) / 1024));
+
+      const titleDiv = document.createElement('div');
+      titleDiv.style.cssText = 'font-weight:700;font-size:12.5px;';
+      titleDiv.textContent = p.name;
+
+      const badge = document.createElement('span');
+      badge.className = 'ttl-badge';
+      badge.textContent = `剩餘 ${remainDays} 天`;
+      titleDiv.appendChild(badge);
+
+      const metaDiv = document.createElement('div');
+      metaDiv.style.cssText = 'font-size:11px;color:var(--text-muted);margin-top:2px;';
+      metaDiv.textContent = `${dt} · ${kb} KB · ${expDateStr} 自動刪除`;
+
+      info.appendChild(titleDiv);
+      info.appendChild(metaDiv);
+
+      const acts = document.createElement('div');
+      acts.className = 'row-flex';
+      const loadBtn = document.createElement('button');
+      loadBtn.type = 'button';
+      loadBtn.className = 'btn btn-xs btn-primary';
+      loadBtn.textContent = '開啟';
+      loadBtn.setAttribute('data-testid', 'btn-cloud-load');
+      loadBtn.onclick = () => loadFromCloud(p.id);
+
+      const delBtn = document.createElement('button');
+      delBtn.type = 'button';
+      delBtn.className = 'btn btn-xs btn-danger';
+      delBtn.textContent = '刪除';
+      delBtn.setAttribute('data-testid', 'btn-cloud-delete');
+      delBtn.onclick = () => deleteFromCloud(p.id, p.name);
+
+      acts.appendChild(loadBtn);
+      acts.appendChild(delBtn);
+      row.appendChild(info);
+      row.appendChild(acts);
+      listEl.appendChild(row);
+    });
+  }
+
   function openCloudModal() {
     const modal = document.getElementById('cloud-modal');
     const desc = document.getElementById('cloud-mode-desc');
     const saveRow = document.getElementById('cloud-save-row');
-    const listEl = document.getElementById('cloud-presets-list');
     modal.classList.add('open');
+    saveRow.style.display = 'flex';
 
     if (!isGasEnvironment()) {
-      desc.textContent = '目前為本機瀏覽器模式（非 Google Apps Script 執行環境）。您的進度已自動儲存於本機瀏覽器，並可透過「匯出 / 匯入 JSON」保存與分享。';
-      saveRow.style.display = 'none';
-      listEl.innerHTML = '<div style="padding:12px;text-align:center;color:var(--text-muted);background:#f8fafc;border-radius:6px;">部署至 GAS Web App 後即可啟用雲端儲存庫。</div>';
-      return;
+      desc.textContent = '本機預覽暫存模式（部署至 GAS Web App 後將同步儲存在雲端屬性庫，皆固定 14 天自動刪除）。';
+    } else {
+      desc.textContent = '將目前多區域工作區壓縮暫存於雲端，方便跨裝置臨時開啟（固定保留 14 天）。';
     }
-
-    desc.textContent = '可將多區域專案透過 Gzip 壓縮分片儲存於 GAS 雲端屬性庫，跨裝置讀取。';
-    saveRow.style.display = 'flex';
     refreshCloudList();
   }
 
   function refreshCloudList() {
     const listEl = document.getElementById('cloud-presets-list');
-    listEl.innerHTML = '<div style="padding:12px;text-align:center;color:var(--text-muted);">載入雲端清單中...</div>';
+    if (!isGasEnvironment()) {
+      const cleaned = cleanupLocalCloudStore();
+      const sorted = cleaned.presets.slice().sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
+      renderCloudPresetsList(sorted, cleaned.purgedCount);
+      return;
+    }
+
+    listEl.innerHTML = '<div style="padding:12px;text-align:center;color:var(--text-muted);">載入雲端暫存清單中...</div>';
     google.script.run
       .withSuccessHandler((res) => {
         if (!res || !res.ok) {
           listEl.innerHTML = `<div style="padding:12px;color:var(--danger);">${(res && res.error) || '讀取失敗'}</div>`;
           return;
         }
-        if (!res.presets.length) {
-          listEl.innerHTML = '<div style="padding:12px;text-align:center;color:var(--text-muted);background:#f8fafc;border-radius:6px;">目前尚未建立任何雲端專案。</div>';
-          return;
-        }
-        listEl.innerHTML = '';
-        res.presets.forEach((p) => {
-          const row = document.createElement('div');
-          row.className = 'preset-item';
-          const info = document.createElement('div');
-          const dt = p.updatedAt ? new Date(p.updatedAt).toLocaleString('zh-TW') : '';
-          info.innerHTML = `<div style="font-weight:700;font-size:12.5px;"></div><div style="font-size:11px;color:var(--text-muted);">${dt} · ${Math.ceil((p.compressedBytes || 0) / 1024)} KB</div>`;
-          info.firstChild.textContent = p.name;
-
-          const acts = document.createElement('div');
-          acts.className = 'row-flex';
-          const loadBtn = document.createElement('button');
-          loadBtn.type = 'button';
-          loadBtn.className = 'btn btn-xs btn-primary';
-          loadBtn.textContent = '載入';
-          loadBtn.onclick = () => loadFromCloud(p.id);
-
-          const delBtn = document.createElement('button');
-          delBtn.type = 'button';
-          delBtn.className = 'btn btn-xs btn-danger';
-          delBtn.textContent = '刪除';
-          delBtn.onclick = () => deleteFromCloud(p.id, p.name);
-
-          acts.appendChild(loadBtn);
-          acts.appendChild(delBtn);
-          row.appendChild(info);
-          row.appendChild(acts);
-          listEl.appendChild(row);
-        });
+        renderCloudPresetsList(res.presets || [], res.purgedCount || 0);
       })
       .withFailureHandler((err) => {
         listEl.innerHTML = `<div style="padding:12px;color:var(--danger);">連線錯誤：${err.message || err}</div>`;
@@ -3066,47 +4314,90 @@
   }
 
   function saveToCloud() {
-    if (!isGasEnvironment()) return;
     const nameInput = document.getElementById('cloud-preset-name');
-    const name = nameInput.value.trim() || (getActiveTab().name + ' 專案');
+    const name = nameInput.value.trim() || (getActiveTab().name + ' 暫存');
     const btn = document.getElementById('btn-cloud-save');
+    const json = JSON.stringify(serializeWorkspace());
+
+    if (!isGasEnvironment()) {
+      const cleaned = cleanupLocalCloudStore();
+      const nowMs = Date.now();
+      const entry = {
+        id: uid('p'),
+        name: name.slice(0, 80),
+        createdAt: new Date(nowMs).toISOString(),
+        updatedAt: new Date(nowMs).toISOString(),
+        expiresAt: new Date(nowMs + CLOUD_TTL_MS).toISOString(),
+        ttlDays: CLOUD_TTL_DAYS,
+        rawBytes: json.length,
+        data: json
+      };
+      const next = [entry].concat(cleaned.presets);
+      try {
+        localStorage.setItem(LOCAL_CLOUD_KEY, JSON.stringify(next));
+        nameInput.value = '';
+        showToast(`已儲存至暫存區：「${entry.name}」（保留 14 天）`, 'success');
+        refreshCloudList();
+      } catch (err) {
+        showToast('本機暫存空間不足，請改用「儲存專案」下載保存', 'error');
+      }
+      return;
+    }
+
     btn.disabled = true;
     btn.textContent = '儲存中...';
-    const json = JSON.stringify(serializeWorkspace());
     google.script.run
       .withSuccessHandler((res) => {
         btn.disabled = false;
-        btn.textContent = '儲存目前專案';
+        btn.textContent = '儲存至雲端暫存';
         if (res && res.ok) {
           nameInput.value = '';
-          showToast(`已儲存至雲端：「${res.preset.name}」`, 'success');
+          showToast(`已儲存至雲端暫存：「${res.preset.name}」（14 天後自動刪除）`, 'success');
           refreshCloudList();
         } else {
-          showToast((res && res.error) || '雲端儲存失敗', 'error');
+          showToast((res && res.error) || '雲端暫存失敗', 'error');
         }
       })
       .withFailureHandler((err) => {
         btn.disabled = false;
-        btn.textContent = '儲存目前專案';
-        showToast('雲端儲存錯誤：' + (err.message || err), 'error');
+        btn.textContent = '儲存至雲端暫存';
+        showToast('雲端暫存錯誤：' + (err.message || err), 'error');
       })
       .saveCloudPreset(uid('p'), name, json);
   }
 
-  function loadFromCloud(presetId) {
-    if (!isGasEnvironment()) return;
+  async function loadFromCloud(presetId) {
+    if (!isGasEnvironment()) {
+      const cleaned = cleanupLocalCloudStore();
+      const target = cleaned.presets.find(p => p.id === presetId);
+      if (!target || !target.data) {
+        showToast('找不到指定的暫存專案（可能已超過 14 天自動刪除）', 'error');
+        refreshCloudList();
+        return;
+      }
+      try {
+        await restoreWorkspaceFromPayload(JSON.parse(target.data));
+        document.getElementById('cloud-modal').classList.remove('open');
+        showToast(`已開啟暫存專案：「${target.name}」`, 'success');
+      } catch (err) {
+        showToast('解析暫存專案失敗：' + err.message, 'error');
+      }
+      return;
+    }
+
     google.script.run
       .withSuccessHandler(async (res) => {
         if (res && res.ok && res.data) {
           try {
             await restoreWorkspaceFromPayload(JSON.parse(res.data));
             document.getElementById('cloud-modal').classList.remove('open');
-            showToast(`已載入雲端專案：「${res.preset.name}」`, 'success');
+            showToast(`已開啟雲端暫存：「${res.preset.name}」`, 'success');
           } catch (err) {
-            showToast('解析雲端專案失敗：' + err.message, 'error');
+            showToast('解析雲端暫存失敗：' + err.message, 'error');
           }
         } else {
-          showToast((res && res.error) || '載入失敗', 'error');
+          showToast((res && res.error) || '開啟失敗', 'error');
+          refreshCloudList();
         }
       })
       .withFailureHandler((err) => showToast('雲端讀取失敗：' + (err.message || err), 'error'))
@@ -3116,16 +4407,26 @@
   async function deleteFromCloud(presetId, name) {
     const ok = await openModal({
       mode: 'confirm',
-      title: '刪除雲端專案',
-      desc: `確定要從雲端刪除「${name}」嗎？`,
+      title: '刪除雲端暫存專案',
+      desc: `確定要刪除暫存專案「${name}」嗎？`,
       danger: true,
       okText: '刪除'
     });
     if (!ok) return;
+
+    if (!isGasEnvironment()) {
+      const cleaned = cleanupLocalCloudStore();
+      const next = cleaned.presets.filter(p => p.id !== presetId);
+      try { localStorage.setItem(LOCAL_CLOUD_KEY, JSON.stringify(next)); } catch (_) {}
+      showToast(`已刪除暫存專案「${name}」`);
+      refreshCloudList();
+      return;
+    }
+
     google.script.run
       .withSuccessHandler((res) => {
         if (res && res.ok) {
-          showToast(`已刪除雲端專案「${name}」`);
+          showToast(`已刪除雲端暫存「${name}」`);
           refreshCloudList();
         } else {
           showToast((res && res.error) || '刪除失敗', 'error');
@@ -3211,6 +4512,45 @@
       };
     });
 
+    // Custom Flow Legend Editor modal buttons
+    document.getElementById('btn-open-legend-editor').onclick = () => openLegendModal(null);
+    document.getElementById('btn-legend-cancel').onclick = closeLegendModal;
+    document.getElementById('btn-legend-place-click').onclick = () => confirmLegendModal(true);
+    document.getElementById('btn-legend-confirm').onclick = () => confirmLegendModal(false);
+    document.getElementById('btn-legend-add-item').onclick = () => {
+      const cfg = readLegendConfigFromEditor();
+      const palette = ['#7c3aed', '#0891b2', '#ea580c', '#db2777', '#4f46e5', '#0f766e'];
+      cfg.items.push({
+        enabled: true,
+        code: 'C' + (cfg.items.length + 1),
+        name: '自訂動線項目',
+        color: palette[cfg.items.length % palette.length]
+      });
+      renderLegendEditorRows(cfg.items);
+    };
+    document.getElementById('btn-legend-reset-default').onclick = () => {
+      const def = getDefaultLegendConfig();
+      document.getElementById('legend-title-input').value = def.title;
+      renderLegendEditorRows(def.items);
+    };
+
+    // Custom Shape Block 2D/3D toggle & opacity slider
+    const btn2d = document.getElementById('shape-mode-2d');
+    const btn3d = document.getElementById('shape-mode-3d');
+    btn2d.onclick = () => {
+      shapeViewMode = '2d';
+      btn2d.classList.add('active');
+      btn3d.classList.remove('active');
+    };
+    btn3d.onclick = () => {
+      shapeViewMode = '3d';
+      btn3d.classList.add('active');
+      btn2d.classList.remove('active');
+    };
+    document.getElementById('shape-opacity').oninput = function () {
+      document.getElementById('shape-opacity-val').textContent = this.value + '%';
+    };
+
     // Tool buttons
     document.querySelectorAll('[data-tool]').forEach(btn => {
       btn.onclick = () => {
@@ -3260,11 +4600,13 @@
     // Global keyboard shortcuts
     window.addEventListener('keydown', (e) => {
       const modalOpen = document.getElementById('generic-modal').classList.contains('open')
-        || document.getElementById('cloud-modal').classList.contains('open');
+        || document.getElementById('cloud-modal').classList.contains('open')
+        || document.getElementById('legend-modal').classList.contains('open');
       if (modalOpen) {
         if (e.key === 'Escape') {
           if (document.getElementById('generic-modal').classList.contains('open')) closeModal(false);
           document.getElementById('cloud-modal').classList.remove('open');
+          closeLegendModal();
         }
         return;
       }
@@ -3317,6 +4659,11 @@
     syncRackMSelect();
     bindEvents();
 
+    // Auto-purge any expired local temp storage entries on startup
+    if (!isGasEnvironment()) {
+      cleanupLocalCloudStore();
+    }
+
     let restored = false;
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -3330,7 +4677,7 @@
     }
 
     if (!restored) {
-      tabs = [createDefaultTab('主區域 1', 'office')];
+      tabs = [createDefaultTab('主區域 1', 'facility_full')];
       activeTabId = tabs[0].id;
       renderTabsBar();
       await renderTabToCanvas(tabs[0]);
