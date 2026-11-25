@@ -1,0 +1,4 @@
+﻿v4 spec
+1. Add an editable text box tool (可修改的文字方塊) so users can easily place and double-click edit custom text boxes on the canvas (supporting click/drag or click-to-place, moving/resizing/copy/delete/undo, kept above shape/mask layers).
+2. In Template 2 (冷藏庫平面範本 2D / coldroom_2d), remove the objects and texts highlighted inside the red boxes in the reference image: (a) remove the two ceiling/wall air cooler / evaporator units and their labels ("冷風機 EVAP-1" and "冷風機 EVAP-2"), and (b) remove the center floor text label ("中央作業通道 (W-04 冷藏庫 2D)"), keeping the clean cold room floor, racks, walls, and door frame.
+3. Verify with Playwright multi-role tests (0 console/page/HTTP errors), commit and push to origin/main, wait for GitHub Actions deploy workflow to succeed, verify live GAS /exec URL, and update STATUS.md & VERIFICATION_REPORT.md.

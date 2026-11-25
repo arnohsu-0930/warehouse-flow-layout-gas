@@ -1,0 +1,5 @@
+﻿v4 + v5 unified task spec
+1. Add an easy-to-use editable text box tool (可修改的文字方塊) so users can place and double-click edit custom text boxes on canvas (click/drag or click-to-place, move/resize/copy/delete/undo, kept above shape/mask layers).
+2. In Template 2 (冷藏庫平面範本 2D / coldroom_2d), remove the objects and texts highlighted in red boxes: the two air cooler/evaporator units and labels (冷風機 EVAP-1, EVAP-2) and center text (中央作業通道 W-04 冷藏庫 2D), keeping clean cold room floor, racks, walls, and door frame.
+3. Dynamic point buttons and point legend color sync with rack/shelf tier count: when rack/shelf tier count changes (2 to 8 tiers), dynamically generate/update point buttons for each tier (T, L..., M, B) with consistent tier colors, and synchronize point legend card colors and items with tier count and color choices.
+4. Do NOT touch files outside C:/2026 GAS/warehouse-flow-layout-gas. Run Playwright multi-role verification (0 console/page/HTTP errors), commit and push to origin/main, wait for GitHub Actions deploy workflow to succeed, verify live GAS /exec URL, and update STATUS.md & VERIFICATION_REPORT.md.

@@ -405,6 +405,38 @@
       font-size: 11.5px;
     }
 
+    .rack-height-item input[type="color"] {
+      width: 22px;
+      height: 20px;
+      padding: 0;
+      border-radius: 4px;
+      cursor: pointer;
+      flex: 0 0 auto;
+    }
+
+    /* v5: dynamic tier point buttons */
+    .marker-tier-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+    }
+    .marker-tier-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      font-weight: 700;
+      padding-left: 4px;
+      padding-right: 4px;
+    }
+    .marker-tier-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      border: 1px solid #0f172a;
+      flex: 0 0 auto;
+    }
+
     .inspector-box {
       background: #f8fafc;
       border: 1px solid var(--border);
@@ -766,12 +798,13 @@
         </div>
       </section>
 
-      <!-- 2. Masking, Labels & Custom Legend -->
+      <!-- 2. Masking, Text Boxes, Labels & Custom Legend -->
       <section class="dock-section">
         <div class="dock-section-title">
-          <span>2. 遮罩、標籤與自訂圖例</span>
+          <span>2. 遮罩、文字方塊與自訂圖例</span>
         </div>
         <div class="grid-2" style="margin-bottom:6px;">
+          <button type="button" class="btn btn-sm" data-tool="textbox" data-testid="tool-textbox" style="grid-column:1 / -1;background:#eff6ff;border-color:#93c5fd;color:#1e40af;font-weight:700;" title="可修改的文字方塊（點擊或拖曳大小放置，雙擊直接編輯多行文字，永遠置於形狀/遮罩上層）">✏️ 文字方塊（雙擊可修改）</button>
           <button type="button" class="btn btn-sm" data-tool="mask-rect" data-testid="tool-mask-rect" title="無框白色方形遮罩 (點擊或拖曳)">⬜ 白色方遮罩</button>
           <button type="button" class="btn btn-sm" data-tool="mask-circle" data-testid="tool-mask-circle" title="無框白色圓形遮罩 (點擊或拖曳)">⚪ 白色圓遮罩</button>
           <button type="button" class="btn btn-sm" data-tool="label" data-testid="tool-label" title="新增區域文字標籤 (永遠置頂)">📝 區域標籤</button>
@@ -784,7 +817,7 @@
             自由箭頭色
             <input type="color" id="draw-custom-color" class="color-swatch" value="#e11d48">
           </label>
-          <span style="font-size:10.5px;color:var(--text-muted);">圖例可雙擊編輯與自由縮放</span>
+          <span style="font-size:10.5px;color:var(--text-muted);">文字方塊與圖例皆可雙擊編輯</span>
         </div>
       </section>
 
@@ -868,11 +901,8 @@
         <div class="dock-section-title">
           <span>5. 點位、空調與尺寸標註</span>
         </div>
-        <div class="grid-3" style="margin-bottom:6px;">
-          <button type="button" class="btn btn-sm marker-btn-T" data-tool="marker-T" data-testid="tool-marker-T" title="上層點位 (自動編號)">💗 T 點位</button>
-          <button type="button" class="btn btn-sm marker-btn-M" data-tool="marker-M" data-testid="tool-marker-M" title="中層點位 (自動編號)">💜 M 點位</button>
-          <button type="button" class="btn btn-sm marker-btn-B" data-tool="marker-B" data-testid="tool-marker-B" title="下層點位 (自動編號)">💙 B 點位</button>
-        </div>
+        <div style="font-size:10.5px;color:var(--text-muted);margin-bottom:4px;" id="marker-tier-hint" data-testid="marker-tier-hint">點位按鈕依「6. 多層貨架」層數同步</div>
+        <div class="marker-tier-grid" id="marker-tier-buttons" data-testid="marker-tier-buttons" style="margin-bottom:6px;"></div>
         <div class="row-flex" style="margin-bottom:8px;justify-content:space-between;">
           <label style="font-size:11.5px;color:var(--text-muted);display:flex;align-items:center;gap:5px;">
             下一點位編號:
@@ -999,6 +1029,8 @@
     <li><strong>更換底圖與範本：</strong>支援上傳任意 PNG / JPG / SVG 平面圖，或直接套用 3 種內建範本（空白畫布、冷藏庫 2D、冷藏庫 3D 等角純淨空間）。</li>
     <li><strong>3D 綠色空間箱與 3D 獨立門物件：</strong>提供純淨無內建設備的 3D 綠色空間箱（僅地板＋牆面）與獨立 3D 保溫門物件，選取後可自由切換朝向、旋轉角度、水平/垂直翻轉、左右/上下鏡像與縮放尺寸。</li>
     <li><strong>多分頁管理：</strong>上方分頁列可新增、雙擊重新命名、複製或刪除不同樓層/區域平面。</li>
+    <li><strong>可修改文字方塊：</strong>點選「✏️ 文字方塊」後可在畫布點擊或拖曳大小放置，支援<strong>雙擊直接編輯多行文字</strong>、拖拉左右控點自動換行、調整字級/配色/外框，且永遠保持在形狀與遮罩圖層之上。</li>
+    <li><strong>點位按鈕依層數同步：</strong>「6. 多層貨架」層數（2–8 層）或 M 層變更時，「5. 點位」按鈕會自動產生 T / L… / M / B 各層按鈕；各層左側色塊可改顏色，點位按鈕、已放置點位、貨架層徽章與「點位圖例」卡片會同步更新項目與顏色。</li>
     <li><strong>自訂動線圖例：</strong>放置前可勾選項目、修改代碼/名稱/顏色或新增自訂項目；放置後可自由拖曳縮放，<strong>雙擊</strong>即可再次編輯。</li>
     <li><strong>2D/3D 自訂形狀方塊：</strong>支援矩形、圓角矩形、圓形/橢圓、L 型區塊，可自由調整填滿色、框線色、透明度與 2D/3D 等角視角，<strong>雙擊</strong>即可修改置中標籤文字。</li>
     <li><strong>文字正向箭頭：</strong>P / M / W 與自訂動線箭頭支援 6 種方向，旋轉時文字仍保持水平正向。</li>
@@ -1079,7 +1111,7 @@
   const CLOUD_TTL_MS = CLOUD_TTL_DAYS * 24 * 60 * 60 * 1000;
   const CUSTOM_PROPS = [
     'customType', 'isAlwaysTop', 'isMask', 'markerType', 'markerNumber',
-    'arrowMeta', 'dimMeta', 'rackConfig', 'equipMeta', 'legendConfig', 'shapeMeta', 'room3dMeta', 'door3dMeta', 'objId'
+    'arrowMeta', 'dimMeta', 'rackConfig', 'equipMeta', 'legendConfig', 'shapeMeta', 'room3dMeta', 'door3dMeta', 'textBoxMeta', 'tierMeta', 'objId'
   ];
 
   const RACK_THEMES = {
@@ -1130,6 +1162,13 @@
   // Rack configurator state
   let rackHeightsState = { 0: 240, 1: 160, 2: 90, 3: 15, 4: 0, 5: 0, 6: 0, 7: 0 };
   let racksVisible = true;
+
+  // v5: Tier colors shared by rack diagrams, point buttons, markers and point legend cards
+  const DEFAULT_TIER_COLORS = {
+    T: '#ff66b2', M: '#9c27b0', B: '#3366cc',
+    L7: '#ef4444', L6: '#f97316', L5: '#eab308', L4: '#22c55e', L3: '#14b8a6', L2: '#0ea5e9'
+  };
+  let tierColorsState = Object.assign({}, DEFAULT_TIER_COLORS);
 
   // Modal state
   let modalResolver = null;
@@ -1234,7 +1273,7 @@
       return { width: 1200, height: 800, dataUrl: null };
     }
 
-    // 2. Cold Room Floor Plan Template (2D)
+    // 2. Cold Room Floor Plan Template (2D) — Clean Floor, Racks, Walls & Door Frame (No Evaporators or Center Floor Text)
     if (templateId === 'coldroom_2d') {
       const svg = `
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
@@ -1247,12 +1286,6 @@
   <path d="M 280 200 L 204 200 A 76 76 0 0 1 280 128" fill="none" stroke="#0f172a" stroke-width="2"/>
   <line x1="280" y1="56" x2="280" y2="200" stroke="#0284c7" stroke-width="3"/>
   <text x="195" y="132" font-family="sans-serif" font-size="13" font-weight="bold" fill="#0369a1" text-anchor="end">保溫雙開門</text>
-
-  <!-- Cooling / Evaporator Units (Ceiling Projection) -->
-  <rect x="440" y="76" width="96" height="32" rx="4" fill="#bae6fd" stroke="#0284c7" stroke-width="2"/>
-  <text x="488" y="97" font-family="sans-serif" font-size="11" font-weight="bold" fill="#0369a1" text-anchor="middle">冷風機 EVAP-1</text>
-  <rect x="592" y="196" width="114" height="30" rx="4" fill="#bae6fd" stroke="#0284c7" stroke-width="2"/>
-  <text x="649" y="216" font-family="sans-serif" font-size="11" font-weight="bold" fill="#0369a1" text-anchor="middle">冷風機 EVAP-2</text>
 
   <!-- Left & Right Rack Bays -->
   <g stroke="#166534" stroke-width="1.8" fill="#ffffff">
@@ -1268,8 +1301,6 @@
     <rect x="602" y="498" width="106" height="84"/><line x1="602" y1="498" x2="708" y2="582"/><line x1="708" y1="498" x2="602" y2="582"/>
     <rect x="602" y="582" width="106" height="84"/><line x1="602" y1="582" x2="708" y2="666"/><line x1="708" y1="582" x2="602" y2="666"/>
   </g>
-  <text x="504" y="468" font-family="sans-serif" font-size="16" font-weight="bold" fill="#166534" text-anchor="middle">中央作業通道</text>
-  <text x="504" y="492" font-family="sans-serif" font-size="13" fill="#15803d" text-anchor="middle">(W-04 冷藏庫 2D)</text>
 
   <!-- Right Side Space for Rack Diagrams & Legends -->
   <rect x="790" y="56" width="366" height="660" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="6,5"/>
@@ -1414,9 +1445,14 @@
         tab.virtualHeight = bgImg.height;
       }
 
-      // Sync rack visibility
+      // Sync rack visibility & re-init editable text boxes
       canvas.getObjects().forEach(o => {
         if (o.customType === 'rackDiagram') o.visible = racksVisible;
+        if (o.customType === 'textBox') {
+          o.objectCaching = false;
+          if (typeof o.initDimensions === 'function') o.initDimensions();
+          o.setCoords();
+        }
       });
       keepLabelsOnTop();
       fitCanvasToViewport();
@@ -1666,6 +1702,126 @@
     tab.undoStack.push(next);
     await applySnapshotString(next);
     showToast('已重做');
+  }
+
+  // ==================== Editable Text Box (v4) ====================
+  let fabricTextboxPatched = false;
+  function patchFabricTextboxBoxStyle() {
+    if (fabricTextboxPatched || typeof fabric === 'undefined' || !fabric.Textbox) return;
+    fabricTextboxPatched = true;
+
+    const origShouldCache = fabric.Textbox.prototype.shouldCache;
+    fabric.Textbox.prototype.shouldCache = function () {
+      if (this.customType === 'textBox') return false;
+      return origShouldCache.call(this);
+    };
+
+    const origCalcTextHeight = fabric.Textbox.prototype.calcTextHeight;
+    fabric.Textbox.prototype.calcTextHeight = function () {
+      const baseH = origCalcTextHeight.call(this);
+      if (this.customType === 'textBox' && this.textBoxMeta && this.textBoxMeta.minHeight) {
+        return Math.max(baseH, Number(this.textBoxMeta.minHeight) || 0);
+      }
+      return baseH;
+    };
+
+    const origRenderBg = fabric.Textbox.prototype._renderBackground;
+    fabric.Textbox.prototype._renderBackground = function (ctx) {
+      if (this.customType === 'textBox' && this.textBoxMeta) {
+        const meta = this.textBoxMeta;
+        const dim = this._getNonTransformedDimensions();
+        const padX = meta.padX !== undefined ? Number(meta.padX) : 10;
+        const padY = meta.padY !== undefined ? Number(meta.padY) : 8;
+        const x = -dim.x / 2 - padX;
+        const y = -dim.y / 2 - padY;
+        const w = dim.x + padX * 2;
+        const h = dim.y + padY * 2;
+        const r = Math.max(0, Math.min(meta.borderRadius !== undefined ? Number(meta.borderRadius) : 6, w / 2, h / 2));
+
+        ctx.save();
+        ctx.beginPath();
+        if (r > 0) {
+          ctx.moveTo(x + r, y);
+          ctx.lineTo(x + w - r, y);
+          ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+          ctx.lineTo(x + w, y + h - r);
+          ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+          ctx.lineTo(x + r, y + h);
+          ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+          ctx.lineTo(x, y + r);
+          ctx.quadraticCurveTo(x, y, x + r, y);
+        } else {
+          ctx.rect(x, y, w, h);
+        }
+        ctx.closePath();
+
+        if (meta.bgEnabled !== false && meta.bgColor) {
+          ctx.fillStyle = meta.bgColor;
+          ctx.fill();
+        }
+        const bw = Number(meta.borderWidth || 0);
+        if (bw > 0 && meta.borderColor) {
+          ctx.strokeStyle = meta.borderColor;
+          ctx.lineWidth = bw;
+          ctx.stroke();
+        }
+        ctx.restore();
+        this._removeShadow(ctx);
+        return;
+      }
+      return origRenderBg.call(this, ctx);
+    };
+  }
+
+  function createEditableTextBox(opts) {
+    patchFabricTextboxBoxStyle();
+    const width = Math.max(80, Math.round(opts.width || 200));
+    const minHeight = Math.max(0, Math.round(opts.minHeight || 30));
+    const text = opts.text !== undefined ? String(opts.text) : '雙擊編輯文字';
+    const fontSize = Math.max(10, Math.min(72, parseInt(opts.fontSize, 10) || 18));
+    const textColor = opts.textColor || '#0f172a';
+    const bgColor = opts.bgColor || '#ffffff';
+    const bgEnabled = opts.bgEnabled !== false;
+    const borderColor = opts.borderColor || '#2563eb';
+    const borderWidth = opts.borderWidth !== undefined ? Number(opts.borderWidth) : 2;
+    const borderRadius = opts.borderRadius !== undefined ? Number(opts.borderRadius) : 6;
+    const textAlign = opts.textAlign || 'left';
+    const fontWeight = opts.fontWeight || 'normal';
+
+    const tb = new fabric.Textbox(text, {
+      left: opts.x || 300,
+      top: opts.y || 240,
+      width: width,
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      fontFamily: "'Noto Sans TC', 'Microsoft JhengHei', sans-serif",
+      fill: textColor,
+      textAlign: textAlign,
+      lineHeight: 1.25,
+      splitByGrapheme: true,
+      originX: 'center',
+      originY: 'center',
+      padding: 12,
+      borderColor: '#2563eb',
+      cornerColor: '#2563eb',
+      objectCaching: false,
+      customType: 'textBox',
+      isAlwaysTop: true,
+      textBoxMeta: {
+        bgColor: bgColor,
+        bgEnabled: bgEnabled,
+        borderColor: borderColor,
+        borderWidth: borderWidth,
+        borderRadius: borderRadius,
+        padX: 10,
+        padY: 8,
+        minHeight: minHeight
+      },
+      objId: uid('tb')
+    });
+    tb.initDimensions();
+    tb.setCoords();
+    return tb;
   }
 
   // ==================== Object Builders ====================
@@ -2515,15 +2671,70 @@
     });
   }
 
-  function createHvacLegend(x, y) {
-    const text = '【點位與空調圖例】\nT : 上層 (Top)   M : 中層 (Middle)   B : 下層 (Bottom)\nSA : 出風口 (Supply Air)   SA-D : 向下出風\nRA : 回風口 (Return Air)   RA-U : 向上回風';
-    const styles = { 1: {}, 2: {}, 3: {} };
-    for (let i = 0; i < 70; i++) {
-      styles[1][i] = { fill: '#7e22ce' };
-      styles[2][i] = { fill: '#1d4ed8' };
-      styles[3][i] = { fill: '#c2410c' };
+  // ==================== v5: Tier helpers (shared by racks, point buttons, markers & legend) ====================
+  function getTierTag(i, tiers, mIndex) {
+    if (i === 0) return 'T';
+    if (i === tiers - 1) return 'B';
+    if (i === mIndex) return 'M';
+    return 'L' + (tiers - i);
+  }
+
+  function getTierColor(tag, overrides) {
+    const src = overrides || tierColorsState;
+    return (src && src[tag]) || tierColorsState[tag] || DEFAULT_TIER_COLORS[tag] || '#eab308';
+  }
+
+  function getContrastTextColor(hex) {
+    const h = String(hex || '').replace('#', '');
+    if (h.length !== 6) return '#0f172a';
+    const r = parseInt(h.slice(0, 2), 16), g = parseInt(h.slice(2, 4), 16), b = parseInt(h.slice(4, 6), 16);
+    return (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.55 ? '#0f172a' : '#ffffff';
+  }
+
+  function getTierNames(tag) {
+    if (tag === 'T') return { zh: '上層', en: 'Top' };
+    if (tag === 'M') return { zh: '中層', en: 'Middle' };
+    if (tag === 'B') return { zh: '下層', en: 'Bottom' };
+    const n = tag.slice(1);
+    return { zh: `第 ${n} 層`, en: `Level ${n}` };
+  }
+
+  // Ordered top → bottom list of tiers for the current rack configurator settings
+  function getCurrentTierList() {
+    const tiers = Math.max(2, Math.min(8, parseInt(document.getElementById('rack-tiers').value, 10) || 4));
+    const mSel = parseInt(document.getElementById('rack-m-tier').value, 10);
+    const mIndex = isNaN(mSel) ? -1 : mSel;
+    const list = [];
+    for (let i = 0; i < tiers; i++) {
+      const tag = getTierTag(i, tiers, mIndex);
+      const names = getTierNames(tag);
+      list.push({ index: i, tag, zh: names.zh, en: names.en, color: getTierColor(tag) });
     }
-    return new fabric.Textbox(text, {
+    return list;
+  }
+
+  function createHvacLegend(x, y, tierList) {
+    const list = (tierList && tierList.length) ? tierList : getCurrentTierList();
+    const lines = ['【點位與空調圖例】'];
+    const styles = {};
+    list.forEach(t => {
+      const head = `● ${t.tag}`;
+      const line = `${head} : ${t.zh} (${t.en})`;
+      const lineIdx = lines.length;
+      styles[lineIdx] = {};
+      for (let c = 0; c < head.length; c++) styles[lineIdx][c] = { fill: t.color };
+      lines.push(line);
+    });
+    const saLine = 'SA : 出風口 (Supply Air)   SA-D : 向下出風';
+    const raLine = 'RA : 回風口 (Return Air)   RA-U : 向上回風';
+    styles[lines.length] = {};
+    for (let c = 0; c < saLine.length; c++) styles[lines.length][c] = { fill: '#1d4ed8' };
+    lines.push(saLine);
+    styles[lines.length] = {};
+    for (let c = 0; c < raLine.length; c++) styles[lines.length][c] = { fill: '#c2410c' };
+    lines.push(raLine);
+
+    return new fabric.Textbox(lines.join('\n'), {
       left: x,
       top: y,
       width: 390,
@@ -2542,17 +2753,14 @@
       shadow: new fabric.Shadow({ color: 'rgba(15,23,42,0.16)', blur: 8, offsetX: 2, offsetY: 3 }),
       customType: 'legend',
       isAlwaysTop: true,
+      tierMeta: { kind: 'pointLegend', tiers: list.map(t => ({ tag: t.tag, color: t.color })) },
       objId: uid('leg')
     });
   }
 
-  function createMarkerGroup(type, num, x, y) {
-    const palette = {
-      T: { fill: '#ff66b2', text: '#0f172a' },
-      M: { fill: '#9c27b0', text: '#ffffff' },
-      B: { fill: '#3366cc', text: '#ffffff' }
-    };
-    const p = palette[type] || palette.T;
+  function createMarkerGroup(type, num, x, y, color) {
+    const fillColor = color || getTierColor(type);
+    const p = { fill: fillColor, text: getContrastTextColor(fillColor) };
     const mainCircle = new fabric.Circle({
       radius: 13,
       fill: p.fill,
@@ -2564,7 +2772,7 @@
       top: 0
     });
     const letter = new fabric.Text(type, {
-      fontSize: 13,
+      fontSize: String(type).length > 1 ? 11 : 13,
       fontWeight: 'bold',
       fontFamily: 'sans-serif',
       fill: p.text,
@@ -2601,6 +2809,7 @@
       customType: 'marker',
       markerType: type,
       markerNumber: String(num),
+      tierMeta: { kind: 'marker', color: fillColor },
       objId: uid('mk')
     });
   }
@@ -2784,6 +2993,11 @@
     const heights = config.heights || {};
     const style = config.style || '3d';
     const name = (config.name || '多層貨架').trim();
+    const tierColors = {};
+    for (let i = 0; i < tiers; i++) {
+      const tg = getTierTag(i, tiers, mIndex);
+      tierColors[tg] = getTierColor(tg, config.tierColors);
+    }
 
     const items = [];
     const totalH = 300;
@@ -2826,20 +3040,10 @@
 
     for (let i = 0; i < tiers; i++) {
       const yPos = 8 + i * gap;
-      let levelName = '';
-      let badgeFill = '#eab308';
-      let badgeText = '#0f172a';
-      let shortTag = 'L' + (tiers - i);
-
-      if (i === 0) {
-        levelName = 'Top'; shortTag = 'T'; badgeFill = '#ff66b2'; badgeText = '#0f172a';
-      } else if (i === tiers - 1) {
-        levelName = 'Bottom'; shortTag = 'B'; badgeFill = '#3366cc'; badgeText = '#ffffff';
-      } else if (i === mIndex) {
-        levelName = 'Middle'; shortTag = 'M'; badgeFill = '#9c27b0'; badgeText = '#ffffff';
-      } else {
-        levelName = 'Level ' + (tiers - i);
-      }
+      const shortTag = getTierTag(i, tiers, mIndex);
+      const levelName = getTierNames(shortTag).en;
+      const badgeFill = getTierColor(shortTag, tierColors);
+      const badgeText = getContrastTextColor(badgeFill);
 
       const hVal = heights[i] !== undefined ? heights[i] : 0;
 
@@ -2919,7 +3123,7 @@
       borderColor: theme.box,
       cornerColor: theme.box,
       customType: 'rackDiagram',
-      rackConfig: JSON.parse(JSON.stringify({ name, tiers, mIndex, style, theme: config.theme, heights })),
+      rackConfig: JSON.parse(JSON.stringify({ name, tiers, mIndex, style, theme: config.theme, heights, tierColors })),
       objId: uid('rack')
     });
   }
@@ -2965,10 +3169,11 @@
     grid.innerHTML = '';
 
     for (let i = 0; i < tiers; i++) {
-      let shortName = 'L' + (tiers - i);
-      if (i === 0) shortName = 'T (Top)';
-      else if (i === tiers - 1) shortName = 'B (Bot)';
-      else if (i === mIndex) shortName = 'M (Mid)';
+      const tag = getTierTag(i, tiers, mIndex);
+      let shortName = tag;
+      if (tag === 'T') shortName = 'T (Top)';
+      else if (tag === 'B') shortName = 'B (Bot)';
+      else if (tag === 'M') shortName = 'M (Mid)';
 
       if (rackHeightsState[i] === undefined) {
         rackHeightsState[i] = Math.max(10, Math.round(240 - i * (220 / Math.max(1, tiers - 1))));
@@ -2976,8 +3181,22 @@
 
       const item = document.createElement('label');
       item.className = 'rack-height-item';
+      const colorInp = document.createElement('input');
+      colorInp.type = 'color';
+      colorInp.value = getTierColor(tag);
+      colorInp.title = `${shortName} 層顏色（同步點位按鈕、點位與點位圖例）`;
+      colorInp.setAttribute('data-testid', `rack-tier-color-${tag}`);
+      colorInp.oninput = () => {
+        tierColorsState[tag] = colorInp.value;
+        renderMarkerTierButtons();
+      };
+      colorInp.onchange = () => {
+        tierColorsState[tag] = colorInp.value;
+        onTierConfigChanged({ recolorTag: tag });
+      };
       const span = document.createElement('span');
       span.textContent = shortName;
+      span.style.flex = '1';
       const inp = document.createElement('input');
       inp.type = 'number';
       inp.value = rackHeightsState[i];
@@ -2985,9 +3204,115 @@
       inp.oninput = () => {
         rackHeightsState[i] = parseFloat(inp.value) || 0;
       };
+      item.appendChild(colorInp);
       item.appendChild(span);
       item.appendChild(inp);
       grid.appendChild(item);
+    }
+    renderMarkerTierButtons();
+  }
+
+  // ==================== v5: Dynamic Tier Point Buttons & Point Legend Sync ====================
+  function onMarkerTierButtonClick(btn) {
+    const tool = btn.dataset.tool;
+    if (activeTool === tool) setPlacementMode(null);
+    else setPlacementMode(tool, {});
+  }
+
+  function renderMarkerTierButtons() {
+    const wrap = document.getElementById('marker-tier-buttons');
+    if (!wrap) return;
+    const list = getCurrentTierList();
+    // Remove stale dynamic tool names
+    Object.keys(TOOL_NAMES).forEach(k => { if (k.startsWith('marker-')) delete TOOL_NAMES[k]; });
+    wrap.innerHTML = '';
+    wrap.style.gridTemplateColumns = `repeat(${list.length <= 4 ? list.length : 4}, 1fr)`;
+    list.forEach(t => {
+      const tool = `marker-${t.tag}`;
+      TOOL_NAMES[tool] = `${t.tag} 點位 · ${t.zh} (連續點擊放置)`;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn btn-sm marker-tier-btn';
+      btn.dataset.tool = tool;
+      btn.setAttribute('data-testid', `tool-marker-${t.tag}`);
+      btn.setAttribute('data-tier-color', t.color);
+      btn.title = `${t.zh} (${t.en}) 點位 (自動編號)`;
+      btn.style.background = t.color + '1f';
+      btn.style.borderColor = t.color;
+      btn.style.color = '#0f172a';
+      const dot = document.createElement('span');
+      dot.className = 'marker-tier-dot';
+      dot.style.background = t.color;
+      const lbl = document.createElement('span');
+      lbl.textContent = `${t.tag} 點位`;
+      btn.appendChild(dot);
+      btn.appendChild(lbl);
+      btn.onclick = () => onMarkerTierButtonClick(btn);
+      if (activeTool === tool) btn.classList.add('btn-active');
+      wrap.appendChild(btn);
+    });
+    const hint = document.getElementById('marker-tier-hint');
+    if (hint) hint.textContent = `點位按鈕依「6. 多層貨架」${list.length} 層同步（${list.map(t => t.tag).join(' / ')}）`;
+    // Exit placement if the active marker tier no longer exists
+    if (activeTool && activeTool.startsWith('marker-') && !TOOL_NAMES[activeTool]) {
+      setPlacementMode(null);
+    }
+  }
+
+  function replaceCanvasObject(oldObj, newObj) {
+    const idx = canvas.getObjects().indexOf(oldObj);
+    newObj.set({ scaleX: oldObj.scaleX, scaleY: oldObj.scaleY, angle: oldObj.angle, visible: oldObj.visible });
+    if (oldObj.objId) newObj.objId = oldObj.objId;
+    canvas.remove(oldObj);
+    if (idx >= 0) canvas.insertAt(newObj, idx);
+    else canvas.add(newObj);
+    newObj.setCoords();
+    return newObj;
+  }
+
+  // Sync point legend cards (items + colors), and recolor markers / rack badges of a changed tier tag
+  let suppressRackUISync = false;
+  function onTierConfigChanged(opts) {
+    renderMarkerTierButtons();
+    if (!canvas) return;
+    const o = opts || {};
+    const list = getCurrentTierList();
+    const active = canvas.getActiveObject();
+    let nextActive = active;
+    let changed = 0;
+    canvas.getObjects().slice().forEach(obj => {
+      if (obj.customType === 'legend') {
+        const updated = replaceCanvasObject(obj, createHvacLegend(obj.left, obj.top, list));
+        if (active === obj) nextActive = updated;
+        changed++;
+      } else if (o.recolorTag && obj.customType === 'marker' && obj.markerType === o.recolorTag) {
+        const updated = replaceCanvasObject(obj, createMarkerGroup(obj.markerType, obj.markerNumber || '1', obj.left, obj.top, getTierColor(o.recolorTag)));
+        if (active === obj) nextActive = updated;
+        changed++;
+      } else if (o.recolorTag && obj.customType === 'rackDiagram' && obj.rackConfig) {
+        const rc = obj.rackConfig;
+        const rTiers = Math.max(2, Math.min(8, parseInt(rc.tiers, 10) || 4));
+        let hasTag = false;
+        for (let i = 0; i < rTiers; i++) if (getTierTag(i, rTiers, rc.mIndex) === o.recolorTag) hasTag = true;
+        if (!hasTag) return;
+        const nextCfg = JSON.parse(JSON.stringify(rc));
+        nextCfg.tierColors = Object.assign({}, nextCfg.tierColors || {}, { [o.recolorTag]: getTierColor(o.recolorTag) });
+        const updated = replaceCanvasObject(obj, buildRackDiagramGroup(nextCfg, obj.left, obj.top));
+        if (active === obj) nextActive = updated;
+        changed++;
+      }
+    });
+    if (changed) {
+      keepLabelsOnTop();
+      suppressRackUISync = true;
+      try {
+        if (nextActive && nextActive !== active) canvas.setActiveObject(nextActive);
+        canvas.renderAll();
+        pushUndoSnapshot();
+        updateInspector();
+      } finally {
+        suppressRackUISync = false;
+      }
     }
   }
 
@@ -3004,12 +3329,14 @@
       mIndex: isNaN(mIndex) ? -1 : mIndex,
       style: document.getElementById('rack-style').value,
       theme: document.getElementById('rack-theme').value,
-      heights
+      heights,
+      tierColors: Object.assign({}, tierColorsState)
     };
   }
 
   function populateRackUIFromConfig(cfg) {
     if (!cfg) return;
+    if (cfg.tierColors) tierColorsState = Object.assign({}, tierColorsState, cfg.tierColors);
     document.getElementById('rack-name').value = cfg.name || '多層貨架';
     document.getElementById('rack-tiers').value = cfg.tiers || 4;
     document.getElementById('rack-style').value = cfg.style || '3d';
@@ -3072,6 +3399,7 @@
   // ==================== Placement Mode Management ====================
   const TOOL_NAMES = {
     'arrow': '動線箭頭',
+    'textbox': '可修改文字方塊 (點擊或拖曳大小放置)',
     'mask-rect': '白色方形遮罩 (點擊或拖曳)',
     'mask-circle': '白色圓形遮罩 (點擊或拖曳)',
     'label': '區域文字標籤',
@@ -3084,9 +3412,6 @@
     'room-box-3d': '3D 綠色空間箱 (點擊或拖曳調整大小)',
     'door-3d': '3D 獨立門物件 (點擊或拖曳調整大小)',
     'free-arrow': '自由箭頭 (拖曳或點擊)',
-    'marker-T': 'T 點位 (連續點擊放置)',
-    'marker-M': 'M 點位 (連續點擊放置)',
-    'marker-B': 'B 點位 (連續點擊放置)',
     'hvac-sa': 'SA 出風口',
     'hvac-ra': 'RA 回風口',
     'hvac-sad': 'SA-D 向下出風',
@@ -3146,6 +3471,7 @@
 
   // ==================== Canvas Interaction ====================
   function initCanvas() {
+    patchFabricTextboxBoxStyle();
     canvas = new fabric.Canvas('studio-canvas', {
       preserveObjectStacking: true,
       selection: true,
@@ -3187,13 +3513,24 @@
     });
 
     canvas.on('text:editing:exited', () => {
+      keepLabelsOnTop();
       pushUndoSnapshot();
+      updateInspector();
     });
 
-    // Double-click custom edit for markers, dimension lines, custom flow legends, and shape blocks
+    // Double-click custom edit for text boxes, markers, dimension lines, custom flow legends, and shape blocks
     canvas.on('mouse:dblclick', async (opt) => {
       if (activeTool || !opt.target) return;
       const obj = opt.target;
+      if (obj.customType === 'textBox') {
+        if (!obj.isEditing) {
+          canvas.setActiveObject(obj);
+          obj.enterEditing();
+          obj.selectAll();
+          canvas.renderAll();
+        }
+        return;
+      }
       if (obj.customType === 'customFlowLegend') {
         openLegendModal(obj);
       } else if (obj.customType === 'shapeBlock' && obj.shapeMeta) {
@@ -3223,7 +3560,7 @@
           defaultValue: obj.markerNumber || '1'
         });
         if (val !== null && val.trim() !== '') {
-          const updated = createMarkerGroup(obj.markerType, val.trim().slice(0, 8), obj.left, obj.top);
+          const updated = createMarkerGroup(obj.markerType, val.trim().slice(0, 8), obj.left, obj.top, (obj.tierMeta && obj.tierMeta.color) || null);
           updated.set({ scaleX: obj.scaleX, scaleY: obj.scaleY, angle: obj.angle });
           canvas.remove(obj);
           canvas.add(updated);
@@ -3278,10 +3615,17 @@
       // Drag-capable tools
       const isShapeTool = activeTool.startsWith('shape-');
       const isIso3dTool = activeTool === 'room-box-3d' || activeTool === 'door-3d';
-      if (isShapeTool || isIso3dTool || ['mask-rect', 'mask-circle', 'free-arrow', 'sa-dir', 'ra-dir', 'dimension'].includes(activeTool)) {
+      if (isShapeTool || isIso3dTool || ['textbox', 'mask-rect', 'mask-circle', 'free-arrow', 'sa-dir', 'ra-dir', 'dimension'].includes(activeTool)) {
         isDrawing = true;
         const drawColor = document.getElementById('draw-custom-color').value;
-        if (activeTool === 'mask-rect') {
+        if (activeTool === 'textbox') {
+          previewObj = new fabric.Rect({
+            left: ptr.x, top: ptr.y, width: 1, height: 1,
+            fill: 'rgba(255,255,255,0.88)', stroke: '#2563eb', strokeWidth: 2, strokeDashArray: [5, 4],
+            rx: 6, ry: 6,
+            originX: 'center', originY: 'center', selectable: false, evented: false
+          });
+        } else if (activeTool === 'mask-rect') {
           previewObj = new fabric.Rect({
             left: ptr.x, top: ptr.y, width: 1, height: 1,
             fill: '#ffffff', stroke: '#cbd5e1', strokeWidth: 1, strokeDashArray: [4, 3],
@@ -3399,7 +3743,7 @@
       const midX = (drawStart.x + ptr.x) / 2;
       const midY = (drawStart.y + ptr.y) / 2;
 
-      if (activeTool === 'mask-rect' || (activeTool && activeTool.startsWith('shape-')) || activeTool === 'room-box-3d' || activeTool === 'door-3d') {
+      if (activeTool === 'textbox' || activeTool === 'mask-rect' || (activeTool && activeTool.startsWith('shape-')) || activeTool === 'room-box-3d' || activeTool === 'door-3d') {
         previewObj.set({ left: midX, top: midY, width: Math.max(2, w), height: Math.max(2, h) });
       } else if (activeTool === 'mask-circle') {
         previewObj.set({ left: midX, top: midY, radius: Math.max(2, Math.hypot(w, h) / 2) });
@@ -3429,6 +3773,7 @@
             });
           } else {
             cloned.set({ left: origin.left, top: origin.top, evented: true, selectable: true, objId: uid('dup') });
+            if (cloned.textBoxMeta) cloned.textBoxMeta = Object.assign({}, cloned.textBoxMeta);
             canvas.add(cloned);
           }
           keepLabelsOnTop();
@@ -3457,7 +3802,17 @@
 
       let created = null;
 
-      if (activeTool === 'mask-rect') {
+      if (activeTool === 'textbox') {
+        const boxW = dist < 12 ? 200 : Math.max(100, Math.round(w - 20));
+        const boxMinH = dist < 12 ? 30 : Math.max(28, Math.round(h - 16));
+        created = createEditableTextBox({
+          x: dist < 12 ? drawStart.x : midX,
+          y: dist < 12 ? drawStart.y : midY,
+          width: boxW,
+          minHeight: boxMinH,
+          text: '雙擊編輯文字'
+        });
+      } else if (activeTool === 'mask-rect') {
         created = new fabric.Rect({
           left: dist < 10 ? drawStart.x : midX,
           top: dist < 10 ? drawStart.y : midY,
@@ -3572,6 +3927,10 @@
         keepLabelsOnTop();
         setPlacementMode(null);
         canvas.setActiveObject(created);
+        if (created.customType === 'textBox') {
+          created.enterEditing();
+          created.selectAll();
+        }
         canvas.renderAll();
         pushUndoSnapshot();
         updateInspector();
@@ -3592,7 +3951,7 @@
       return;
     }
 
-    if (obj.customType === 'rackDiagram' && obj.rackConfig) {
+    if (!suppressRackUISync && obj.customType === 'rackDiagram' && obj.rackConfig) {
       populateRackUIFromConfig(obj.rackConfig);
     }
 
@@ -3607,6 +3966,7 @@
     };
     const typeNames = {
       flowArrow: '動線箭頭',
+      textBox: '可修改文字方塊 (置頂)',
       maskRect: '白色方形遮罩',
       maskCircle: '白色圓形遮罩',
       label: '區域文字標籤 (置頂)',
@@ -3640,7 +4000,48 @@
     const curAngle = Math.round(((obj.angle || 0) % 360 + 360) % 360);
 
     let extraHtml = '';
-    if (obj.customType === 'customFlowLegend') {
+    if (obj.customType === 'textBox') {
+      const m = obj.textBoxMeta || { bgColor: '#ffffff', bgEnabled: true, borderColor: '#2563eb', borderWidth: 2, borderRadius: 6, padX: 10, padY: 8, minHeight: 30 };
+      const curFs = Math.round(obj.fontSize || 18);
+      const curAlign = obj.textAlign || 'left';
+      const isBold = obj.fontWeight === 'bold' || Number(obj.fontWeight) >= 700;
+      extraHtml = `
+        <div style="margin-top:8px;padding-top:7px;border-top:1px solid var(--border);">
+          <button type="button" class="btn btn-xs btn-primary" id="insp-textbox-edit" data-testid="insp-textbox-edit" style="width:100%;margin-bottom:6px;">✏️ 直接編輯方塊文字</button>
+          <div class="row-flex" style="margin-bottom:5px;justify-content:space-between;">
+            <span style="font-size:10.5px;color:var(--text-muted);">字體大小: <strong id="insp-textbox-fs-val">${curFs}px</strong></span>
+            <input type="range" id="insp-textbox-fontsize" data-testid="insp-textbox-fontsize" min="10" max="56" value="${curFs}" style="width:125px;">
+          </div>
+          <div class="row-flex" style="margin-bottom:5px;justify-content:space-between;">
+            <label style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;">
+              文字 <input type="color" id="insp-textbox-color" data-testid="insp-textbox-color" class="color-swatch" value="${obj.fill || '#0f172a'}">
+            </label>
+            <label style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;">
+              底色 <input type="color" id="insp-textbox-bg" data-testid="insp-textbox-bg" class="color-swatch" value="${m.bgColor || '#ffffff'}">
+            </label>
+            <label style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;">
+              框線 <input type="color" id="insp-textbox-border" data-testid="insp-textbox-border" class="color-swatch" value="${m.borderColor || '#2563eb'}">
+            </label>
+          </div>
+          <div class="row-flex" style="margin-bottom:5px;justify-content:space-between;">
+            <button type="button" class="btn btn-xs ${m.bgEnabled !== false ? 'btn-active' : ''}" id="insp-textbox-bg-toggle" data-testid="insp-textbox-bg-toggle">${m.bgEnabled !== false ? '底色:開' : '底色:透明'}</button>
+            <select id="insp-textbox-border-w" data-testid="insp-textbox-border-w" class="select-input" style="padding:2px 5px;font-size:11px;">
+              <option value="0" ${Number(m.borderWidth) === 0 ? 'selected' : ''}>無外框</option>
+              <option value="1" ${Number(m.borderWidth) === 1 ? 'selected' : ''}>細外框 1px</option>
+              <option value="2" ${Number(m.borderWidth) === 2 ? 'selected' : ''}>標準框 2px</option>
+              <option value="3" ${Number(m.borderWidth) === 3 ? 'selected' : ''}>粗外框 3px</option>
+            </select>
+            <button type="button" class="btn btn-xs ${isBold ? 'btn-active' : ''}" id="insp-textbox-bold" data-testid="insp-textbox-bold"><strong>B</strong> 粗體</button>
+          </div>
+          <div class="grid-3" style="margin-bottom:4px;">
+            <button type="button" class="btn btn-xs ${curAlign === 'left' ? 'btn-active' : ''}" id="insp-textbox-align-left" data-testid="insp-textbox-align-left">靠左</button>
+            <button type="button" class="btn btn-xs ${curAlign === 'center' ? 'btn-active' : ''}" id="insp-textbox-align-center" data-testid="insp-textbox-align-center">置中</button>
+            <button type="button" class="btn btn-xs ${curAlign === 'right' ? 'btn-active' : ''}" id="insp-textbox-align-right" data-testid="insp-textbox-align-right">靠右</button>
+          </div>
+          <div style="font-size:10.5px;color:#2563eb;margin-top:4px;">提示：雙擊文字方塊可直接編輯多行文字；拖拉左右控點可調整寬度自動換行</div>
+        </div>
+      `;
+    } else if (obj.customType === 'customFlowLegend') {
       extraHtml = `
         <button type="button" class="btn btn-xs btn-primary" id="insp-edit-legend" data-testid="insp-edit-legend" style="width:100%;margin-top:6px;">✏️ 編輯圖例項目 / 顏色</button>
         <div style="font-size:11px;color:#2563eb;margin-top:4px;">提示：可直接拖拉四角縮放，或雙擊圖例修改內容</div>
@@ -3851,6 +4252,72 @@
       updateInspector();
     };
 
+    if (obj.customType === 'textBox') {
+      const patchMeta = (patch) => {
+        obj.textBoxMeta = Object.assign({
+          bgColor: '#ffffff', bgEnabled: true, borderColor: '#2563eb',
+          borderWidth: 2, borderRadius: 6, padX: 10, padY: 8, minHeight: 30
+        }, obj.textBoxMeta || {}, patch);
+        obj.dirty = true;
+        obj.initDimensions();
+        obj.setCoords();
+        canvas.renderAll();
+        pushUndoSnapshot();
+        updateInspector();
+      };
+      document.getElementById('insp-textbox-edit').onclick = () => {
+        canvas.setActiveObject(obj);
+        obj.enterEditing();
+        obj.selectAll();
+        canvas.renderAll();
+      };
+      document.getElementById('insp-textbox-fontsize').oninput = function () {
+        const fs = parseInt(this.value, 10) || 18;
+        document.getElementById('insp-textbox-fs-val').textContent = fs + 'px';
+        obj.set('fontSize', fs);
+        obj.initDimensions();
+        obj.setCoords();
+        canvas.renderAll();
+      };
+      document.getElementById('insp-textbox-fontsize').onchange = () => pushUndoSnapshot();
+      document.getElementById('insp-textbox-color').onchange = function () {
+        obj.set('fill', this.value);
+        canvas.renderAll();
+        pushUndoSnapshot();
+      };
+      document.getElementById('insp-textbox-bg').onchange = function () {
+        patchMeta({ bgColor: this.value, bgEnabled: true });
+      };
+      document.getElementById('insp-textbox-border').onchange = function () {
+        patchMeta({ borderColor: this.value });
+      };
+      document.getElementById('insp-textbox-bg-toggle').onclick = () => {
+        const curEnabled = !obj.textBoxMeta || obj.textBoxMeta.bgEnabled !== false;
+        patchMeta({ bgEnabled: !curEnabled });
+      };
+      document.getElementById('insp-textbox-border-w').onchange = function () {
+        patchMeta({ borderWidth: parseInt(this.value, 10) || 0 });
+      };
+      document.getElementById('insp-textbox-bold').onclick = () => {
+        const isBold = obj.fontWeight === 'bold' || Number(obj.fontWeight) >= 700;
+        obj.set('fontWeight', isBold ? 'normal' : 'bold');
+        obj.initDimensions();
+        obj.setCoords();
+        canvas.renderAll();
+        pushUndoSnapshot();
+        updateInspector();
+      };
+      const setAlign = (align) => {
+        obj.set('textAlign', align);
+        canvas.renderAll();
+        pushUndoSnapshot();
+        updateInspector();
+      };
+      document.getElementById('insp-textbox-align-left').onclick = () => setAlign('left');
+      document.getElementById('insp-textbox-align-center').onclick = () => setAlign('center');
+      document.getElementById('insp-textbox-align-right').onclick = () => setAlign('right');
+    }
+
     if (obj.customType === 'customFlowLegend') {
       document.getElementById('insp-edit-legend').onclick = () => openLegendModal(obj);
     }
@@ -4039,11 +4506,13 @@
         cloned.canvas = canvas;
         cloned.forEachObject(o => {
           o.objId = uid('p');
+          if (o.textBoxMeta) o.textBoxMeta = Object.assign({}, o.textBoxMeta);
           canvas.add(o);
         });
         cloned.setCoords();
       } else {
         cloned.objId = uid('p');
+        if (cloned.textBoxMeta) cloned.textBoxMeta = Object.assign({}, cloned.textBoxMeta);
         canvas.add(cloned);
       }
       clipboardObj.left += 28;
@@ -4129,11 +4598,18 @@
   // ==================== Serialization, LocalStorage, Export/Import JSON & PNG ====================
   function serializeWorkspace() {
     snapshotActiveTabToMemory();
+    const rackTiersEl = document.getElementById('rack-tiers');
+    const rackMTierEl = document.getElementById('rack-m-tier');
     return {
       version: 1,
       app: 'FloorPlanFlowLayoutStudio',
       savedAt: new Date().toISOString(),
       activeTabId: activeTabId,
+      tierConfig: {
+        tiers: rackTiersEl ? (parseInt(rackTiersEl.value, 10) || 4) : 4,
+        mIndex: rackMTierEl ? parseInt(rackMTierEl.value, 10) : 1,
+        colors: Object.assign({}, tierColorsState)
+      },
       tabs: tabs.map(t => ({
         id: t.id,
         name: t.name,
@@ -4150,6 +4626,21 @@
   async function restoreWorkspaceFromPayload(payload) {
     if (!payload || !Array.isArray(payload.tabs) || payload.tabs.length === 0) {
       throw new Error('設定檔格式不正確或缺少分頁資料');
+    }
+    if (payload.tierConfig) {
+      if (payload.tierConfig.colors) {
+        tierColorsState = Object.assign({}, DEFAULT_TIER_COLORS, payload.tierConfig.colors);
+      }
+      const rackTiersEl = document.getElementById('rack-tiers');
+      if (rackTiersEl && payload.tierConfig.tiers) {
+        rackTiersEl.value = String(Math.max(2, Math.min(8, parseInt(payload.tierConfig.tiers, 10) || 4)));
+      }
+      syncRackMSelect();
+      const rackMTierEl = document.getElementById('rack-m-tier');
+      if (rackMTierEl && payload.tierConfig.mIndex !== undefined && !isNaN(payload.tierConfig.mIndex)) {
+        rackMTierEl.value = String(payload.tierConfig.mIndex);
+      }
+      renderRackHeightInputs();
     }
     tabs = payload.tabs.map((t, idx) => ({
       id: t.id || uid('tab'),
@@ -4282,6 +4773,10 @@
     if (!ok) return;
     if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
     try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
+    tierColorsState = Object.assign({}, DEFAULT_TIER_COLORS);
+    const rackTiersEl = document.getElementById('rack-tiers');
+    if (rackTiersEl) rackTiersEl.value = '4';
+    syncRackMSelect();
     tabs = [createDefaultTab('主區域 1', 'blank')];
     activeTabId = tabs[0].id;
     renderTabsBar();
@@ -4710,8 +5205,8 @@
     };
 
     // Rack configurator
-    document.getElementById('rack-tiers').onchange = syncRackMSelect;
-    document.getElementById('rack-m-tier').onchange = renderRackHeightInputs;
+    document.getElementById('rack-tiers').onchange = () => { syncRackMSelect(); onTierConfigChanged(); };
+    document.getElementById('rack-m-tier').onchange = () => { renderRackHeightInputs(); onTierConfigChanged(); };
     document.getElementById('btn-insert-rack').onclick = insertRackToCanvas;
     document.getElementById('btn-update-rack').onclick = updateSelectedRack;
     document.getElementById('btn-toggle-racks').onclick = toggleRacksVisibility;
@@ -4744,10 +5239,17 @@
         return;
       }
 
+      const activeObj = canvas && canvas.getActiveObject();
+      if (activeObj && activeObj.isEditing) {
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          activeObj.exitEditing();
+          canvas.renderAll();
+        }
+        return;
+      }
       const tag = (e.target && e.target.tagName || '').toLowerCase();
       if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
-      const activeObj = canvas && canvas.getActiveObject();
-      if (activeObj && activeObj.isEditing) return;
 
       if (e.key === 'Escape') {
         if (activeTool) setPlacementMode(null);
