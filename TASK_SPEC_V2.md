@@ -1,0 +1,6 @@
+﻿v2
+1. Cloud Temp Storage: Fixed 14 days auto-delete (NO user dropdown), plain Chinese buttons (Save Project / Open Project / Cloud Temp Storage).
+2. Custom Flow Legend: Allow checking/unchecking items, editing code/name/color, adding custom items before placement, plus double-click edit & resize.
+3. Custom Shape & Label Blocks: Rect, Rounded Rect, Circle/Ellipse, L-Shape with fill/stroke/opacity, 2D Planar vs 3D Isometric toggle, and centered double-click editable text label.
+4. Templates (remove clinic wording): (1) Blank Canvas 1200x800, (2) Facility Floor Plan Template (Full) color-coded green/orange/pink/blue/white/yellow with room codes W-01..W-05 P-01..P-22 M-01..M-06 CH-01, (3) Laboratory Floor Plan Template (Yellow) with M-01..M-06 & lab equipment, (4) Manufacturing Zone Floor Plan Template (Red Frame) with P-01..P-21 pink/blue/white zones, (5) Warehouse Zone Floor Plan Template (Blue Frame) with W-01..W-05 P-18..P-22 green cold room & orange pallet racks & pink packing edge, (6) Cold Room Floor Plan Template (2D), (7) Cold Room Isometric Space Template (3D).
+5. Run Playwright multi-role verification across all 7 templates, custom legend, 2D/3D shape blocks, 14-day cloud auto-clean, 0 console/page/HTTP errors, push to main, verify live GAS /exec URL, update STATUS.md & VERIFICATION_REPORT.md.

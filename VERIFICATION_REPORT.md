@@ -1,10 +1,10 @@
-# Verification Report — Floor Plan Flow & Layout Studio (GAS)
+# Verification Report (v2) — Floor Plan Flow & Layout Studio (GAS)
 
-> 測試執行時間：2026-11-25 08:53–08:56 (Asia/Taipei)  
-> 測試工具：Playwright Headless Chromium (`chromium-1234`, `playwright-core`)  
+> 測試執行時間：2026-11-25 10:21–10:24 (Asia/Taipei)  
+> 測試工具：Playwright Headless Chromium (`chromium_headless_shell-1234`, `playwright-core 1.65.1`)  
 > 驗證對象：
-> 1. **Local Build**：`http://127.0.0.1:49719/index.html`
-> 2. **Live GAS `/exec` URL**：`https://script.google.com/macros/s/AKfycby2kyBgSIgdQdxpkyXeXkh5F9h0wDrBDYpPfZpOMAkoBLrAmUMrU2WciRZFuIOg1_y_/exec`（自動穿透 GAS `#sandboxFrame` → `#userHtmlFrame` 進行真實操作）
+> 1. **Local Build**：`http://127.0.0.1:59208/index.html`
+> 2. **Live GAS `/exec` URL**：`https://script.google.com/macros/s/AKfycby2kyBgSIgdQdxpkyXeXkh5F9h0wDrBDYpPfZpOMAkoBLrAmUMrU2WciRZFuIOg1_y_/exec`（固定部署版本 `@4`，穿透 `#sandboxFrame` → `#userHtmlFrame` 實測）
 
 ---
 
@@ -12,11 +12,13 @@
 
 | 驗證項目 | Local Build | Live GAS `/exec` | 結果 |
 |---|---:|---:|---|
-| Role 1 — 通用空間 / 辦公規劃者 | PASS | PASS | ✅ |
-| Role 2 — 工程師 / 技術人員 | PASS | PASS | ✅ |
-| Role 3 — 一般公開使用者（輸出與重置） | PASS | PASS | ✅ |
+| 白話中文按鈕（儲存專案 / 開啟專案 / 雲端暫存）& 零「診所」用字 | PASS (`clinicHits=0`) | PASS (`clinicHits=0`) | ✅ |
+| 全部 7 種內建範本套用與畫布尺寸驗證 | PASS (`7/7`) | PASS (`7/7`) | ✅ |
+| Role 1 — 自訂動線圖例（勾選/改碼改色/新增/雙擊編輯）+ 專案存取 | PASS | PASS | ✅ |
+| Role 2 — 2D/3D 自訂形狀方塊（4 形狀/切換/雙擊改字）+ 點位/空調/貨架/快捷鍵 | PASS | PASS | ✅ |
+| Role 3 — 14 天固定雲端暫存（無選單/過期清理/實測存取刪除）+ PNG 匯出 + 重置 | PASS | PASS | ✅ |
 | Desktop 視口 (`1440×900`) 無水平溢位 | PASS (`1440/1440`) | PASS (`1440/1440`) | ✅ |
-| Mobile 視口 (`390×844`) 抽屜與畫布適配 | PASS (`390/390`) | PASS (`390/390`) | ✅ |
+| Mobile 視口 (`390×844`) 抽屜開關與畫布適配 | PASS (`390/390`) | PASS (`390/390`) | ✅ |
 | Console Errors | **0** | **0** | ✅ |
 | Page Errors (Uncaught Exceptions) | **0** | **0** | ✅ |
 | HTTP 4xx / 5xx Errors | **0** | **0** | ✅ |
@@ -25,39 +27,50 @@
 
 ## 詳細測試證據
 
-### Role 1 — General Facility / Office Planner（空間規劃者）
+### 1. 全部 7 種內建範本與用字檢查
+
+| # | 範本 ID | 下拉選單名稱 | 驗證規格與內容 | Local / Live 實測尺寸 |
+|---|---|---|---|---|
+| 1 | `blank` | 1. 空白畫布 (1200×800) | 純白空白畫布 | `1200 × 800` / `1200 × 800` |
+| 2 | `facility_full` | 2. 全廠區平面範本 (完整版) | 綠/橘/粉/藍/白/黃分色，完整包含 `W-01`..`W-05`、`P-01`..`P-22`、`M-01`..`M-06`、`CH-01`（34 房號零缺漏） | `1400 × 900` / `1400 × 900` |
+| 3 | `lab_yellow` | 3. 實驗室平面範本 (黃區) | `M-01`..`M-06` + 排煙櫃、BSC、HPLC/GC-MS、清洗槽、滅菌釜等設備 | `1200 × 800` / `1200 × 800` |
+| 4 | `mfg_red` | 4. 製造區平面範本 (紅框區) | 紅色外框，`P-01`..`P-21` 粉/藍/白分區 | `1200 × 800` / `1200 × 800` |
+| 5 | `wh_blue` | 5. 倉儲區平面範本 (藍框區) | 藍色外框，`W-01`..`W-05`、`P-18`..`P-22` 綠冷藏庫 + 橘棧板架 + 粉包裝邊 | `1200 × 800` / `1200 × 800` |
+| 6 | `coldroom_2d` | 6. 冷藏庫平面範本 (2D) | L 型冷藏庫 2D 平面、雙開保溫門、冷風機與儲位 | `1200 × 800` / `1200 × 800` |
+| 7 | `coldroom_3d` | 7. 冷藏庫等角立體空間範本 (3D) | 等角 3D 空間網格、保溫牆、視窗雙開門與冷風機 | `1200 × 800` / `1200 × 800` |
+
+- 全頁文字與選單掃描「診所 / clinic」出現次數：**0**。
+- 頂部操作按鈕文字確認：`💾 儲存專案`、`📂 開啟專案`、`☁️ 雲端暫存`。
+
+### 2. Role 1 — 空間規劃者（自訂動線圖例 + 專案存取）
 
 | 測試步驟 | Local Build 實測結果 | Live GAS `/exec` 實測結果 |
 |---|---|---|
-| 上傳自訂平面圖（SVG `1000×700`） | 成功套用底圖，狀態列更新為 `畫布：1000 × 700` | 成功套用底圖，狀態列更新為 `畫布：1000 × 700` |
-| 新增區域分頁 | 分頁數 `1 → 2` | 分頁數 `1 → 2` |
-| 繪製多方向 P / M / W 動線箭頭（`right`, `up`, `double-h`） | 成功放置 3 組文字正向箭頭（`objects=3`） | 成功放置 3 組文字正向箭頭（`objects=3`） |
-| 放置白色無框方形/圓形遮罩 + 可編輯標籤 + 多色圖例 | 成功建立並置頂標籤與圖例（`objects=7`） | 成功建立並置頂標籤與圖例（`objects=7`） |
-| 匯出 `.json` 設定檔 | 下載有效 JSON（`25,655 bytes`，含 2 個分頁） | 下載有效 JSON（`25,662 bytes`，含 2 個分頁） |
-| 重整頁面 → 清除重置 → 匯入 `.json` 驗證完整還原 | 完整還原 `2` 個分頁與 `7` 個物件 | 完整還原 `2` 個分頁與 `7` 個物件 |
+| 開啟自訂動線圖例視窗，取消勾選 `W`、修改 `P→P1/人員主通道/#1d4ed8`、新增自訂項 `C1/清潔專用動線/#7c3aed` 並插入 | 成功插入畫布（`objects=1`），屬性面板顯示「自訂動線圖例」 | 成功插入畫布（`objects=1`），屬性面板顯示「自訂動線圖例」 |
+| 畫布上實測**雙擊**已放置之自訂動線圖例修改標題並儲存 | 重新載入已改內容（`P1`、`C1`），儲存後原地更新（`objects=1`） | 重新載入已改內容（`P1`、`C1`），儲存後原地更新（`objects=1`） |
+| 放置 P/M 動線箭頭 + 白色遮罩 + 區域標籤 + 新增分頁 | `2` 分頁、`5` 物件正常建立 | `2` 分頁、`5` 物件正常建立 |
+| 點選「儲存專案」下載 `.json` → 重置全部 →「開啟專案」還原 | 下載 `58,166 bytes` 有效 JSON，重置歸 0 後完整還原 `2` 分頁與 `5` 物件 | 下載 `58,166 bytes` 有效 JSON，重置歸 0 後完整還原 `2` 分頁與 `5` 物件 |
 
-### Role 2 — Engineer / Technician（工程師 / 技術人員）
+### 3. Role 2 — 配置工程師（2D/3D 自訂形狀方塊 + 點位 / 空調 / 貨架 / 快捷鍵）
 
 | 測試步驟 | Local Build 實測結果 | Live GAS `/exec` 實測結果 |
 |---|---|---|
-| 放置 T / M / B 編號點位（1, 2, 3） | 成功放置，下一個自動編號遞增至 `4` | 成功放置，下一個自動編號遞增至 `4` |
-| 放置 SA、RA、SA-D、RA-U 與 SA/RA 方向箭頭 | 6 種空調/氣流物件全部正常繪製 | 6 種空調/氣流物件全部正常繪製 |
-| 建立自訂文字尺寸標註線（`"4.25 m"`） | 拖曳並於內建對話框輸入 `"4.25 m"` 成功建立 | 拖曳並於內建對話框輸入 `"4.25 m"` 成功建立 |
-| 設定 4 層多層貨架圖（高度 `260/180/100/20 cm`）並插入 | 成功插入可拖曳貨架圖（`objects=11`） | 成功插入可拖曳貨架圖（`objects=11`） |
-| `Ctrl+C` / `Ctrl+V` 複製貼上 | 物件數 `11 → 12` | 物件數 `11 → 12` |
-| `Ctrl+Drag` 拖曳原位複製 | 物件數 `12 → 13` | 物件數 `12 → 13` |
-| `Delete` 刪除選取物件 | 物件數 `13 → 12` | 物件數 `13 → 12` |
-| `Ctrl+Z` 復原（Undo） | 物件數 `12 → 13`（成功還原被刪物件） | 物件數 `12 → 13`（成功還原被刪物件） |
+| 依序放置 2D 矩形、2D 圓角矩形、3D 等角圓柱(橢圓)、3D 等角 L 型區塊（含自訂填滿/框線色與置中標籤） | 4 種形狀皆正確繪製（`objects=4`） | 4 種形狀皆正確繪製（`objects=4`） |
+| 屬性面板點擊切換已選 L 型方塊 `3D 等角 ↔ 2D 平面` | 視角狀態即時切換並重繪成功 | 視角狀態即時切換並重繪成功 |
+| 畫布上**雙擊**已放置之 3D L 型方塊編輯置中文字標籤 | 彈出文字編輯對話框並原地更新標籤（`objects=4`） | 彈出文字編輯對話框並原地更新標籤（`objects=4`） |
+| 放置 T/M/B 編號點位、SA/RA 空調、尺寸線 (`4.50 m`)、多層貨架圖 | 點位編號自動遞增至 `4`，共 `11` 物件 | 點位編號自動遞增至 `4`，共 `11` 物件 |
+| `Ctrl+C` / `Ctrl+V`、`Delete`、`Ctrl+Z` (Undo) | `11 → 12 → 11 → 12` 全部正確 | `11 → 12 → 11 → 12` 全部正確 |
 
-### Role 3 — Public User / Reset & Export（公開使用者輸出與重置）
+### 4. Role 3 — 雲端暫存 14 天自動刪除 + PNG 匯出 + 乾淨重置
 
 | 測試步驟 | Local Build 實測結果 | Live GAS `/exec` 實測結果 |
 |---|---|---|
-| 匯出 2x 高解析 PNG 並驗證檔頭與大小（> 10KB） | 有效 PNG（Header `89504e470d0a1a0a`，**`255,057 bytes`** ≈ 249 KB） | 有效 PNG（Header `89504e470d0a1a0a`，**`255,490 bytes`** ≈ 249 KB） |
+| 檢查「雲端暫存」視窗無使用者保留天數下拉選單，且顯示固定 14 天提示 | `<select>` 數量 **`0`**，明確顯示「固定保留 14 天自動刪除」 | `<select>` 數量 **`0`**，明確顯示「固定保留 14 天自動刪除」 |
+| 14 天過期自動清除驗證 | 注入 15 天前過期測試資料與 1 天前有效資料，開啟視窗即自動清除過期項目並顯示清理提示，保留有效項目（`剩餘 13 天`） | `Code.gs` 每次 list/save/load/delete 強制執行 `cleanupExpiredPresets_()`（`CLOUD_TTL_DAYS = 14`），實測寫入與讀取 GAS PropertiesService 均顯示 `剩餘 14 天` |
+| 實測儲存暫存專案並刪除清理 | 儲存、顯示於列表、確認刪除皆通過，零殘留 | 儲存至真實 GAS 雲端、顯示於列表、點擊刪除確認（z-index 修正後無遮擋）並清除完畢，零殘留 |
+| 匯出 2x 高解析 PNG | 有效 PNG（`89504e470d0a1a0a`，**`520,852 bytes`**） | 有效 PNG（`89504e470d0a1a0a`，**`520,981 bytes`**） |
 | 執行「重置全部」並重新整理頁面 | 零殘留測試資料（`tabs=1`, `objects=0`） | 零殘留測試資料（`tabs=1`, `objects=0`） |
 
-### Viewport & Zero-Error Verification
+### 5. 驗證過程中發現並修正之問題
 
-- **Desktop (`1440×900`)**：`innerWidth: 1440`, `scrollWidth: 1440`，畫布完整置中顯示，無橫向捲軸溢位。
-- **Mobile (`390×844`)**：`innerWidth: 390`, `scrollWidth: 390`，行動版工具抽屜按鈕（`☰ 工具`）可見、展開與點擊遮罩收合皆正常，操作指南抽屜開關正常。
-- **Zero-Error Gate**：本機與 Live GAS 兩輪測試皆為 **0 Console Errors**、**0 Page Errors**、**0 HTTP 4xx/5xx**。
+- **彈窗層級遮擋修復**：首次本地 Playwright 測試雲端暫存刪除流程時，偵測到 `#cloud-modal` 與 `#generic-modal` 同為 `z-index: 100` 且 `#cloud-modal` 位於 DOM 較後方，導致刪除確認按鈕被 `#cloud-modal` 遮擋。已於 `index.html` 新增 `#generic-modal { z-index: 115; }` 並重新部署至 GAS `@4`，本機與 Live GAS 雙環境重測皆完全通過。
