@@ -311,12 +311,18 @@
       border-bottom-color: #fed7aa;
     }
 
+    .mode-banner.vertex-editing {
+      background: #fef3c7;
+      border-bottom-color: #f59e0b;
+    }
+
     .mode-label {
       font-size: 12px;
       font-weight: 700;
       color: #1e40af;
     }
     .mode-banner.placing .mode-label { color: #c2410c; }
+    .mode-banner.vertex-editing .mode-label { color: #92400e; }
 
     .dock-section {
       border-bottom: 1px solid var(--border);
@@ -443,6 +449,83 @@
       border-radius: 6px;
       padding: 8px;
       font-size: 12px;
+    }
+
+    /* v6 Inspector Freeform Geometry Controls */
+    .insp-section {
+      margin-top: 8px;
+      padding-top: 7px;
+      border-top: 1px solid var(--border);
+    }
+    .insp-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4px;
+    }
+    .insp-slider-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 5px;
+      margin-bottom: 4px;
+    }
+    .insp-slider-row label {
+      font-size: 10.5px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      min-width: 58px;
+    }
+    .insp-slider-row input[type="range"] {
+      flex: 1;
+      min-width: 72px;
+    }
+    .insp-num-mini {
+      width: 50px;
+      padding: 2px 4px;
+      font-size: 11px;
+      text-align: center;
+      border: 1px solid var(--border-strong);
+      border-radius: 4px;
+      background: #fff;
+      color: var(--text-main);
+      font-family: inherit;
+    }
+    .insp-badge-custom {
+      display: inline-block;
+      padding: 1px 5px;
+      border-radius: 999px;
+      background: #fef3c7;
+      color: #92400e;
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .insp-preset-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 4px;
+      margin-bottom: 4px;
+    }
+    .insp-preset-btn {
+      padding: 2px 6px;
+      font-size: 10.5px;
+      border-radius: 4px;
+      border: 1px solid var(--border-strong);
+      background: #fff;
+      color: var(--text-main);
+      cursor: pointer;
+      font-weight: 600;
+      font-family: inherit;
+    }
+    .insp-preset-btn:hover {
+      background: var(--primary-soft);
+      border-color: var(--primary);
+      color: var(--primary);
     }
 
     /* Canvas Stage */
@@ -1032,7 +1115,7 @@
     <li><strong>可修改文字方塊：</strong>點選「✏️ 文字方塊」後可在畫布點擊或拖曳大小放置，支援<strong>雙擊直接編輯多行文字</strong>、拖拉左右控點自動換行、調整字級/配色/外框，且永遠保持在形狀與遮罩圖層之上。</li>
     <li><strong>點位按鈕依層數同步：</strong>「6. 多層貨架」層數（2–8 層）或 M 層變更時，「5. 點位」按鈕會自動產生 T / L… / M / B 各層按鈕；各層左側色塊可改顏色，點位按鈕、已放置點位、貨架層徽章與「點位圖例」卡片會同步更新項目與顏色。</li>
     <li><strong>自訂動線圖例：</strong>放置前可勾選項目、修改代碼/名稱/顏色或新增自訂項目；放置後可自由拖曳縮放，<strong>雙擊</strong>即可再次編輯。</li>
-    <li><strong>2D/3D 自訂形狀方塊：</strong>支援矩形、圓角矩形、圓形/橢圓、L 型區塊，可自由調整填滿色、框線色、透明度與 2D/3D 等角視角，<strong>雙擊</strong>即可修改置中標籤文字。</li>
+    <li><strong>2D/3D 自訂形狀方塊與自由頂點拉伸（v6）：</strong>支援矩形、圓角矩形、圓形/橢圓、L 型區塊、3D 棧板/立柱、3D 空間箱與 3D 門物件。拖曳上下左右中點控點可獨立變寬/變高並即時重繪無變形立體幾何、置中文字永遠保持清晰水平正向；於右側屬性面板點選「<strong>✏️ 頂點自由拉伸</strong>」可拖曳任意角落橘點與邊線藍點做出斜牆、梯形或任意透視斜角，並可微調寬/深/厚度、任意旋轉角度與等角俯角/斜角偏斜。</li>
     <li><strong>文字正向箭頭：</strong>P / M / W 與自訂動線箭頭支援 6 種方向，旋轉時文字仍保持水平正向。</li>
     <li><strong>快速複製與復原：</strong>按住 <span class="kbd">Ctrl</span> 拖曳複製，或使用 <span class="kbd">Ctrl+C</span> / <span class="kbd">Ctrl+V</span>、<span class="kbd">Ctrl+Z</span> 復原、<span class="kbd">Ctrl+Y</span> 重做、<span class="kbd">Delete</span> 刪除。</li>
     <li><strong>專案保存與雲端暫存：</strong>「儲存專案 / 開啟專案」可本機備份；「雲端暫存」固定保留 <strong>14 天</strong>，到期將自動清除。</li>
@@ -1110,7 +1193,7 @@
   const CLOUD_TTL_DAYS = 14;
   const CLOUD_TTL_MS = CLOUD_TTL_DAYS * 24 * 60 * 60 * 1000;
   const CUSTOM_PROPS = [
-    'customType', 'isAlwaysTop', 'isMask', 'markerType', 'markerNumber',
+    'customType', 'isAlwaysTop', 'isMask', 'isBlockLabel', 'markerType', 'markerNumber',
     'arrowMeta', 'dimMeta', 'rackConfig', 'equipMeta', 'legendConfig', 'shapeMeta', 'room3dMeta', 'door3dMeta', 'textBoxMeta', 'tierMeta', 'objId'
   ];
 
@@ -1153,6 +1236,10 @@
   let shapeViewMode = '2d';
   let currentLegendDraft = getDefaultLegendConfig();
   let editingLegendObj = null;
+
+  // v6: Freeform Vertex / Corner Edit Mode state
+  let vertexEditState = null;
+  let isNormalizingScale = false;
 
   // Clipboard & Ctrl+Drag state
   let clipboardObj = null;
@@ -1369,12 +1456,16 @@
   function snapshotActiveTabToMemory() {
     const tab = getActiveTab();
     if (!tab || !canvas) return;
-    tab.fabricJson = canvas.toJSON(CUSTOM_PROPS);
-    tab.fabricJson.backgroundImage = null; // Stored separately in tab.bgDataUrl
+    const raw = canvas.toJSON(CUSTOM_PROPS);
+    if (Array.isArray(raw.objects)) {
+      raw.objects = raw.objects.filter(o => !o.isVertexHandle);
+    }
+    raw.backgroundImage = null; // Stored separately in tab.bgDataUrl
+    tab.fabricJson = raw;
   }
 
   function pushUndoSnapshot() {
-    if (isRestoring || !canvas) return;
+    if (isRestoring || !canvas || vertexEditState) return;
     const tab = getActiveTab();
     if (!tab) return;
     const json = canvas.toJSON(CUSTOM_PROPS);
@@ -1426,6 +1517,7 @@
 
   async function renderTabToCanvas(tab, skipPushUndo) {
     if (!tab || !canvas) return;
+    if (vertexEditState) exitVertexEditMode(false);
     isRestoring = true;
     try {
       setPlacementMode(null);
@@ -1445,7 +1537,7 @@
         tab.virtualHeight = bgImg.height;
       }
 
-      // Sync rack visibility & re-init editable text boxes
+      // Sync rack visibility, re-init editable text boxes, and keep block/arrow labels upright
       canvas.getObjects().forEach(o => {
         if (o.customType === 'rackDiagram') o.visible = racksVisible;
         if (o.customType === 'textBox') {
@@ -1453,6 +1545,8 @@
           if (typeof o.initDimensions === 'function') o.initDimensions();
           o.setCoords();
         }
+        if (o.customType === 'shapeBlock') keepBlockTextUpright(o);
+        if (o.customType === 'flowArrow') keepArrowTextUpright(o);
       });
       keepLabelsOnTop();
       fitCanvasToViewport();
@@ -1481,6 +1575,7 @@
 
   async function switchTab(tabId) {
     if (tabId === activeTabId) return;
+    if (vertexEditState) exitVertexEditMode(true);
     snapshotActiveTabToMemory();
     activeTabId = tabId;
     renderTabsBar();
@@ -1662,7 +1757,8 @@
 
   function updateStatusCounts() {
     if (!canvas) return;
-    document.getElementById('status-count').textContent = '物件：' + canvas.getObjects().length;
+    const count = canvas.getObjects().filter(o => !o.isVertexHandle).length;
+    document.getElementById('status-count').textContent = '物件：' + count;
   }
 
   function updateUndoRedoButtons() {
@@ -2172,7 +2268,298 @@
     }
   }
 
-  // ==================== Custom Shape & Label Blocks (2D Planar & 3D Isometric) ====================
+  // ==================== Custom Shape & Label Blocks (2D Planar & 3D Isometric + v6 Freeform) ====================
+  const FREEFORM_BLOCK_TYPES = new Set(['shapeBlock', 'equipment', 'roomBox3d', 'door3d']);
+
+  function clampNum(val, min, max, fallback) {
+    const n = Number(val);
+    if (!isFinite(n)) return fallback;
+    return Math.max(min, Math.min(max, n));
+  }
+
+  function cloneVerts(verts) {
+    if (!Array.isArray(verts)) return null;
+    return verts.map(p => ({ x: Number(p.x) || 0, y: Number(p.y) || 0 }));
+  }
+
+  function rotFlipPt(pt, angle, flipX, flipY) {
+    const fx = flipX ? -pt.x : pt.x;
+    const fy = flipY ? -pt.y : pt.y;
+    const rad = (angle || 0) * Math.PI / 180;
+    const c = Math.cos(rad);
+    const s = Math.sin(rad);
+    return { x: fx * c - fy * s, y: fx * s + fy * c };
+  }
+
+  function invRotFlipPt(pt, angle, flipX, flipY) {
+    const rad = -(angle || 0) * Math.PI / 180;
+    const c = Math.cos(rad);
+    const s = Math.sin(rad);
+    const ux = pt.x * c - pt.y * s;
+    const uy = pt.x * s + pt.y * c;
+    return { x: flipX ? -ux : ux, y: flipY ? -uy : uy };
+  }
+
+  function makeIsoBasis(isoAngle, isoSkew) {
+    const ang = clampNum(isoAngle, 10, 60, 30);
+    const sk = clampNum(isoSkew, -45, 45, 0);
+    const aXDeg = clampNum(ang - sk * 0.5, 5, 80, 30);
+    const aYDeg = clampNum(ang + sk * 0.5, 5, 80, 30);
+    const aX = aXDeg * Math.PI / 180;
+    const aY = aYDeg * Math.PI / 180;
+    return {
+      ux: { x: -Math.cos(aX), y: Math.sin(aX) },
+      uy: { x: Math.cos(aY), y: Math.sin(aY) },
+      aX,
+      aY,
+      isoAngle: ang,
+      isoSkew: sk
+    };
+  }
+
+  function makeIsoProjector(isoAngle, isoSkew, scale, mirrorX, mirrorY) {
+    const b = makeIsoBasis(isoAngle, isoSkew);
+    const s = scale || 1;
+    return (ix, iy, iz) => {
+      let px = (ix * b.ux.x + iy * b.uy.x) * s;
+      let py = (ix * b.ux.y + iy * b.uy.y - (iz || 0)) * s;
+      if (mirrorX) px = -px;
+      if (mirrorY) py = -py;
+      return { x: px, y: py };
+    };
+  }
+
+  function transformVertsByIsoDelta(verts, oldAngle, oldSkew, newAngle, newSkew) {
+    if (!Array.isArray(verts) || verts.length < 3) return verts;
+    const c = polygonCentroid(verts);
+    const bOld = makeIsoBasis(oldAngle, oldSkew);
+    const bNew = makeIsoBasis(newAngle, newSkew);
+    const det = bOld.ux.x * bOld.uy.y - bOld.uy.x * bOld.ux.y;
+    if (Math.abs(det) < 1e-5) return cloneVerts(verts);
+    return verts.map(p => {
+      const dx = p.x - c.x;
+      const dy = p.y - c.y;
+      const ix = (dx * bOld.uy.y - dy * bOld.uy.x) / det;
+      const iy = (-dx * bOld.ux.y + dy * bOld.ux.x) / det;
+      return {
+        x: c.x + ix * bNew.ux.x + iy * bNew.uy.x,
+        y: c.y + ix * bNew.ux.y + iy * bNew.uy.y
+      };
+    });
+  }
+
+  function signedPolyArea(pts) {
+    let area = 0;
+    for (let i = 0; i < pts.length; i++) {
+      const a = pts[i];
+      const b = pts[(i + 1) % pts.length];
+      area += (a.x * b.y - b.x * a.y);
+    }
+    return area * 0.5;
+  }
+
+  function ensureClockwiseVerts(pts) {
+    const arr = pts.map(p => ({ x: p.x, y: p.y }));
+    if (signedPolyArea(arr) < 0) arr.reverse();
+    return arr;
+  }
+
+  function polygonCentroid(pts) {
+    if (!pts || !pts.length) return { x: 0, y: 0 };
+    let sx = 0, sy = 0;
+    pts.forEach(p => { sx += p.x; sy += p.y; });
+    return { x: sx / pts.length, y: sy / pts.length };
+  }
+
+  function vertsBoundingBox(pts) {
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    pts.forEach(p => {
+      if (p.x < minX) minX = p.x;
+      if (p.x > maxX) maxX = p.x;
+      if (p.y < minY) minY = p.y;
+      if (p.y > maxY) maxY = p.y;
+    });
+    return { minX, maxX, minY, maxY, width: Math.max(1, maxX - minX), height: Math.max(1, maxY - minY) };
+  }
+
+  function bilinearQuad(quad, u, v) {
+    const p00 = quad[0], p10 = quad[1], p11 = quad[2], p01 = quad[3];
+    const x = (1 - u) * (1 - v) * p00.x + u * (1 - v) * p10.x + u * v * p11.x + (1 - u) * v * p01.x;
+    const y = (1 - u) * (1 - v) * p00.y + u * (1 - v) * p10.y + u * v * p11.y + (1 - u) * v * p01.y;
+    return { x, y };
+  }
+
+  function buildRoundedPolyPath(pts, cornerRatio) {
+    const n = pts.length;
+    if (n < 3) return '';
+    const r = clampNum(cornerRatio, 0.04, 0.42, 0.18);
+    const lerp = (a, b, f) => ({ x: a.x + (b.x - a.x) * f, y: a.y + (b.y - a.y) * f });
+    let d = '';
+    for (let i = 0; i < n; i++) {
+      const prev = pts[(i - 1 + n) % n];
+      const cur = pts[i];
+      const next = pts[(i + 1) % n];
+      const pIn = lerp(cur, prev, r);
+      const pOut = lerp(cur, next, r);
+      if (i === 0) d += `M ${pIn.x.toFixed(2)} ${pIn.y.toFixed(2)} `;
+      else d += `L ${pIn.x.toFixed(2)} ${pIn.y.toFixed(2)} `;
+      d += `Q ${cur.x.toFixed(2)} ${cur.y.toFixed(2)} ${pOut.x.toFixed(2)} ${pOut.y.toFixed(2)} `;
+    }
+    return d + 'Z';
+  }
+
+  function buildSmoothClosedPath(pts) {
+    const n = pts.length;
+    if (n < 3) return '';
+    const mid = (a, b) => ({ x: (a.x + b.x) * 0.5, y: (a.y + b.y) * 0.5 });
+    const start = mid(pts[n - 1], pts[0]);
+    let d = `M ${start.x.toFixed(2)} ${start.y.toFixed(2)} `;
+    for (let i = 0; i < n; i++) {
+      const cur = pts[i];
+      const next = pts[(i + 1) % n];
+      const m = mid(cur, next);
+      d += `Q ${cur.x.toFixed(2)} ${cur.y.toFixed(2)} ${m.x.toFixed(2)} ${m.y.toFixed(2)} `;
+    }
+    return d + 'Z';
+  }
+
+  function sampleSmoothClosedCurve(pts, stepsPerSeg) {
+    const n = pts.length;
+    const steps = stepsPerSeg || 4;
+    const mid = (a, b) => ({ x: (a.x + b.x) * 0.5, y: (a.y + b.y) * 0.5 });
+    const out = [];
+    for (let i = 0; i < n; i++) {
+      const prev = pts[(i - 1 + n) % n];
+      const cur = pts[i];
+      const next = pts[(i + 1) % n];
+      const p0 = mid(prev, cur);
+      const p2 = mid(cur, next);
+      for (let s = 0; s < steps; s++) {
+        const t = s / steps;
+        const mt = 1 - t;
+        out.push({
+          x: mt * mt * p0.x + 2 * mt * t * cur.x + t * t * p2.x,
+          y: mt * mt * p0.y + 2 * mt * t * cur.y + t * t * p2.y
+        });
+      }
+    }
+    return out;
+  }
+
+  function buildExtrudedPrismItems(topVerts, extrudeHeight, opts) {
+    const items = [];
+    const h = Math.max(4, extrudeHeight || 24);
+    const strokeColor = opts.strokeColor || '#2563eb';
+    const topFill = opts.topFill || '#dbeafe';
+    const leftFill = opts.leftFill || shadeHex(topFill, -14);
+    const rightFill = opts.rightFill || shadeHex(topFill, -26);
+    const strokeW = opts.strokeWidth || 2;
+    const topStrokeW = opts.topStrokeWidth || 2.2;
+    const isSmooth = !!opts.smooth;
+    const isRounded = !!opts.rounded;
+
+    const cw = ensureClockwiseVerts(isSmooth ? sampleSmoothClosedCurve(topVerts, 4) : topVerts);
+    const bot = cw.map(p => ({ x: p.x, y: p.y + h }));
+
+    // Collect front-facing vertical faces (outward normal ny = -(b.x - a.x) > 0)
+    const faces = [];
+    const n = cw.length;
+    for (let i = 0; i < n; i++) {
+      const j = (i + 1) % n;
+      const a = cw[i];
+      const b = cw[j];
+      const dx = b.x - a.x;
+      const dy = b.y - a.y;
+      if (dx < -0.05) {
+        const faceFill = dy >= 0 ? rightFill : leftFill;
+        faces.push({
+          avgY: (a.y + b.y) * 0.5,
+          pts: [a, b, bot[j], bot[i]],
+          fill: faceFill
+        });
+      }
+    }
+    // Painter's algorithm: draw backmost front-facing walls first
+    faces.sort((u, v) => u.avgY - v.avgY);
+    if (isSmooth) {
+      // Smooth curved extruded shell: draw contiguous front silhouette strip + clean rim
+      faces.forEach(f => {
+        items.push(new fabric.Polygon(f.pts, {
+          fill: f.fill, stroke: f.fill, strokeWidth: 0.8, strokeLineJoin: 'round'
+        }));
+      });
+      // Outer bottom curved rim & vertical silhouette edges
+      const frontChains = [];
+      let curChain = [];
+      for (let i = 0; i < n; i++) {
+        const j = (i + 1) % n;
+        if (cw[j].x < cw[i].x - 0.05) {
+          if (!curChain.length) curChain.push(i);
+          curChain.push(j);
+        } else if (curChain.length) {
+          frontChains.push(curChain);
+          curChain = [];
+        }
+      }
+      if (curChain.length) frontChains.push(curChain);
+      frontChains.forEach(chain => {
+        const bPts = chain.map(idx => bot[idx]);
+        items.push(new fabric.Polyline(bPts, {
+          fill: 'transparent', stroke: strokeColor, strokeWidth: strokeW, strokeLineJoin: 'round', strokeLineCap: 'round'
+        }));
+        const firstIdx = chain[0];
+        const lastIdx = chain[chain.length - 1];
+        items.push(new fabric.Line([cw[firstIdx].x, cw[firstIdx].y, bot[firstIdx].x, bot[firstIdx].y], {
+          stroke: strokeColor, strokeWidth: strokeW, strokeLineCap: 'round'
+        }));
+        items.push(new fabric.Line([cw[lastIdx].x, cw[lastIdx].y, bot[lastIdx].x, bot[lastIdx].y], {
+          stroke: strokeColor, strokeWidth: strokeW, strokeLineCap: 'round'
+        }));
+      });
+    } else {
+      faces.forEach(f => {
+        items.push(new fabric.Polygon(f.pts, {
+          fill: f.fill, stroke: strokeColor, strokeWidth: strokeW, strokeLineJoin: 'round'
+        }));
+      });
+    }
+
+    // Top face
+    if (isSmooth) {
+      items.push(new fabric.Path(buildSmoothClosedPath(topVerts), {
+        fill: topFill, stroke: strokeColor, strokeWidth: topStrokeW, strokeLineJoin: 'round'
+      }));
+    } else if (isRounded) {
+      items.push(new fabric.Path(buildRoundedPolyPath(cw, 0.18), {
+        fill: topFill, stroke: strokeColor, strokeWidth: topStrokeW, strokeLineJoin: 'round'
+      }));
+    } else {
+      items.push(new fabric.Polygon(cw, {
+        fill: topFill, stroke: strokeColor, strokeWidth: topStrokeW, strokeLineJoin: 'round'
+      }));
+    }
+    return items;
+  }
+
+  function keepBlockTextUpright(group) {
+    if (!group || group.customType !== 'shapeBlock') return;
+    const objs = group.getObjects();
+    const txt = objs.find(o => o.isBlockLabel || o.type === 'text');
+    if (!txt) return;
+    const oddFlip = Boolean(group.flipX) !== Boolean(group.flipY);
+    const counterAngle = oddFlip ? (group.angle || 0) : -(group.angle || 0);
+    const invSx = 1 / Math.max(0.05, Math.abs(group.scaleX || 1));
+    const invSy = 1 / Math.max(0.05, Math.abs(group.scaleY || 1));
+    txt.set({
+      angle: counterAngle,
+      flipX: !!group.flipX,
+      flipY: !!group.flipY,
+      scaleX: invSx,
+      scaleY: invSy
+    });
+    group.dirty = true;
+  }
+
   function shadeHex(hex, percent) {
     const clean = String(hex || '#dbeafe').replace('#', '');
     if (clean.length !== 6) return hex || '#dbeafe';
@@ -2184,45 +2571,21 @@
     return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
   }
 
-  function createCustomShapeBlockGroup(opts) {
-    const shapeType = opts.shapeType || 'rect'; // rect | roundrect | ellipse | lshape
-    const fillColor = opts.fillColor || '#dbeafe';
-    const strokeColor = opts.strokeColor || '#2563eb';
-    const opacity = typeof opts.opacity === 'number' ? Math.max(0.1, Math.min(1, opts.opacity)) : 0.85;
-    const viewMode = opts.viewMode === '3d' ? '3d' : '2d';
-    const label = opts.label !== undefined ? String(opts.label) : '區域方塊';
-    const w = Math.max(48, Math.round(opts.width || 160));
-    const h = Math.max(40, Math.round(opts.height || 104));
-
-    const items = [];
-    let labelX = 0;
-    let labelY = 0;
-
+  function getDefaultShapeVerts(shapeType, viewMode, w, h, extrudeHeight, isoAngle, isoSkew) {
     if (viewMode === '2d') {
-      if (shapeType === 'rect') {
-        items.push(new fabric.Rect({
-          left: 0, top: 0, width: w, height: h,
-          fill: fillColor, stroke: strokeColor, strokeWidth: 2.5,
-          originX: 'center', originY: 'center'
-        }));
-      } else if (shapeType === 'roundrect') {
-        const rad = Math.min(22, Math.round(Math.min(w, h) * 0.24));
-        items.push(new fabric.Rect({
-          left: 0, top: 0, width: w, height: h, rx: rad, ry: rad,
-          fill: fillColor, stroke: strokeColor, strokeWidth: 2.5,
-          originX: 'center', originY: 'center'
-        }));
-      } else if (shapeType === 'ellipse') {
-        items.push(new fabric.Ellipse({
-          left: 0, top: 0, rx: w / 2, ry: h / 2,
-          fill: fillColor, stroke: strokeColor, strokeWidth: 2.5,
-          originX: 'center', originY: 'center'
-        }));
-      } else if (shapeType === 'lshape') {
-        const hw = w / 2, hh = h / 2;
+      const hw = w / 2, hh = h / 2;
+      if (shapeType === 'ellipse') {
+        const pts = [];
+        for (let i = 0; i < 8; i++) {
+          const a = -Math.PI / 2 + i * (Math.PI / 4);
+          pts.push({ x: Math.cos(a) * hw, y: Math.sin(a) * hh });
+        }
+        return pts;
+      }
+      if (shapeType === 'lshape') {
         const armW = w * 0.42;
         const armH = h * 0.42;
-        const pts = [
+        return [
           { x: -hw, y: -hh },
           { x: -hw + armW, y: -hh },
           { x: -hw + armW, y: hh - armH },
@@ -2230,120 +2593,166 @@
           { x: hw, y: hh },
           { x: -hw, y: hh }
         ];
-        items.push(new fabric.Polygon(pts, {
-          fill: fillColor, stroke: strokeColor, strokeWidth: 2.5, strokeLineJoin: 'round',
-          originX: 'center', originY: 'center'
+      }
+      return [
+        { x: -hw, y: -hh },
+        { x: hw, y: -hh },
+        { x: hw, y: hh },
+        { x: -hw, y: hh }
+      ];
+    }
+
+    // 3D Isometric top-face control vertices (clockwise in screen coords)
+    const iso = makeIsoProjector(isoAngle, isoSkew, 1, false, false);
+    if (shapeType === 'ellipse') {
+      const rx = w * 0.46;
+      const tiltScale = Math.sin(clampNum(isoAngle, 10, 60, 30) * Math.PI / 180) / 0.5;
+      const ry = Math.max(16, h * 0.28 * tiltScale);
+      const skewShear = Math.tan(clampNum(isoSkew, -45, 45, 0) * Math.PI / 180) * 0.35;
+      const topY = -extrudeHeight / 2;
+      const pts = [];
+      for (let i = 0; i < 8; i++) {
+        const a = -Math.PI / 2 + i * (Math.PI / 4);
+        const px = Math.cos(a) * rx;
+        const py = Math.sin(a) * ry;
+        pts.push({ x: px + py * skewShear, y: py + topY });
+      }
+      return pts;
+    }
+    if (shapeType === 'lshape') {
+      const iw = w * 0.68;
+      const il = h * 0.78;
+      const aw = iw * 0.44;
+      const al = il * 0.44;
+      const lPts2d = [
+        [0, 0], [0, il], [iw, il], [iw, il - al], [aw, il - al], [aw, 0]
+      ];
+      return lPts2d.map(([px, py]) => iso(px, py, extrudeHeight));
+    }
+    const iw = w * 0.64;
+    const il = h * 0.72;
+    return [
+      iso(0, 0, extrudeHeight),
+      iso(0, il, extrudeHeight),
+      iso(iw, il, extrudeHeight),
+      iso(iw, 0, extrudeHeight)
+    ];
+  }
+
+  function createCustomShapeBlockGroup(opts) {
+    const shapeType = opts.shapeType || 'rect'; // rect | roundrect | ellipse | lshape
+    const fillColor = opts.fillColor || '#dbeafe';
+    const strokeColor = opts.strokeColor || '#2563eb';
+    const opacity = typeof opts.opacity === 'number' ? Math.max(0.1, Math.min(1, opts.opacity)) : 0.85;
+    const viewMode = opts.viewMode === '3d' ? '3d' : '2d';
+    const label = opts.label !== undefined ? String(opts.label) : '區域方塊';
+    const w = Math.round(clampNum(opts.width, 40, 800, 160));
+    const h = Math.round(clampNum(opts.height, 32, 800, 104));
+    const defaultExtrude = Math.max(18, Math.min(54, Math.round(Math.min(w, h) * 0.34)));
+    const extrudeHeight = Math.round(clampNum(opts.extrudeHeight, 6, 260, defaultExtrude));
+    const isoAngle = Math.round(clampNum(opts.isoAngle, 10, 60, 30));
+    const isoSkew = Math.round(clampNum(opts.isoSkew, -45, 45, 0));
+    const customVerts = (Array.isArray(opts.customVerts) && opts.customVerts.length >= 3) ? cloneVerts(opts.customVerts) : null;
+    const activeVerts = customVerts || getDefaultShapeVerts(shapeType, viewMode, w, h, extrudeHeight, isoAngle, isoSkew);
+
+    const items = [];
+    let labelX = 0;
+    let labelY = 0;
+
+    if (viewMode === '2d') {
+      if (!customVerts && shapeType === 'rect') {
+        items.push(new fabric.Rect({
+          left: -w / 2, top: -h / 2, width: w, height: h,
+          fill: fillColor, stroke: strokeColor, strokeWidth: 2.5
         }));
+      } else if (!customVerts && shapeType === 'roundrect') {
+        const rad = Math.min(22, Math.round(Math.min(w, h) * 0.24));
+        items.push(new fabric.Rect({
+          left: -w / 2, top: -h / 2, width: w, height: h, rx: rad, ry: rad,
+          fill: fillColor, stroke: strokeColor, strokeWidth: 2.5
+        }));
+      } else if (!customVerts && shapeType === 'ellipse') {
+        items.push(new fabric.Ellipse({
+          left: -w / 2, top: -h / 2, rx: w / 2, ry: h / 2,
+          fill: fillColor, stroke: strokeColor, strokeWidth: 2.5
+        }));
+      } else if (shapeType === 'roundrect') {
+        items.push(new fabric.Path(buildRoundedPolyPath(activeVerts, 0.18), {
+          fill: fillColor, stroke: strokeColor, strokeWidth: 2.5, strokeLineJoin: 'round'
+        }));
+      } else if (shapeType === 'ellipse') {
+        items.push(new fabric.Path(buildSmoothClosedPath(activeVerts), {
+          fill: fillColor, stroke: strokeColor, strokeWidth: 2.5, strokeLineJoin: 'round'
+        }));
+      } else {
+        items.push(new fabric.Polygon(activeVerts, {
+          fill: fillColor, stroke: strokeColor, strokeWidth: 2.5, strokeLineJoin: 'round'
+        }));
+      }
+
+      if (!customVerts && shapeType === 'lshape') {
         labelX = -w * 0.1;
         labelY = h * 0.22;
+      } else {
+        const c = polygonCentroid(activeVerts);
+        labelX = c.x;
+        labelY = c.y;
       }
     } else {
-      // 3D Isometric Extruded Primitives
+      // 3D Isometric / Freeform Extruded Primitives
       const topFill = fillColor;
       const leftFill = shadeHex(fillColor, -14);
       const rightFill = shadeHex(fillColor, -26);
-      const depth = Math.max(22, Math.min(54, Math.round(Math.min(w, h) * 0.34)));
 
-      if (shapeType === 'rect' || shapeType === 'roundrect') {
-        const iw = w * 0.64;
-        const il = h * 0.72;
-        const iso = (ix, iy, iz) => ({
-          x: (-ix * 0.866 + iy * 0.866),
-          y: (ix * 0.5 + iy * 0.5 - iz)
-        });
-        const t0 = iso(0, 0, depth), t1 = iso(iw, 0, depth), t2 = iso(iw, il, depth), t3 = iso(0, il, depth);
-        const b1 = iso(iw, 0, 0), b2 = iso(iw, il, 0), b3 = iso(0, il, 0);
-
-        // Left & Right visible vertical faces
-        items.push(new fabric.Polygon([t1, t2, b2, b1], {
-          fill: leftFill, stroke: strokeColor, strokeWidth: 2, strokeLineJoin: 'round'
-        }));
-        items.push(new fabric.Polygon([t2, t3, b3, b2], {
-          fill: rightFill, stroke: strokeColor, strokeWidth: 2, strokeLineJoin: 'round'
-        }));
-
-        if (shapeType === 'roundrect') {
-          // Isometric chamfered/rounded top face
-          const c = 0.18;
-          const lerp = (a, b, f) => ({ x: a.x + (b.x - a.x) * f, y: a.y + (b.y - a.y) * f });
-          const p0a = lerp(t0, t1, c), p0b = lerp(t1, t0, c);
-          const p1a = lerp(t1, t2, c), p1b = lerp(t2, t1, c);
-          const p2a = lerp(t2, t3, c), p2b = lerp(t3, t2, c);
-          const p3a = lerp(t3, t0, c), p3b = lerp(t0, t3, c);
-          const pathStr = `M ${p0a.x} ${p0a.y} L ${p0b.x} ${p0b.y} Q ${t1.x} ${t1.y} ${p1a.x} ${p1a.y} L ${p1b.x} ${p1b.y} Q ${t2.x} ${t2.y} ${p2a.x} ${p2a.y} L ${p2b.x} ${p2b.y} Q ${t3.x} ${t3.y} ${p3a.x} ${p3a.y} L ${p3b.x} ${p3b.y} Q ${t0.x} ${t0.y} ${p0a.x} ${p0a.y} Z`;
-          items.push(new fabric.Path(pathStr, {
-            fill: topFill, stroke: strokeColor, strokeWidth: 2.2, strokeLineJoin: 'round'
-          }));
-        } else {
-          items.push(new fabric.Polygon([t0, t1, t2, t3], {
-            fill: topFill, stroke: strokeColor, strokeWidth: 2.2, strokeLineJoin: 'round'
-          }));
-        }
-        labelX = (t0.x + t2.x) / 2;
-        labelY = (t0.y + t2.y) / 2;
-      } else if (shapeType === 'ellipse') {
-        // 3D Isometric Cylinder
+      if (!customVerts && shapeType === 'ellipse' && isoSkew === 0) {
         const rx = w * 0.46;
-        const ry = Math.max(20, h * 0.28);
-        const topY = -depth / 2;
-        const botY = depth / 2;
-        // Cylinder side body
+        const tiltScale = Math.sin(isoAngle * Math.PI / 180) / 0.5;
+        const ry = Math.max(16, h * 0.28 * tiltScale);
+        const topY = -extrudeHeight / 2;
+        const botY = extrudeHeight / 2;
         const bodyPath = `M ${-rx} ${topY} L ${-rx} ${botY} A ${rx} ${ry} 0 0 0 ${rx} ${botY} L ${rx} ${topY} Z`;
         items.push(new fabric.Path(bodyPath, {
           fill: leftFill, stroke: strokeColor, strokeWidth: 2.2, strokeLineJoin: 'round'
         }));
-        // Top ellipse face
         items.push(new fabric.Ellipse({
-          left: 0, top: topY, rx: rx, ry: ry,
-          fill: topFill, stroke: strokeColor, strokeWidth: 2.2,
-          originX: 'center', originY: 'center'
+          left: -rx, top: topY - ry, rx: rx, ry: ry,
+          fill: topFill, stroke: strokeColor, strokeWidth: 2.2
         }));
         labelX = 0;
         labelY = topY;
-      } else if (shapeType === 'lshape') {
-        // True 3D Isometric L-Shaped Prism
-        const iw = w * 0.68;
-        const il = h * 0.78;
-        const aw = iw * 0.44;
-        const al = il * 0.44;
-        const iso = (ix, iy, iz) => ({
-          x: (-ix * 0.866 + iy * 0.866),
-          y: (ix * 0.5 + iy * 0.5 - iz)
+      } else {
+        const prismItems = buildExtrudedPrismItems(activeVerts, extrudeHeight, {
+          topFill,
+          leftFill,
+          rightFill,
+          strokeColor,
+          strokeWidth: 2,
+          topStrokeWidth: 2.2,
+          rounded: shapeType === 'roundrect',
+          smooth: shapeType === 'ellipse'
         });
-        const lPts2d = [
-          [0, 0], [aw, 0], [aw, il - al], [iw, il - al], [iw, il], [0, il]
-        ];
-        const topPts = lPts2d.map(([px, py]) => iso(px, py, depth));
-        const botPts = lPts2d.map(([px, py]) => iso(px, py, 0));
+        prismItems.forEach(it => items.push(it));
 
-        // Visible front-facing extruded faces: (1->2), (2->3), (3->4), (4->5)
-        items.push(new fabric.Polygon([topPts[1], topPts[2], botPts[2], botPts[1]], {
-          fill: leftFill, stroke: strokeColor, strokeWidth: 1.8, strokeLineJoin: 'round'
-        }));
-        items.push(new fabric.Polygon([topPts[2], topPts[3], botPts[3], botPts[2]], {
-          fill: rightFill, stroke: strokeColor, strokeWidth: 1.8, strokeLineJoin: 'round'
-        }));
-        items.push(new fabric.Polygon([topPts[3], topPts[4], botPts[4], botPts[3]], {
-          fill: leftFill, stroke: strokeColor, strokeWidth: 2, strokeLineJoin: 'round'
-        }));
-        items.push(new fabric.Polygon([topPts[4], topPts[5], botPts[5], botPts[4]], {
-          fill: rightFill, stroke: strokeColor, strokeWidth: 2, strokeLineJoin: 'round'
-        }));
-        // Top L face
-        items.push(new fabric.Polygon(topPts, {
-          fill: topFill, stroke: strokeColor, strokeWidth: 2.2, strokeLineJoin: 'round'
-        }));
-        const centerPt = iso(iw * 0.35, il * 0.72, depth);
-        labelX = centerPt.x;
-        labelY = centerPt.y;
+        if (!customVerts && shapeType === 'lshape') {
+          const iso = makeIsoProjector(isoAngle, isoSkew, 1, false, false);
+          const centerPt = iso(w * 0.68 * 0.35, h * 0.78 * 0.72, extrudeHeight);
+          labelX = centerPt.x;
+          labelY = centerPt.y;
+        } else {
+          const c = polygonCentroid(activeVerts);
+          labelX = c.x;
+          labelY = c.y;
+        }
       }
     }
 
+    const bb = vertsBoundingBox(activeVerts);
+    const fontSize = Math.max(12, Math.min(20, Math.round(Math.min(bb.width, bb.height) * 0.16)));
     if (label && label.trim() !== '') {
       items.push(new fabric.Text(label.trim(), {
         left: labelX,
         top: labelY,
-        fontSize: Math.max(12, Math.min(18, Math.round(Math.min(w, h) * 0.16))),
+        fontSize: fontSize,
         fontWeight: 'bold',
         fontFamily: 'sans-serif',
         fill: '#0f172a',
@@ -2351,13 +2760,13 @@
         textAlign: 'center',
         originX: 'center',
         originY: 'center',
-        padding: 3
+        padding: 3,
+        isBlockLabel: true
       }));
     }
 
-    return new fabric.Group(items, {
-      left: opts.x,
-      top: opts.y,
+    // Build without left/top first so Fabric records exact natural bounding-box center offset
+    const group = new fabric.Group(items, {
       originX: 'center',
       originY: 'center',
       opacity: opacity,
@@ -2365,18 +2774,36 @@
       cornerColor: strokeColor,
       lockUniScaling: false,
       customType: 'shapeBlock',
-      shapeMeta: {
-        shapeType,
-        fillColor,
-        strokeColor,
-        opacity,
-        viewMode,
-        label: label.trim(),
-        width: w,
-        height: h
-      },
-      objId: uid('shp')
+      objId: opts.objId || uid('shp')
     });
+    const rawCenterOffset = { x: group.left || 0, y: group.top || 0 };
+    group.shapeMeta = {
+      shapeType,
+      fillColor,
+      strokeColor,
+      opacity,
+      viewMode,
+      label: label.trim(),
+      width: w,
+      height: h,
+      extrudeHeight,
+      isoAngle,
+      isoSkew,
+      customVerts: customVerts ? cloneVerts(customVerts) : null,
+      v6CenterOffset: rawCenterOffset
+    };
+    group.set({
+      left: opts.x !== undefined ? opts.x : 300,
+      top: opts.y !== undefined ? opts.y : 240,
+      angle: opts.angle || 0,
+      flipX: !!opts.flipX,
+      flipY: !!opts.flipY,
+      scaleX: 1,
+      scaleY: 1
+    });
+    keepBlockTextUpright(group);
+    group.setCoords();
+    return group;
   }
 
   // ==================== 3D Green Room Box (Floor + Walls Only) & Standalone 3D Door ====================
@@ -2390,10 +2817,18 @@
     return `rgba(${r},${g},${b},${alpha})`;
   }
 
+  function getDefaultRoomFloorVerts(width, depth, orientation, mirrorX, mirrorY, isoAngle, isoSkew) {
+    const effW = (orientation === 1 || orientation === 3) ? depth : width;
+    const effL = (orientation === 1 || orientation === 3) ? width : depth;
+    const s = 0.78;
+    const iso = makeIsoProjector(isoAngle, isoSkew, s, mirrorX, mirrorY);
+    return [iso(0, 0, 0), iso(effW, 0, 0), iso(effW, effL, 0), iso(0, effL, 0)];
+  }
+
   function create3DRoomBoxGroup(opts) {
-    const width = Math.max(100, Math.min(600, Math.round(opts.width || 240)));
-    const depth = Math.max(100, Math.min(700, Math.round(opts.depth || 320)));
-    const wallHeight = Math.max(60, Math.min(400, Math.round(opts.wallHeight || 165)));
+    const width = Math.round(clampNum(opts.width, 80, 720, 240));
+    const depth = Math.round(clampNum(opts.depth, 80, 760, 320));
+    const wallHeight = Math.round(clampNum(opts.wallHeight, 40, 420, 165));
     const orientation = ((parseInt(opts.orientation, 10) || 0) % 4 + 4) % 4; // 0:NE, 1:SE, 2:SW, 3:NW
     const mirrorX = !!opts.mirrorX;
     const mirrorY = !!opts.mirrorY;
@@ -2402,43 +2837,45 @@
     const wallColorLight = shadeHex(wallColor, 7);
     const strokeColor = opts.strokeColor || '#14532d';
     const showGrid = opts.showGrid !== false;
+    const isoAngle = Math.round(clampNum(opts.isoAngle, 10, 60, 30));
+    const isoSkew = Math.round(clampNum(opts.isoSkew, -45, 45, 0));
+    const customVerts = (Array.isArray(opts.customVerts) && opts.customVerts.length === 4) ? cloneVerts(opts.customVerts) : null;
 
     const effW = (orientation === 1 || orientation === 3) ? depth : width;
     const effL = (orientation === 1 || orientation === 3) ? width : depth;
     const s = 0.78;
-
-    const iso = (ix, iy, iz) => {
-      let px = (-ix * 0.866 + iy * 0.866) * s;
-      let py = (ix * 0.5 + iy * 0.5 - iz) * s;
-      if (mirrorX) px = -px;
-      if (mirrorY) py = -py;
-      return { x: px, y: py };
-    };
+    const floorVerts = customVerts || getDefaultRoomFloorVerts(width, depth, orientation, mirrorX, mirrorY, isoAngle, isoSkew);
+    const dz = (mirrorY ? 1 : -1) * wallHeight * s;
+    const topVerts = floorVerts.map(p => ({ x: p.x, y: p.y + dz }));
+    const [f00, fW0, fWL, f0L] = floorVerts;
+    const [t00, tW0, tWL, t0L] = topVerts;
 
     const items = [];
 
-    // 1. Clean Green Isometric Floor
-    items.push(new fabric.Polygon([
-      iso(0, 0, 0), iso(effW, 0, 0), iso(effW, effL, 0), iso(0, effL, 0)
-    ], {
+    // 1. Clean Green Isometric / Freeform Floor
+    items.push(new fabric.Polygon([f00, fW0, fWL, f0L], {
       fill: floorColor,
       stroke: strokeColor,
       strokeWidth: 2.5,
       strokeLineJoin: 'round'
     }));
 
-    // 2. Subtle Floor Grid Lines
+    // 2. Subtle Floor Grid Lines (bilinear across floor quad so freeform/trapezoid floors keep crisp grid)
     if (showGrid) {
       const step = 64;
       const gridStroke = shadeHex(floorColor, -22);
       for (let gx = step; gx < effW; gx += step) {
-        const a = iso(gx, 0, 0), b = iso(gx, effL, 0);
+        const u = gx / effW;
+        const a = bilinearQuad(floorVerts, u, 0);
+        const b = bilinearQuad(floorVerts, u, 1);
         items.push(new fabric.Line([a.x, a.y, b.x, b.y], {
           stroke: gridStroke, strokeWidth: 1, strokeDashArray: [4, 4]
         }));
       }
       for (let gy = step; gy < effL; gy += step) {
-        const a = iso(0, gy, 0), b = iso(effW, gy, 0);
+        const v = gy / effL;
+        const a = bilinearQuad(floorVerts, 0, v);
+        const b = bilinearQuad(floorVerts, 1, v);
         items.push(new fabric.Line([a.x, a.y, b.x, b.y], {
           stroke: gridStroke, strokeWidth: 1, strokeDashArray: [4, 4]
         }));
@@ -2446,111 +2883,151 @@
     }
 
     // Wall builders (Floor + 2 adjacent insulated walls only; NO blue rack, NO baked door)
-    const wallLeftBack = () => new fabric.Polygon([
-      iso(0, 0, 0), iso(effW, 0, 0), iso(effW, 0, wallHeight), iso(0, 0, wallHeight)
-    ], { fill: wallColor, stroke: '#1e293b', strokeWidth: 2.4, strokeLineJoin: 'round' });
+    const wallLeftBack = () => new fabric.Polygon([f00, fW0, tW0, t00], {
+      fill: wallColor, stroke: '#1e293b', strokeWidth: 2.4, strokeLineJoin: 'round'
+    });
 
-    const wallRightBack = () => new fabric.Polygon([
-      iso(0, 0, 0), iso(0, effL, 0), iso(0, effL, wallHeight), iso(0, 0, wallHeight)
-    ], { fill: wallColorLight, stroke: '#1e293b', strokeWidth: 2.4, strokeLineJoin: 'round' });
+    const wallRightBack = () => new fabric.Polygon([f00, f0L, t0L, t00], {
+      fill: wallColorLight, stroke: '#1e293b', strokeWidth: 2.4, strokeLineJoin: 'round'
+    });
 
-    const wallFrontLeft = () => new fabric.Polygon([
-      iso(effW, 0, 0), iso(effW, effL, 0), iso(effW, effL, wallHeight), iso(effW, 0, wallHeight)
-    ], { fill: hexToRgba(wallColor, 0.52), stroke: '#1e293b', strokeWidth: 2.2, strokeLineJoin: 'round' });
+    const wallFrontLeft = () => new fabric.Polygon([fW0, fWL, tWL, tW0], {
+      fill: hexToRgba(wallColor, 0.52), stroke: '#1e293b', strokeWidth: 2.2, strokeLineJoin: 'round'
+    });
 
-    const wallFrontRight = () => new fabric.Polygon([
-      iso(0, effL, 0), iso(effW, effL, 0), iso(effW, effL, wallHeight), iso(0, effL, wallHeight)
-    ], { fill: hexToRgba(wallColorLight, 0.56), stroke: '#1e293b', strokeWidth: 2.2, strokeLineJoin: 'round' });
+    const wallFrontRight = () => new fabric.Polygon([f0L, fWL, tWL, t0L], {
+      fill: hexToRgba(wallColorLight, 0.56), stroke: '#1e293b', strokeWidth: 2.2, strokeLineJoin: 'round'
+    });
 
     // 3. Draw back walls & top guide & cutaway front walls according to 3D orientation
     if (orientation === 0) {
       items.push(wallLeftBack());
       items.push(wallRightBack());
-      items.push(new fabric.Polyline([
-        iso(effW, 0, wallHeight), iso(effW, effL, wallHeight), iso(0, effL, wallHeight)
-      ], { fill: 'transparent', stroke: '#cbd5e1', strokeWidth: 1.5, strokeDashArray: [6, 5] }));
+      items.push(new fabric.Polyline([tW0, tWL, t0L], {
+        fill: 'transparent', stroke: '#cbd5e1', strokeWidth: 1.5, strokeDashArray: [6, 5]
+      }));
     } else if (orientation === 1) {
       items.push(wallRightBack());
-      items.push(new fabric.Polyline([
-        iso(0, 0, wallHeight), iso(effW, 0, wallHeight), iso(effW, effL, wallHeight)
-      ], { fill: 'transparent', stroke: '#cbd5e1', strokeWidth: 1.5, strokeDashArray: [6, 5] }));
+      items.push(new fabric.Polyline([t00, tW0, tWL], {
+        fill: 'transparent', stroke: '#cbd5e1', strokeWidth: 1.5, strokeDashArray: [6, 5]
+      }));
       items.push(wallFrontRight());
     } else if (orientation === 2) {
-      items.push(new fabric.Polyline([
-        iso(effW, 0, wallHeight), iso(0, 0, wallHeight), iso(0, effL, wallHeight)
-      ], { fill: 'transparent', stroke: '#cbd5e1', strokeWidth: 1.5, strokeDashArray: [6, 5] }));
+      items.push(new fabric.Polyline([tW0, t00, t0L], {
+        fill: 'transparent', stroke: '#cbd5e1', strokeWidth: 1.5, strokeDashArray: [6, 5]
+      }));
       items.push(wallFrontLeft());
       items.push(wallFrontRight());
     } else {
       items.push(wallLeftBack());
-      items.push(new fabric.Polyline([
-        iso(0, 0, wallHeight), iso(0, effL, wallHeight), iso(effW, effL, wallHeight)
-      ], { fill: 'transparent', stroke: '#cbd5e1', strokeWidth: 1.5, strokeDashArray: [6, 5] }));
+      items.push(new fabric.Polyline([t00, t0L, tWL], {
+        fill: 'transparent', stroke: '#cbd5e1', strokeWidth: 1.5, strokeDashArray: [6, 5]
+      }));
       items.push(wallFrontLeft());
     }
 
-    return new fabric.Group(items, {
-      left: opts.x,
-      top: opts.y,
+    const group = new fabric.Group(items, {
       originX: 'center',
       originY: 'center',
       borderColor: '#15803d',
       cornerColor: '#15803d',
       lockUniScaling: false,
       customType: 'roomBox3d',
-      room3dMeta: {
-        width,
-        depth,
-        wallHeight,
-        orientation,
-        mirrorX,
-        mirrorY,
-        floorColor,
-        wallColor,
-        strokeColor,
-        showGrid
-      },
-      objId: uid('rm3d')
+      objId: opts.objId || uid('rm3d')
     });
+    const rawCenterOffset = { x: group.left || 0, y: group.top || 0 };
+    group.room3dMeta = {
+      width,
+      depth,
+      wallHeight,
+      orientation,
+      mirrorX,
+      mirrorY,
+      floorColor,
+      wallColor,
+      strokeColor,
+      showGrid,
+      isoAngle,
+      isoSkew,
+      customVerts: customVerts ? cloneVerts(customVerts) : null,
+      v6CenterOffset: rawCenterOffset
+    };
+    group.set({
+      left: opts.x !== undefined ? opts.x : 420,
+      top: opts.y !== undefined ? opts.y : 340,
+      angle: opts.angle || 0,
+      flipX: !!opts.flipX,
+      flipY: !!opts.flipY,
+      opacity: typeof opts.opacity === 'number' ? opts.opacity : 1,
+      scaleX: 1,
+      scaleY: 1
+    });
+    group.setCoords();
+    return group;
+  }
+
+  function getDoorIsoBasis(orientation, isoAngle, isoSkew) {
+    const b = makeIsoBasis(isoAngle, isoSkew);
+    const ux = b.ux; // (-cos aX, sin aX)
+    const uy = b.uy; // (+cos aY, sin aY)
+    const BASIS = {
+      'front-left':  { span: { x: uy.x, y: uy.y },   depth: { x: -ux.x, y: -ux.y }, out: { x: ux.x, y: ux.y },   sideAtEnd: true },
+      'front-right': { span: { x: ux.x, y: ux.y },   depth: { x: -uy.x, y: -uy.y }, out: { x: uy.x, y: uy.y },   sideAtEnd: false },
+      'back-left':   { span: { x: ux.x, y: ux.y },   depth: { x: uy.x, y: uy.y },   out: { x: uy.x, y: uy.y },   sideAtEnd: true },
+      'back-right':  { span: { x: uy.x, y: uy.y },   depth: { x: ux.x, y: ux.y },   out: { x: ux.x, y: ux.y },   sideAtEnd: false },
+      'flat':        { span: { x: 1, y: 0 },         depth: { x: 0.28, y: -0.22 },   out: { x: 0, y: 0.45 },       sideAtEnd: true }
+    };
+    return BASIS[orientation] || BASIS['front-left'];
+  }
+
+  function getDefaultDoorVerts(orientation, width, height, mirrorX, mirrorY, isoAngle, isoSkew) {
+    const b = getDoorIsoBasis(orientation, isoAngle, isoSkew);
+    const pt = (u, v) => {
+      let px = (u - width / 2) * b.span.x;
+      let py = (u - width / 2) * b.span.y - v;
+      if (mirrorX) px = -px;
+      if (mirrorY) py = -py;
+      return { x: px, y: py };
+    };
+    return [pt(0, 0), pt(width, 0), pt(width, height), pt(0, height)];
   }
 
   function create3DDoorGroup(opts) {
     const orientation = opts.orientation || 'front-left'; // front-left | front-right | back-left | back-right | flat
     const doorStyle = opts.doorStyle === 'single' ? 'single' : 'double';
-    const width = Math.max(50, Math.min(260, Math.round(opts.width || 118)));
-    const height = Math.max(70, Math.min(280, Math.round(opts.height || 152)));
-    const thickness = Math.max(8, Math.min(28, Math.round(opts.thickness || 15)));
+    const width = Math.round(clampNum(opts.width, 40, 360, 118));
+    const height = Math.round(clampNum(opts.height, 50, 380, 152));
+    const thickness = Math.round(clampNum(opts.thickness, 6, 48, 15));
     const mirrorX = !!opts.mirrorX;
     const mirrorY = !!opts.mirrorY;
     const panelColor = opts.panelColor || '#ffffff';
     const frameColor = opts.frameColor || '#0f172a';
     const windowColor = opts.windowColor || '#dbeafe';
+    const isoAngle = Math.round(clampNum(opts.isoAngle, 10, 60, 30));
+    const isoSkew = Math.round(clampNum(opts.isoSkew, -45, 45, 0));
+    const customVerts = (Array.isArray(opts.customVerts) && opts.customVerts.length === 4) ? cloneVerts(opts.customVerts) : null;
 
-    const BASIS = {
-      'front-left':  { span: { x: 0.866, y: 0.5 },  depth: { x: 0.866, y: -0.5 }, out: { x: -0.866, y: 0.5 },  sideAtEnd: true },
-      'front-right': { span: { x: -0.866, y: 0.5 }, depth: { x: -0.866, y: -0.5 }, out: { x: 0.866, y: 0.5 },  sideAtEnd: false },
-      'back-left':   { span: { x: -0.866, y: 0.5 }, depth: { x: 0.866, y: 0.5 },   out: { x: 0.866, y: 0.5 },  sideAtEnd: true },
-      'back-right':  { span: { x: 0.866, y: 0.5 },  depth: { x: -0.866, y: 0.5 },  out: { x: -0.866, y: 0.5 }, sideAtEnd: false },
-      'flat':        { span: { x: 1, y: 0 },        depth: { x: 0.28, y: -0.22 },  out: { x: 0, y: 0.45 },     sideAtEnd: true }
-    };
-    const b = BASIS[orientation] || BASIS['front-left'];
+    const b = getDoorIsoBasis(orientation, isoAngle, isoSkew);
+    const quad = customVerts || getDefaultDoorVerts(orientation, width, height, mirrorX, mirrorY, isoAngle, isoSkew);
+    const mx = mirrorX ? -1 : 1;
+    const my = mirrorY ? -1 : 1;
+    const dVec = { x: thickness * b.depth.x * mx, y: thickness * b.depth.y * my };
+    const sillDepth = 18;
+    const oVec = { x: sillDepth * b.out.x * mx, y: sillDepth * b.out.y * my };
 
-    const pt = (u, v, d, o) => {
-      const dd = d || 0;
-      const oo = o || 0;
-      let px = (u - width / 2) * b.span.x + dd * b.depth.x + oo * b.out.x;
-      let py = (u - width / 2) * b.span.y - v + dd * b.depth.y + oo * b.out.y;
-      if (mirrorX) px = -px;
-      if (mirrorY) py = -py;
-      return { x: px, y: py };
+    const pt = (uNorm, vNorm, dMul, oMul) => {
+      const base = bilinearQuad(quad, uNorm, vNorm);
+      return {
+        x: base.x + (dMul || 0) * dVec.x + (oMul || 0) * oVec.x,
+        y: base.y + (dMul || 0) * dVec.y + (oMul || 0) * oVec.y
+      };
     };
 
     const items = [];
 
     // 1. Subtle Floor Threshold / Swing Clearance Strip
-    const sillDepth = 18;
     items.push(new fabric.Polygon([
-      pt(0, 0, 0, 0), pt(width, 0, 0, 0), pt(width, 0, 0, sillDepth), pt(0, 0, 0, sillDepth)
+      pt(0, 0, 0, 0), pt(1, 0, 0, 0), pt(1, 0, 0, 1), pt(0, 0, 0, 1)
     ], {
       fill: 'rgba(220, 38, 38, 0.10)',
       stroke: '#ef4444',
@@ -2561,7 +3038,7 @@
 
     // 2. 3D Top Jamb Thickness
     items.push(new fabric.Polygon([
-      pt(0, height, 0), pt(width, height, 0), pt(width, height, thickness), pt(0, height, thickness)
+      pt(0, 1, 0, 0), pt(1, 1, 0, 0), pt(1, 1, 1, 0), pt(0, 1, 1, 0)
     ], {
       fill: '#cbd5e1',
       stroke: frameColor,
@@ -2570,9 +3047,9 @@
     }));
 
     // 3. 3D Side Jamb Thickness
-    const sideU = b.sideAtEnd ? width : 0;
+    const sideU = b.sideAtEnd ? 1 : 0;
     items.push(new fabric.Polygon([
-      pt(sideU, 0, 0), pt(sideU, height, 0), pt(sideU, height, thickness), pt(sideU, 0, thickness)
+      pt(sideU, 0, 0, 0), pt(sideU, 1, 0, 0), pt(sideU, 1, 1, 0), pt(sideU, 0, 1, 0)
     ], {
       fill: '#94a3b8',
       stroke: frameColor,
@@ -2582,7 +3059,7 @@
 
     // 4. Main Door Panel Face
     items.push(new fabric.Polygon([
-      pt(0, 0, 0), pt(width, 0, 0), pt(width, height, 0), pt(0, height, 0)
+      pt(0, 0, 0, 0), pt(1, 0, 0, 0), pt(1, 1, 0, 0), pt(0, 1, 0, 0)
     ], {
       fill: panelColor,
       stroke: frameColor,
@@ -2592,10 +3069,10 @@
 
     // 5. Inner Recessed Frame Outline
     items.push(new fabric.Polygon([
-      pt(width * 0.04, height * 0.03, 0),
-      pt(width * 0.96, height * 0.03, 0),
-      pt(width * 0.96, height * 0.97, 0),
-      pt(width * 0.04, height * 0.97, 0)
+      pt(0.04, 0.03, 0, 0),
+      pt(0.96, 0.03, 0, 0),
+      pt(0.96, 0.97, 0, 0),
+      pt(0.04, 0.97, 0, 0)
     ], {
       fill: 'transparent',
       stroke: '#94a3b8',
@@ -2605,70 +3082,85 @@
 
     if (doorStyle === 'double') {
       // Center vertical seam
-      const m0 = pt(width * 0.5, 0, 0), m1 = pt(width * 0.5, height, 0);
+      const m0 = pt(0.5, 0, 0, 0), m1 = pt(0.5, 1, 0, 0);
       items.push(new fabric.Line([m0.x, m0.y, m1.x, m1.y], {
         stroke: frameColor, strokeWidth: 2
       }));
       // Left viewing window
       items.push(new fabric.Polygon([
-        pt(width * 0.14, height * 0.56, 0), pt(width * 0.39, height * 0.56, 0),
-        pt(width * 0.39, height * 0.80, 0), pt(width * 0.14, height * 0.80, 0)
+        pt(0.14, 0.56, 0, 0), pt(0.39, 0.56, 0, 0),
+        pt(0.39, 0.80, 0, 0), pt(0.14, 0.80, 0, 0)
       ], {
         fill: windowColor, stroke: '#0284c7', strokeWidth: 1.5, strokeLineJoin: 'round'
       }));
       // Right viewing window
       items.push(new fabric.Polygon([
-        pt(width * 0.61, height * 0.56, 0), pt(width * 0.86, height * 0.56, 0),
-        pt(width * 0.86, height * 0.80, 0), pt(width * 0.61, height * 0.80, 0)
+        pt(0.61, 0.56, 0, 0), pt(0.86, 0.56, 0, 0),
+        pt(0.86, 0.80, 0, 0), pt(0.61, 0.80, 0, 0)
       ], {
         fill: windowColor, stroke: '#0284c7', strokeWidth: 1.5, strokeLineJoin: 'round'
       }));
       // Two vertical door handles
-      const hl0 = pt(width * 0.43, height * 0.35, 0), hl1 = pt(width * 0.43, height * 0.49, 0);
-      const hr0 = pt(width * 0.57, height * 0.35, 0), hr1 = pt(width * 0.57, height * 0.49, 0);
+      const hl0 = pt(0.43, 0.35, 0, 0), hl1 = pt(0.43, 0.49, 0, 0);
+      const hr0 = pt(0.57, 0.35, 0, 0), hr1 = pt(0.57, 0.49, 0, 0);
       items.push(new fabric.Line([hl0.x, hl0.y, hl1.x, hl1.y], { stroke: '#475569', strokeWidth: 2.6, strokeLineCap: 'round' }));
       items.push(new fabric.Line([hr0.x, hr0.y, hr1.x, hr1.y], { stroke: '#475569', strokeWidth: 2.6, strokeLineCap: 'round' }));
     } else {
       // Single door viewing window
       items.push(new fabric.Polygon([
-        pt(width * 0.24, height * 0.56, 0), pt(width * 0.76, height * 0.56, 0),
-        pt(width * 0.76, height * 0.80, 0), pt(width * 0.24, height * 0.80, 0)
+        pt(0.24, 0.56, 0, 0), pt(0.76, 0.56, 0, 0),
+        pt(0.76, 0.80, 0, 0), pt(0.24, 0.80, 0, 0)
       ], {
         fill: windowColor, stroke: '#0284c7', strokeWidth: 1.5, strokeLineJoin: 'round'
       }));
       // Latch handle
-      const h0 = pt(width * 0.83, height * 0.35, 0), h1 = pt(width * 0.83, height * 0.49, 0);
+      const h0 = pt(0.83, 0.35, 0, 0), h1 = pt(0.83, 0.49, 0, 0);
       items.push(new fabric.Line([h0.x, h0.y, h1.x, h1.y], { stroke: '#475569', strokeWidth: 2.8, strokeLineCap: 'round' }));
       // Hinge markers
-      const hg1a = pt(width * 0.03, height * 0.20, 0), hg1b = pt(width * 0.03, height * 0.27, 0);
-      const hg2a = pt(width * 0.03, height * 0.73, 0), hg2b = pt(width * 0.03, height * 0.80, 0);
+      const hg1a = pt(0.03, 0.20, 0, 0), hg1b = pt(0.03, 0.27, 0, 0);
+      const hg2a = pt(0.03, 0.73, 0, 0), hg2b = pt(0.03, 0.80, 0, 0);
       items.push(new fabric.Line([hg1a.x, hg1a.y, hg1b.x, hg1b.y], { stroke: '#334155', strokeWidth: 3.2 }));
       items.push(new fabric.Line([hg2a.x, hg2a.y, hg2b.x, hg2b.y], { stroke: '#334155', strokeWidth: 3.2 }));
     }
 
-    return new fabric.Group(items, {
-      left: opts.x,
-      top: opts.y,
+    const group = new fabric.Group(items, {
       originX: 'center',
       originY: 'center',
       borderColor: '#dc2626',
       cornerColor: '#dc2626',
       lockUniScaling: false,
       customType: 'door3d',
-      door3dMeta: {
-        orientation,
-        doorStyle,
-        width,
-        height,
-        thickness,
-        mirrorX,
-        mirrorY,
-        panelColor,
-        frameColor,
-        windowColor
-      },
-      objId: uid('dr3d')
+      objId: opts.objId || uid('dr3d')
     });
+    const rawCenterOffset = { x: group.left || 0, y: group.top || 0 };
+    group.door3dMeta = {
+      orientation,
+      doorStyle,
+      width,
+      height,
+      thickness,
+      mirrorX,
+      mirrorY,
+      panelColor,
+      frameColor,
+      windowColor,
+      isoAngle,
+      isoSkew,
+      customVerts: customVerts ? cloneVerts(customVerts) : null,
+      v6CenterOffset: rawCenterOffset
+    };
+    group.set({
+      left: opts.x !== undefined ? opts.x : 380,
+      top: opts.y !== undefined ? opts.y : 300,
+      angle: opts.angle || 0,
+      flipX: !!opts.flipX,
+      flipY: !!opts.flipY,
+      opacity: typeof opts.opacity === 'number' ? opts.opacity : 1,
+      scaleX: 1,
+      scaleY: 1
+    });
+    group.setCoords();
+    return group;
   }
 
   // ==================== v5: Tier helpers (shared by racks, point buttons, markers & legend) ====================
@@ -2939,50 +3431,106 @@
     });
   }
 
-  function createEquipmentGroup(kind, is3d, color, x, y) {
+  function getDefaultEquipVerts(kind, is3d, w, l, h, isoAngle, isoSkew) {
+    if (!is3d) {
+      return [
+        { x: -w / 2, y: -l / 2 },
+        { x: w / 2, y: -l / 2 },
+        { x: w / 2, y: l / 2 },
+        { x: -w / 2, y: l / 2 }
+      ];
+    }
+    const iso = makeIsoProjector(isoAngle, isoSkew, 0.9, false, false);
+    return [iso(0, 0, h), iso(0, l, h), iso(w, l, h), iso(w, 0, h)];
+  }
+
+  function createEquipmentGroup(kind, is3d, color, x, y, extraOpts) {
+    const ext = extraOpts || {};
+    const isPallet = kind === 'pallet';
+    const defW = isPallet ? (is3d ? 72 : 74) : (is3d ? 52 : 14);
+    const defL = isPallet ? (is3d ? 66 : 80) : (is3d ? 10 : 68);
+    const defH = isPallet ? 14 : 115;
+    const w = Math.round(clampNum(ext.width, isPallet ? 24 : 8, 500, defW));
+    const l = Math.round(clampNum(ext.depth, isPallet ? 24 : 8, 500, defL));
+    const h = Math.round(clampNum(ext.extrudeHeight, 6, 360, defH));
+    const isoAngle = Math.round(clampNum(ext.isoAngle, 10, 60, 30));
+    const isoSkew = Math.round(clampNum(ext.isoSkew, -45, 45, 0));
+    const c = color || (isPallet ? '#e6c280' : '#15803d');
+    const customVerts = (Array.isArray(ext.customVerts) && ext.customVerts.length === 4) ? cloneVerts(ext.customVerts) : null;
+    const activeVerts = customVerts || getDefaultEquipVerts(kind, is3d, w, l, h, isoAngle, isoSkew);
+
     const items = [];
-    if (kind === 'pallet') {
+    if (isPallet) {
+      const topFill = ext.color ? hexToRgba(ext.color, 0.52) : 'rgba(230, 194, 128, 0.52)';
+      const leftFill = ext.color ? hexToRgba(shadeHex(ext.color, -12), 0.58) : 'rgba(212, 163, 89, 0.58)';
+      const rightFill = ext.color ? hexToRgba(shadeHex(ext.color, -24), 0.62) : 'rgba(194, 140, 70, 0.62)';
       if (!is3d) {
-        const w = 74, h = 80;
-        items.push(new fabric.Rect({ width: w, height: h, fill: 'rgba(230, 194, 128, 0.42)', stroke: '#8b5a2b', strokeWidth: 2, originX: 'center', originY: 'center' }));
-        items.push(new fabric.Line([-w / 2, -h * 0.22, w / 2, -h * 0.22], { stroke: 'rgba(139,90,43,0.55)', strokeWidth: 1.2, originX: 'center', originY: 'center' }));
-        items.push(new fabric.Line([-w / 2, h * 0.22, w / 2, h * 0.22], { stroke: 'rgba(139,90,43,0.55)', strokeWidth: 1.2, originX: 'center', originY: 'center' }));
+        items.push(new fabric.Polygon(activeVerts, {
+          fill: topFill, stroke: '#8b5a2b', strokeWidth: 2, strokeLineJoin: 'round'
+        }));
+        const s1a = bilinearQuad(activeVerts, 0, 0.28), s1b = bilinearQuad(activeVerts, 1, 0.28);
+        const s2a = bilinearQuad(activeVerts, 0, 0.72), s2b = bilinearQuad(activeVerts, 1, 0.72);
+        items.push(new fabric.Line([s1a.x, s1a.y, s1b.x, s1b.y], { stroke: 'rgba(139,90,43,0.55)', strokeWidth: 1.2 }));
+        items.push(new fabric.Line([s2a.x, s2a.y, s2b.x, s2b.y], { stroke: 'rgba(139,90,43,0.55)', strokeWidth: 1.2 }));
       } else {
-        const iso = (ix, iy, iz) => ({ x: (-ix * 0.866 + iy * 0.866) * 0.9, y: (ix * 0.5 + iy * 0.5 - iz) * 0.9 });
-        const w = 72, l = 66, h = 12;
-        items.push(new fabric.Polygon([iso(0, 0, h), iso(w, 0, h), iso(w, l, h), iso(0, l, h)], { fill: 'rgba(230, 194, 128, 0.5)', stroke: '#8b5a2b', strokeWidth: 1.5 }));
-        items.push(new fabric.Polygon([iso(w, 0, 0), iso(w, l, 0), iso(w, l, h), iso(w, 0, h)], { fill: 'rgba(212, 163, 89, 0.55)', stroke: '#8b5a2b', strokeWidth: 1.5 }));
-        items.push(new fabric.Polygon([iso(0, l, 0), iso(w, l, 0), iso(w, l, h), iso(0, l, h)], { fill: 'rgba(194, 140, 70, 0.55)', stroke: '#8b5a2b', strokeWidth: 1.5 }));
+        const prismItems = buildExtrudedPrismItems(activeVerts, h * 0.9, {
+          topFill, leftFill, rightFill, strokeColor: '#8b5a2b', strokeWidth: 1.6, topStrokeWidth: 1.6
+        });
+        prismItems.forEach(it => items.push(it));
       }
     } else {
-      const c = color || '#15803d';
+      const pc = color || '#15803d';
       if (!is3d) {
-        const w = 14, h = 68;
-        items.push(new fabric.Rect({ width: w, height: h, fill: 'rgba(255,255,255,0.65)', stroke: c, strokeWidth: 2.2, originX: 'center', originY: 'center' }));
-        items.push(new fabric.Line([-w / 2, -h / 2, w / 2, h / 2], { stroke: c, strokeWidth: 1.2, originX: 'center', originY: 'center' }));
-        items.push(new fabric.Line([w / 2, -h / 2, -w / 2, h / 2], { stroke: c, strokeWidth: 1.2, originX: 'center', originY: 'center' }));
+        items.push(new fabric.Polygon(activeVerts, {
+          fill: 'rgba(255,255,255,0.65)', stroke: pc, strokeWidth: 2.2, strokeLineJoin: 'round'
+        }));
+        items.push(new fabric.Line([activeVerts[0].x, activeVerts[0].y, activeVerts[2].x, activeVerts[2].y], { stroke: pc, strokeWidth: 1.2 }));
+        items.push(new fabric.Line([activeVerts[1].x, activeVerts[1].y, activeVerts[3].x, activeVerts[3].y], { stroke: pc, strokeWidth: 1.2 }));
       } else {
-        const iso = (ix, iy, iz) => ({ x: (-ix * 0.866 + iy * 0.866) * 0.9, y: (ix * 0.5 + iy * 0.5 - iz) * 0.9 });
-        const w = 52, l = 10, h = 115;
-        const pts = [[0, 0], [w, 0], [0, l], [w, l]];
-        pts.forEach(([px, py]) => {
-          const p0 = iso(px, py, 0), p1 = iso(px, py, h);
-          items.push(new fabric.Line([p0.x, p0.y, p1.x, p1.y], { stroke: c, strokeWidth: 2 }));
-        });
-        items.push(new fabric.Polygon([iso(0, 0, h), iso(w, 0, h), iso(w, l, h), iso(0, l, h)], { fill: 'rgba(255,255,255,0.2)', stroke: c, strokeWidth: 1.8 }));
-        items.push(new fabric.Polygon([iso(0, 0, 0), iso(w, 0, 0), iso(w, l, 0), iso(0, l, 0)], { fill: 'transparent', stroke: c, strokeWidth: 1.8 }));
+        const dz = h * 0.9;
+        const botVerts = activeVerts.map(p => ({ x: p.x, y: p.y + dz }));
+        items.push(new fabric.Polygon(botVerts, { fill: 'transparent', stroke: pc, strokeWidth: 1.8, strokeLineJoin: 'round' }));
+        for (let i = 0; i < activeVerts.length; i++) {
+          items.push(new fabric.Line([activeVerts[i].x, activeVerts[i].y, botVerts[i].x, botVerts[i].y], { stroke: pc, strokeWidth: 2 }));
+        }
+        items.push(new fabric.Polygon(activeVerts, { fill: 'rgba(255,255,255,0.22)', stroke: pc, strokeWidth: 1.8, strokeLineJoin: 'round' }));
       }
     }
 
-    return new fabric.Group(items, {
-      left: x,
-      top: y,
+    const group = new fabric.Group(items, {
       originX: 'center',
       originY: 'center',
+      borderColor: isPallet ? '#b45309' : (color || '#15803d'),
+      cornerColor: isPallet ? '#b45309' : (color || '#15803d'),
+      lockUniScaling: false,
       customType: 'equipment',
-      equipMeta: { kind, is3d, color },
-      objId: uid('eq')
+      objId: ext.objId || uid('eq')
     });
+    const rawCenterOffset = { x: group.left || 0, y: group.top || 0 };
+    group.equipMeta = {
+      kind,
+      is3d: !!is3d,
+      color: c,
+      width: w,
+      depth: l,
+      extrudeHeight: h,
+      isoAngle,
+      isoSkew,
+      customVerts: customVerts ? cloneVerts(customVerts) : null,
+      v6CenterOffset: rawCenterOffset
+    };
+    group.set({
+      left: x !== undefined ? x : 360,
+      top: y !== undefined ? y : 280,
+      angle: ext.angle || 0,
+      flipX: !!ext.flipX,
+      flipY: !!ext.flipY,
+      opacity: typeof ext.opacity === 'number' ? ext.opacity : 1,
+      scaleX: 1,
+      scaleY: 1
+    });
+    group.setCoords();
+    return group;
   }
 
   // ==================== Multi-Tier Rack / Shelf Diagram Builder ====================
@@ -3396,6 +3944,534 @@
     showToast(count ? (racksVisible ? `已顯示 ${count} 組貨架圖` : `已隱藏 ${count} 組貨架圖`) : '目前畫布上尚無貨架圖');
   }
 
+  // ==================== v6: Unified Freeform Block Rebuild, Scale Normalization & Vertex Edit Mode ====================
+  function deepCloneBlockMetas(o) {
+    if (!o) return;
+    ['shapeMeta', 'equipMeta', 'room3dMeta', 'door3dMeta', 'textBoxMeta', 'legendConfig', 'rackConfig'].forEach(k => {
+      if (o[k]) o[k] = JSON.parse(JSON.stringify(o[k]));
+    });
+  }
+
+  function isFreeformBlock(obj) {
+    return !!(obj && FREEFORM_BLOCK_TYPES.has(obj.customType));
+  }
+
+  function getBlockMeta(obj) {
+    if (!obj) return null;
+    if (obj.customType === 'shapeBlock') return obj.shapeMeta;
+    if (obj.customType === 'equipment') return obj.equipMeta;
+    if (obj.customType === 'roomBox3d') return obj.room3dMeta;
+    if (obj.customType === 'door3d') return obj.door3dMeta;
+    return null;
+  }
+
+  function getBlockControlVerts(obj) {
+    const m = getBlockMeta(obj);
+    if (!m) return null;
+    if (Array.isArray(m.customVerts) && m.customVerts.length >= 3) {
+      return cloneVerts(m.customVerts);
+    }
+    if (obj.customType === 'shapeBlock') {
+      const defExt = Math.max(18, Math.min(54, Math.round(Math.min(m.width || 160, m.height || 104) * 0.34)));
+      return getDefaultShapeVerts(
+        m.shapeType || 'rect',
+        m.viewMode === '3d' ? '3d' : '2d',
+        m.width || 160,
+        m.height || 104,
+        m.extrudeHeight !== undefined ? m.extrudeHeight : defExt,
+        m.isoAngle !== undefined ? m.isoAngle : 30,
+        m.isoSkew !== undefined ? m.isoSkew : 0
+      );
+    }
+    if (obj.customType === 'equipment') {
+      const isPallet = m.kind === 'pallet';
+      const is3d = !!m.is3d;
+      const w = m.width || (isPallet ? (is3d ? 72 : 74) : (is3d ? 52 : 14));
+      const l = m.depth || (isPallet ? (is3d ? 66 : 80) : (is3d ? 10 : 68));
+      const h = m.extrudeHeight || (isPallet ? 14 : 115);
+      return getDefaultEquipVerts(m.kind || 'pallet', is3d, w, l, h, m.isoAngle !== undefined ? m.isoAngle : 30, m.isoSkew !== undefined ? m.isoSkew : 0);
+    }
+    if (obj.customType === 'roomBox3d') {
+      return getDefaultRoomFloorVerts(
+        m.width || 240, m.depth || 320, m.orientation || 0, !!m.mirrorX, !!m.mirrorY,
+        m.isoAngle !== undefined ? m.isoAngle : 30, m.isoSkew !== undefined ? m.isoSkew : 0
+      );
+    }
+    if (obj.customType === 'door3d') {
+      return getDefaultDoorVerts(
+        m.orientation || 'front-left', m.width || 118, m.height || 152, !!m.mirrorX, !!m.mirrorY,
+        m.isoAngle !== undefined ? m.isoAngle : 30, m.isoSkew !== undefined ? m.isoSkew : 0
+      );
+    }
+    return null;
+  }
+
+  function buildFreeformBlockFromMeta(customType, meta, xf) {
+    const pos = xf || {};
+    const common = {
+      x: pos.left !== undefined ? pos.left : 320,
+      y: pos.top !== undefined ? pos.top : 260,
+      angle: pos.angle || 0,
+      flipX: !!pos.flipX,
+      flipY: !!pos.flipY,
+      opacity: typeof pos.opacity === 'number' ? pos.opacity : 1,
+      objId: pos.objId
+    };
+    if (customType === 'shapeBlock') {
+      return createCustomShapeBlockGroup(Object.assign({}, meta, common));
+    }
+    if (customType === 'roomBox3d') {
+      return create3DRoomBoxGroup(Object.assign({}, meta, common));
+    }
+    if (customType === 'door3d') {
+      return create3DDoorGroup(Object.assign({}, meta, common));
+    }
+    if (customType === 'equipment') {
+      return createEquipmentGroup(meta.kind || 'pallet', !!meta.is3d, meta.color, common.x, common.y, Object.assign({}, meta, common));
+    }
+    return null;
+  }
+
+  function rebuildFreeformBlock(obj, metaPatch, opts) {
+    if (!canvas || !isFreeformBlock(obj)) return obj;
+    const o = opts || {};
+    let liveObj = obj;
+    let idx = canvas.getObjects().indexOf(liveObj);
+    if (idx < 0 && liveObj.objId) {
+      const match = canvas.getObjects().find(x => x.objId === liveObj.objId && !x.isVertexHandle);
+      if (match) {
+        liveObj = match;
+        idx = canvas.getObjects().indexOf(liveObj);
+      }
+    }
+    if (idx < 0) return null; // Stale object reference; never insert a ghost duplicate
+
+    const curMeta = getBlockMeta(liveObj) || {};
+    const nextMeta = Object.assign({}, JSON.parse(JSON.stringify(curMeta)), metaPatch || {});
+    const xf = {
+      left: o.left !== undefined ? o.left : liveObj.left,
+      top: o.top !== undefined ? o.top : liveObj.top,
+      angle: o.resetTransforms ? 0 : (o.angle !== undefined ? o.angle : (liveObj.angle || 0)),
+      flipX: o.resetTransforms ? false : (o.flipX !== undefined ? o.flipX : !!liveObj.flipX),
+      flipY: o.resetTransforms ? false : (o.flipY !== undefined ? o.flipY : !!liveObj.flipY),
+      opacity: liveObj.opacity !== undefined ? liveObj.opacity : 1,
+      objId: liveObj.objId
+    };
+    const rebuilt = buildFreeformBlockFromMeta(liveObj.customType, nextMeta, xf);
+    if (!rebuilt) return liveObj;
+    rebuilt.visible = liveObj.visible;
+    canvas.remove(liveObj);
+    canvas.insertAt(rebuilt, idx);
+    if (o.anchorRefOrigin) {
+      const m = getBlockMeta(rebuilt);
+      const off = (m && m.v6CenterOffset) || { x: 0, y: 0 };
+      const offW = rotFlipPt(off, xf.angle, xf.flipX, xf.flipY);
+      rebuilt.set({
+        left: o.anchorRefOrigin.x + offW.x,
+        top: o.anchorRefOrigin.y + offW.y
+      });
+    }
+    if (rebuilt.customType === 'shapeBlock') keepBlockTextUpright(rebuilt);
+    rebuilt.setCoords();
+    if (!o.skipOverlaySync) {
+      keepLabelsOnTop();
+      if (!o.skipSelect) canvas.setActiveObject(rebuilt);
+      canvas.renderAll();
+      if (!o.skipUndo) pushUndoSnapshot();
+      if (!o.skipInspector) updateInspector();
+    }
+    return rebuilt;
+  }
+
+  function scaleCustomVertsAroundCentroid(verts, sx, sy) {
+    const c = polygonCentroid(verts);
+    return verts.map(p => ({
+      x: c.x + (p.x - c.x) * sx,
+      y: c.y + (p.y - c.y) * sy
+    }));
+  }
+
+  function normalizeScaledBlock(obj) {
+    if (!obj || !isFreeformBlock(obj) || isNormalizingScale) return obj;
+    const sx = Math.abs(obj.scaleX || 1);
+    const sy = Math.abs(obj.scaleY || 1);
+    if (Math.abs(sx - 1) <= 0.005 && Math.abs(sy - 1) <= 0.005) {
+      if (obj.customType === 'shapeBlock') keepBlockTextUpright(obj);
+      return obj;
+    }
+
+    isNormalizingScale = true;
+    try {
+      const corner = obj._lastScaleCorner || '';
+      const isHorizOnly = (corner === 'ml' || corner === 'mr') || (Math.abs(sx - 1) > 0.005 && Math.abs(sy - 1) <= 0.005);
+      const isVertOnly = (corner === 'mt' || corner === 'mb') || (Math.abs(sy - 1) > 0.005 && Math.abs(sx - 1) <= 0.005);
+      const m = getBlockMeta(obj) || {};
+      const patch = {};
+
+      if (obj.customType === 'shapeBlock') {
+        const curW = m.width || 160;
+        const curH = m.height || 104;
+        const curExt = m.extrudeHeight !== undefined ? m.extrudeHeight : Math.max(18, Math.min(54, Math.round(Math.min(curW, curH) * 0.34)));
+        if (Array.isArray(m.customVerts) && m.customVerts.length >= 3) {
+          patch.customVerts = scaleCustomVertsAroundCentroid(m.customVerts, sx, sy);
+          patch.width = Math.round(clampNum(curW * sx, 40, 800, curW));
+          patch.height = Math.round(clampNum(curH * sy, 32, 800, curH));
+          if (m.viewMode === '3d' && !isHorizOnly) {
+            patch.extrudeHeight = Math.round(clampNum(curExt * sy, 6, 260, curExt));
+          }
+        } else if (m.viewMode === '3d') {
+          if (isHorizOnly) {
+            patch.width = Math.round(clampNum(curW * sx, 40, 800, curW));
+          } else if (isVertOnly) {
+            patch.height = Math.round(clampNum(curH * sy, 32, 800, curH));
+            patch.extrudeHeight = Math.round(clampNum(curExt * sy, 6, 260, curExt));
+          } else {
+            patch.width = Math.round(clampNum(curW * sx, 40, 800, curW));
+            patch.height = Math.round(clampNum(curH * sy, 32, 800, curH));
+            patch.extrudeHeight = Math.round(clampNum(curExt * ((sx + sy) * 0.5), 6, 260, curExt));
+          }
+        } else {
+          patch.width = Math.round(clampNum(curW * sx, 40, 800, curW));
+          patch.height = Math.round(clampNum(curH * sy, 32, 800, curH));
+        }
+      } else if (obj.customType === 'equipment') {
+        const isPallet = m.kind === 'pallet';
+        const is3d = !!m.is3d;
+        const curW = m.width || (isPallet ? (is3d ? 72 : 74) : (is3d ? 52 : 14));
+        const curL = m.depth || (isPallet ? (is3d ? 66 : 80) : (is3d ? 10 : 68));
+        const curH = m.extrudeHeight || (isPallet ? 14 : 115);
+        const minDim = isPallet ? 24 : 8;
+        if (Array.isArray(m.customVerts) && m.customVerts.length === 4) {
+          patch.customVerts = scaleCustomVertsAroundCentroid(m.customVerts, sx, sy);
+          patch.width = Math.round(clampNum(curW * sx, minDim, 500, curW));
+          patch.depth = Math.round(clampNum(curL * sy, minDim, 500, curL));
+          if (is3d && !isHorizOnly) {
+            patch.extrudeHeight = Math.round(clampNum(curH * sy, 6, 360, curH));
+          }
+        } else if (!is3d) {
+          patch.width = Math.round(clampNum(curW * sx, minDim, 500, curW));
+          patch.depth = Math.round(clampNum(curL * sy, minDim, 500, curL));
+        } else if (isPallet) {
+          if (isHorizOnly) patch.width = Math.round(clampNum(curW * sx, minDim, 500, curW));
+          else if (isVertOnly) patch.depth = Math.round(clampNum(curL * sy, minDim, 500, curL));
+          else {
+            patch.width = Math.round(clampNum(curW * sx, minDim, 500, curW));
+            patch.depth = Math.round(clampNum(curL * sy, minDim, 500, curL));
+            patch.extrudeHeight = Math.round(clampNum(curH * ((sx + sy) * 0.5), 6, 360, curH));
+          }
+        } else {
+          // 3D pillar
+          if (isHorizOnly) patch.width = Math.round(clampNum(curW * sx, minDim, 500, curW));
+          else if (isVertOnly) patch.extrudeHeight = Math.round(clampNum(curH * sy, 16, 360, curH));
+          else {
+            patch.width = Math.round(clampNum(curW * sx, minDim, 500, curW));
+            patch.depth = Math.round(clampNum(curL * sx, minDim, 500, curL));
+            patch.extrudeHeight = Math.round(clampNum(curH * sy, 16, 360, curH));
+          }
+        }
+      } else if (obj.customType === 'roomBox3d') {
+        const curW = m.width || 240;
+        const curL = m.depth || 320;
+        const curH = m.wallHeight || 165;
+        const swapped = m.orientation === 1 || m.orientation === 3;
+        if (Array.isArray(m.customVerts) && m.customVerts.length === 4) {
+          if (isVertOnly) {
+            patch.wallHeight = Math.round(clampNum(curH * sy, 40, 420, curH));
+          } else {
+            patch.customVerts = scaleCustomVertsAroundCentroid(m.customVerts, sx, isHorizOnly ? 1 : sy);
+            patch.width = Math.round(clampNum(curW * sx, 80, 720, curW));
+            if (!isHorizOnly) patch.wallHeight = Math.round(clampNum(curH * sy, 40, 420, curH));
+          }
+        } else if (isHorizOnly) {
+          if (swapped) patch.depth = Math.round(clampNum(curL * sx, 80, 760, curL));
+          else patch.width = Math.round(clampNum(curW * sx, 80, 720, curW));
+        } else if (isVertOnly) {
+          patch.wallHeight = Math.round(clampNum(curH * sy, 40, 420, curH));
+        } else {
+          patch.width = Math.round(clampNum(curW * sx, 80, 720, curW));
+          patch.depth = Math.round(clampNum(curL * sx, 80, 760, curL));
+          patch.wallHeight = Math.round(clampNum(curH * sy, 40, 420, curH));
+        }
+      } else if (obj.customType === 'door3d') {
+        const curW = m.width || 118;
+        const curH = m.height || 152;
+        if (Array.isArray(m.customVerts) && m.customVerts.length === 4) {
+          patch.customVerts = scaleCustomVertsAroundCentroid(m.customVerts, sx, sy);
+        }
+        patch.width = Math.round(clampNum(curW * sx, 40, 360, curW));
+        patch.height = Math.round(clampNum(curH * sy, 50, 380, curH));
+      }
+
+      delete obj._lastScaleCorner;
+      return rebuildFreeformBlock(obj, patch, { skipUndo: true, skipInspector: true });
+    } finally {
+      isNormalizingScale = false;
+    }
+  }
+
+  function updateVertexBannerUI(editing) {
+    const banner = document.getElementById('mode-banner');
+    const label = document.getElementById('mode-label');
+    const cancelBtn = document.getElementById('btn-cancel-mode');
+    if (!banner || !label || !cancelBtn) return;
+    if (editing) {
+      banner.classList.remove('placing');
+      banner.classList.add('vertex-editing');
+      label.textContent = '✏️ 頂點自由拉伸（橘點拉角落 · 藍點拉邊線）';
+      cancelBtn.textContent = '✓ 完成 (Esc)';
+      cancelBtn.setAttribute('data-testid', 'btn-finish-vertex-edit');
+      cancelBtn.style.display = 'inline-flex';
+    } else {
+      banner.classList.remove('vertex-editing');
+      cancelBtn.textContent = '取消 (Esc)';
+      cancelBtn.setAttribute('data-testid', 'btn-cancel-mode');
+      if (!activeTool) {
+        label.textContent = '🖱️ 選取 / 編輯模式';
+        cancelBtn.style.display = 'none';
+      }
+    }
+  }
+
+  function enterVertexEditMode(obj) {
+    if (!canvas || !isFreeformBlock(obj)) return;
+    if (activeTool) setPlacementMode(null);
+    if (vertexEditState) exitVertexEditMode(false);
+
+    // Ensure v6CenterOffset is populated & scale is normalized before editing vertices
+    let target = obj;
+    const preMeta = getBlockMeta(target) || {};
+    if (!preMeta.v6CenterOffset || Math.abs((target.scaleX || 1) - 1) > 0.005 || Math.abs((target.scaleY || 1) - 1) > 0.005) {
+      target = rebuildFreeformBlock(target, {}, { skipUndo: true, skipInspector: true, skipSelect: true });
+    }
+
+    const meta = getBlockMeta(target);
+    const localVerts = getBlockControlVerts(target);
+    if (!meta || !localVerts || localVerts.length < 3) return;
+
+    const angle = target.angle || 0;
+    const flipX = !!target.flipX;
+    const flipY = !!target.flipY;
+    const centerOff = meta.v6CenterOffset || { x: 0, y: 0 };
+    const offW = rotFlipPt(centerOff, angle, flipX, flipY);
+    const refOrigin = { x: target.left - offW.x, y: target.top - offW.y };
+
+    canvas.discardActiveObject();
+    canvas.selection = false;
+    canvas.forEachObject(o => { o.selectable = false; o.evented = false; });
+
+    const localToWorld = (pt) => {
+      const rw = rotFlipPt(pt, angle, flipX, flipY);
+      return { x: refOrigin.x + rw.x, y: refOrigin.y + rw.y };
+    };
+    const worldToLocal = (wpt) => {
+      return invRotFlipPt({ x: wpt.x - refOrigin.x, y: wpt.y - refOrigin.y }, angle, flipX, flipY);
+    };
+
+    const worldPts = localVerts.map(localToWorld);
+    const guidePoly = new fabric.Polygon(worldPts, {
+      fill: 'transparent',
+      stroke: '#f59e0b',
+      strokeWidth: 1.8,
+      strokeDashArray: [5, 4],
+      selectable: false,
+      evented: false,
+      isVertexHandle: true,
+      excludeFromExport: true
+    });
+    canvas.add(guidePoly);
+
+    const edgeHandles = [];
+    const cornerHandles = [];
+    const n = localVerts.length;
+
+    const refreshGuideAndHandles = (skipObj) => {
+      const wPts = vertexEditState.localVerts.map(localToWorld);
+      if (vertexEditState.guidePoly) {
+        canvas.remove(vertexEditState.guidePoly);
+      }
+      const nextGuide = new fabric.Polygon(wPts, {
+        fill: 'transparent',
+        stroke: '#f59e0b',
+        strokeWidth: 1.8,
+        strokeDashArray: [5, 4],
+        selectable: false,
+        evented: false,
+        isVertexHandle: true,
+        excludeFromExport: true
+      });
+      vertexEditState.guidePoly = nextGuide;
+      canvas.add(nextGuide);
+
+      for (let i = 0; i < n; i++) {
+        const ch = vertexEditState.cornerHandles[i];
+        if (ch && ch !== skipObj) {
+          ch.set({ left: wPts[i].x, top: wPts[i].y });
+          ch.setCoords();
+        }
+        const eh = vertexEditState.edgeHandles[i];
+        const j = (i + 1) % n;
+        const mx = (wPts[i].x + wPts[j].x) * 0.5;
+        const my = (wPts[i].y + wPts[j].y) * 0.5;
+        if (eh && eh !== skipObj) {
+          eh.set({ left: mx, top: my });
+          eh._prevPos = { x: mx, y: my };
+          eh.setCoords();
+        }
+      }
+      vertexEditState.edgeHandles.forEach(h => canvas.bringToFront(h));
+      vertexEditState.cornerHandles.forEach(h => canvas.bringToFront(h));
+    };
+
+    const liveRebuildTarget = () => {
+      const st = vertexEditState;
+      if (!st || !st.targetObj) return;
+      const bb = vertsBoundingBox(st.localVerts);
+      const patch = { customVerts: cloneVerts(st.localVerts) };
+      if (st.targetObj.customType === 'shapeBlock') {
+        patch.width = Math.round(clampNum(bb.width, 40, 800, 160));
+        patch.height = Math.round(clampNum(bb.height, 32, 800, 104));
+      } else if (st.targetObj.customType === 'door3d') {
+        const spanW = Math.hypot(st.localVerts[1].x - st.localVerts[0].x, st.localVerts[1].y - st.localVerts[0].y);
+        const spanH = Math.hypot(st.localVerts[3].x - st.localVerts[0].x, st.localVerts[3].y - st.localVerts[0].y);
+        patch.width = Math.round(clampNum(spanW, 40, 360, 118));
+        patch.height = Math.round(clampNum(spanH, 50, 380, 152));
+      }
+      st.targetObj = rebuildFreeformBlock(st.targetObj, patch, {
+        anchorRefOrigin: st.refOrigin,
+        angle: st.angle,
+        flipX: st.flipX,
+        flipY: st.flipY,
+        skipOverlaySync: true
+      });
+      st.targetObj.selectable = false;
+      st.targetObj.evented = false;
+      st.dirty = true;
+    };
+
+    // Edge midpoint handles (cyan — drag an entire edge!)
+    for (let i = 0; i < n; i++) {
+      const j = (i + 1) % n;
+      const mx = (worldPts[i].x + worldPts[j].x) * 0.5;
+      const my = (worldPts[i].y + worldPts[j].y) * 0.5;
+      const eh = new fabric.Circle({
+        left: mx,
+        top: my,
+        radius: 5.5,
+        fill: '#0284c7',
+        stroke: '#ffffff',
+        strokeWidth: 2,
+        originX: 'center',
+        originY: 'center',
+        hasControls: false,
+        hasBorders: false,
+        hoverCursor: 'move',
+        isVertexHandle: true,
+        vertexRole: 'edge',
+        edgeIndex: i,
+        excludeFromExport: true
+      });
+      eh._prevPos = { x: mx, y: my };
+      eh.on('moving', () => {
+        if (!vertexEditState) return;
+        const prev = eh._prevPos || { x: eh.left, y: eh.top };
+        const dWorld = { x: eh.left - prev.x, y: eh.top - prev.y };
+        const dLocal = invRotFlipPt(dWorld, angle, flipX, flipY);
+        eh._prevPos = { x: eh.left, y: eh.top };
+        vertexEditState.localVerts[i] = {
+          x: vertexEditState.localVerts[i].x + dLocal.x,
+          y: vertexEditState.localVerts[i].y + dLocal.y
+        };
+        vertexEditState.localVerts[j] = {
+          x: vertexEditState.localVerts[j].x + dLocal.x,
+          y: vertexEditState.localVerts[j].y + dLocal.y
+        };
+        liveRebuildTarget();
+        refreshGuideAndHandles(eh);
+        canvas.renderAll();
+      });
+      edgeHandles.push(eh);
+      canvas.add(eh);
+    }
+
+    // Corner vertex handles (orange — drag any corner freely!)
+    for (let i = 0; i < n; i++) {
+      const ch = new fabric.Circle({
+        left: worldPts[i].x,
+        top: worldPts[i].y,
+        radius: 7.5,
+        fill: '#f97316',
+        stroke: '#ffffff',
+        strokeWidth: 2.2,
+        originX: 'center',
+        originY: 'center',
+        hasControls: false,
+        hasBorders: false,
+        hoverCursor: 'grab',
+        isVertexHandle: true,
+        vertexRole: 'corner',
+        vertexIndex: i,
+        excludeFromExport: true
+      });
+      ch.on('moving', () => {
+        if (!vertexEditState) return;
+        vertexEditState.localVerts[i] = worldToLocal({ x: ch.left, y: ch.top });
+        liveRebuildTarget();
+        refreshGuideAndHandles(ch);
+        canvas.renderAll();
+      });
+      cornerHandles.push(ch);
+      canvas.add(ch);
+    }
+
+    vertexEditState = {
+      targetObj: target,
+      refOrigin,
+      angle,
+      flipX,
+      flipY,
+      localVerts,
+      guidePoly,
+      cornerHandles,
+      edgeHandles,
+      dirty: false
+    };
+
+    updateVertexBannerUI(true);
+    updateInspector();
+    canvas.renderAll();
+    showToast('已進入頂點自由拉伸模式：拖曳橘點可拉伸任意角落、藍點可拉伸邊線', 'success');
+  }
+
+  function exitVertexEditMode(commitUndo) {
+    if (!vertexEditState || !canvas) return;
+    const st = vertexEditState;
+    vertexEditState = null;
+
+    if (st.guidePoly) canvas.remove(st.guidePoly);
+    (st.cornerHandles || []).forEach(h => canvas.remove(h));
+    (st.edgeHandles || []).forEach(h => canvas.remove(h));
+
+    canvas.selection = true;
+    canvas.forEachObject(o => {
+      if (!o.isVertexHandle) {
+        o.selectable = true;
+        o.evented = true;
+      }
+    });
+
+    updateVertexBannerUI(false);
+    keepLabelsOnTop();
+    if (st.targetObj && canvas.getObjects().includes(st.targetObj)) {
+      st.targetObj.setCoords();
+      canvas.setActiveObject(st.targetObj);
+    }
+    canvas.renderAll();
+    if (commitUndo !== false && st.dirty) {
+      pushUndoSnapshot();
+    }
+    updateInspector();
+  }
+
   // ==================== Placement Mode Management ====================
   const TOOL_NAMES = {
     'arrow': '動線箭頭',
@@ -3424,6 +4500,7 @@
   };
 
   function setPlacementMode(tool, meta) {
+    if (vertexEditState) exitVertexEditMode(true);
     activeTool = tool;
     activeToolMeta = meta || {};
     isDrawing = false;
@@ -3488,10 +4565,23 @@
       cornerStyle: 'circle'
     });
 
-    // Keep flow arrow badge upright when rotated
+    // Keep flow arrow & shape block labels upright and un-squashed during rotation & scaling
     canvas.on('object:rotating', (opt) => {
-      if (opt.target && opt.target.customType === 'flowArrow') {
+      if (!opt.target) return;
+      if (opt.target.customType === 'flowArrow') {
         keepArrowTextUpright(opt.target);
+      } else if (opt.target.customType === 'shapeBlock') {
+        keepBlockTextUpright(opt.target);
+      }
+    });
+
+    canvas.on('object:scaling', (opt) => {
+      if (!opt.target) return;
+      if (opt.transform && opt.transform.corner) {
+        opt.target._lastScaleCorner = opt.transform.corner;
+      }
+      if (opt.target.customType === 'shapeBlock') {
+        keepBlockTextUpright(opt.target);
       }
     });
 
@@ -3500,8 +4590,12 @@
     canvas.on('selection:cleared', updateInspector);
 
     canvas.on('object:modified', (opt) => {
-      if (opt.target && opt.target.customType === 'flowArrow') {
-        keepArrowTextUpright(opt.target);
+      if (opt.target && opt.target.isVertexHandle) return;
+      let target = opt.target;
+      if (target && target.customType === 'flowArrow') {
+        keepArrowTextUpright(target);
+      } else if (target && isFreeformBlock(target)) {
+        target = normalizeScaledBlock(target);
       }
       keepLabelsOnTop();
       pushUndoSnapshot();
@@ -3541,16 +4635,7 @@
           defaultValue: obj.shapeMeta.label || ''
         });
         if (val !== null) {
-          const nextMeta = Object.assign({}, obj.shapeMeta, { label: val.trim().slice(0, 36) });
-          const updated = createCustomShapeBlockGroup(Object.assign({}, nextMeta, { x: obj.left, y: obj.top }));
-          updated.set({ scaleX: obj.scaleX, scaleY: obj.scaleY, angle: obj.angle, opacity: obj.opacity });
-          canvas.remove(obj);
-          canvas.add(updated);
-          keepLabelsOnTop();
-          canvas.setActiveObject(updated);
-          canvas.renderAll();
-          pushUndoSnapshot();
-          updateInspector();
+          rebuildFreeformBlock(obj, { label: val.trim().slice(0, 36) });
         }
       } else if (obj.customType === 'marker') {
         const val = await openModal({
@@ -3599,6 +4684,14 @@
 
     // Mouse Down
     canvas.on('mouse:down', (opt) => {
+      // Exit vertex edit mode when clicking empty canvas area
+      if (vertexEditState) {
+        if (!opt.target || !opt.target.isVertexHandle) {
+          exitVertexEditMode(true);
+        }
+        return;
+      }
+
       // Ctrl+Drag duplicate in select mode
       if (!activeTool && opt.target && (opt.e.ctrlKey || opt.e.metaKey)) {
         if (!opt.transform || opt.transform.action === 'drag') {
@@ -3773,7 +4866,7 @@
             });
           } else {
             cloned.set({ left: origin.left, top: origin.top, evented: true, selectable: true, objId: uid('dup') });
-            if (cloned.textBoxMeta) cloned.textBoxMeta = Object.assign({}, cloned.textBoxMeta);
+            deepCloneBlockMetas(cloned);
             canvas.add(cloned);
           }
           keepLabelsOnTop();
@@ -3936,13 +5029,23 @@
         updateInspector();
       }
     });
+
+    // Read-only studio accessor for testing & diagnostics
+    window.__FPLS_STUDIO__ = {
+      getCanvas: () => canvas,
+      getVertexEditState: () => vertexEditState
+    };
   }
 
   // ==================== Inspector ====================
   function updateInspector() {
     const box = document.getElementById('inspector-box');
     const updateRackBtn = document.getElementById('btn-update-rack');
-    const obj = canvas ? canvas.getActiveObject() : null;
+    const rawActive = canvas ? canvas.getActiveObject() : null;
+    const isEditingVerts = !!vertexEditState;
+    const obj = isEditingVerts
+      ? vertexEditState.targetObj
+      : (rawActive && !rawActive.isVertexHandle ? rawActive : null);
 
     updateRackBtn.disabled = !(obj && obj.customType === 'rackDiagram');
 
@@ -3964,6 +5067,9 @@
       'back-right': '後右牆',
       'flat': '正面立視'
     };
+    const equipKindLabel = obj.equipMeta
+      ? `${obj.equipMeta.kind === 'pallet' ? '棧板/設備' : '立柱'} (${obj.equipMeta.is3d ? '3D 等角' : '2D 平面'})`
+      : '設備 / 棧板 / 立柱';
     const typeNames = {
       flowArrow: '動線箭頭',
       textBox: '可修改文字方塊 (置頂)',
@@ -3989,7 +5095,7 @@
       saDir: 'SA 出風方向',
       raDir: 'RA 回風方向',
       dimension: '尺寸標註線',
-      equipment: '設備 / 棧板 / 立柱',
+      equipment: equipKindLabel,
       rackDiagram: '多層貨架圖',
       drawRect: '自訂方框',
       freeArrow: '自由箭頭'
@@ -3998,6 +5104,57 @@
     const label = typeNames[obj.customType] || (obj.type === 'activeSelection' ? `多選物件 (${obj.getObjects().length})` : obj.type);
     const opacityPct = Math.round((obj.opacity !== undefined ? obj.opacity : 1) * 100);
     const curAngle = Math.round(((obj.angle || 0) % 360 + 360) % 360);
+
+    // Helper HTML for v6 Freeform Vertex Edit + Isometric Angle/Skew controls
+    const buildVertexAndIsoControlsHtml = (meta, showIso, showVerts) => {
+      const hasCustomVerts = Array.isArray(meta.customVerts) && meta.customVerts.length >= 3;
+      const curIsoA = Math.round(clampNum(meta.isoAngle, 10, 60, 30));
+      const curIsoS = Math.round(clampNum(meta.isoSkew, -45, 45, 0));
+      let html = '';
+      if (showVerts) {
+        html += `
+          <div class="insp-section">
+            <div class="insp-section-title">
+              <span>多邊形頂點自由拉伸</span>
+              ${hasCustomVerts ? '<span class="insp-badge-custom" data-testid="insp-custom-verts-badge">已自訂頂點</span>' : ''}
+            </div>
+            <div class="grid-2" style="margin-bottom:4px;">
+              <button type="button" class="btn btn-xs ${isEditingVerts ? 'btn-primary' : ''}" id="insp-toggle-vertex-edit" data-testid="insp-toggle-vertex-edit" style="${hasCustomVerts ? '' : 'grid-column:1 / -1;'}">${isEditingVerts ? '✓ 完成頂點編輯' : '✏️ 頂點自由拉伸'}</button>
+              ${hasCustomVerts ? '<button type="button" class="btn btn-xs" id="insp-reset-verts" data-testid="insp-reset-verts">↺ 重設頂點</button>' : ''}
+            </div>
+            <div style="font-size:10px;color:var(--text-muted);">拖曳橘點可拉任意角落成梯形/斜牆；拖曳藍點可整段拉伸邊線</div>
+          </div>
+        `;
+      }
+      if (showIso) {
+        html += `
+          <div class="insp-section">
+            <div class="insp-section-title">
+              <span>3D 斜角與透視角度調整</span>
+              <span style="font-size:10px;color:var(--text-muted);">${curIsoA}° / ${curIsoS >= 0 ? '+' + curIsoS : curIsoS}°</span>
+            </div>
+            <div class="insp-slider-row">
+              <label for="insp-iso-angle">視角俯角</label>
+              <input type="range" id="insp-iso-angle" data-testid="insp-iso-angle" min="10" max="60" value="${curIsoA}">
+              <input type="number" id="insp-iso-angle-num" data-testid="insp-iso-angle-num" class="insp-num-mini" min="10" max="60" value="${curIsoA}">
+            </div>
+            <div class="insp-slider-row">
+              <label for="insp-iso-skew">斜角偏斜</label>
+              <input type="range" id="insp-iso-skew" data-testid="insp-iso-skew" min="-45" max="45" value="${curIsoS}">
+              <input type="number" id="insp-iso-skew-num" data-testid="insp-iso-skew-num" class="insp-num-mini" min="-45" max="45" value="${curIsoS}">
+            </div>
+            <div class="insp-preset-row">
+              <button type="button" class="insp-preset-btn" data-iso-preset="30,0" data-testid="insp-iso-preset-std">標準30°</button>
+              <button type="button" class="insp-preset-btn" data-iso-preset="18,0" data-testid="insp-iso-preset-flat">平緩18°</button>
+              <button type="button" class="insp-preset-btn" data-iso-preset="45,0" data-testid="insp-iso-preset-steep">俯視45°</button>
+              <button type="button" class="insp-preset-btn" data-iso-preset="30,-22" data-testid="insp-iso-preset-left">左斜</button>
+              <button type="button" class="insp-preset-btn" data-iso-preset="30,22" data-testid="insp-iso-preset-right">右斜</button>
+            </div>
+          </div>
+        `;
+      }
+      return html;
+    };
 
     let extraHtml = '';
     if (obj.customType === 'textBox') {
@@ -4048,25 +5205,84 @@
       `;
     } else if (obj.customType === 'shapeBlock' && obj.shapeMeta) {
       const m = obj.shapeMeta;
+      const is3d = m.viewMode === '3d';
+      const curW = Math.round(m.width || 160);
+      const curH = Math.round(m.height || 104);
+      const curExt = Math.round(m.extrudeHeight !== undefined ? m.extrudeHeight : Math.max(18, Math.min(54, Math.round(Math.min(curW, curH) * 0.34))));
       extraHtml = `
-        <div class="row-flex" style="margin-top:6px;justify-content:space-between;">
-          <label style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;">
-            填滿 <input type="color" id="insp-shape-fill" class="color-swatch" value="${m.fillColor || '#dbeafe'}">
-          </label>
-          <label style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;">
-            框線 <input type="color" id="insp-shape-stroke" class="color-swatch" value="${m.strokeColor || '#2563eb'}">
-          </label>
+        <div class="insp-section">
+          <div class="row-flex" style="margin-bottom:6px;justify-content:space-between;">
+            <label style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;">
+              填滿 <input type="color" id="insp-shape-fill" class="color-swatch" value="${m.fillColor || '#dbeafe'}">
+            </label>
+            <label style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;">
+              框線 <input type="color" id="insp-shape-stroke" class="color-swatch" value="${m.strokeColor || '#2563eb'}">
+            </label>
+          </div>
+          <div class="grid-2" style="margin-bottom:6px;">
+            <button type="button" class="btn btn-xs" id="insp-toggle-shape-3d" data-testid="insp-toggle-shape-3d">${is3d ? '🔄 轉為 2D 平面' : '🔄 轉為 3D 等角'}</button>
+            <button type="button" class="btn btn-xs btn-primary" id="insp-edit-shape-label" data-testid="insp-edit-shape-label">✏️ 編輯文字</button>
+          </div>
+          <div class="insp-section-title"><span>獨立尺寸微調（無變形重繪）</span></div>
+          <div class="insp-slider-row">
+            <label for="insp-geo-w">寬度 W</label>
+            <input type="range" id="insp-geo-w" data-testid="insp-geo-w" min="40" max="640" value="${curW}">
+            <input type="number" id="insp-geo-w-num" data-testid="insp-geo-w-num" class="insp-num-mini" min="40" max="800" value="${curW}">
+          </div>
+          <div class="insp-slider-row">
+            <label for="insp-geo-l">${is3d ? '深度 L' : '高度 H'}</label>
+            <input type="range" id="insp-geo-l" data-testid="insp-geo-l" min="32" max="640" value="${curH}">
+            <input type="number" id="insp-geo-l-num" data-testid="insp-geo-l-num" class="insp-num-mini" min="32" max="800" value="${curH}">
+          </div>
+          ${is3d ? `
+          <div class="insp-slider-row">
+            <label for="insp-geo-h">立體厚度</label>
+            <input type="range" id="insp-geo-h" data-testid="insp-geo-h" min="6" max="220" value="${curExt}">
+            <input type="number" id="insp-geo-h-num" data-testid="insp-geo-h-num" class="insp-num-mini" min="6" max="260" value="${curExt}">
+          </div>` : ''}
         </div>
-        <div class="grid-2" style="margin-top:6px;">
-          <button type="button" class="btn btn-xs" id="insp-toggle-shape-3d" data-testid="insp-toggle-shape-3d">${m.viewMode === '3d' ? '🔄 轉為 2D 平面' : '🔄 轉為 3D 等角'}</button>
-          <button type="button" class="btn btn-xs btn-primary" id="insp-edit-shape-label" data-testid="insp-edit-shape-label">✏️ 編輯文字</button>
+        ${buildVertexAndIsoControlsHtml(m, is3d, true)}
+        <div style="font-size:10.5px;color:#2563eb;margin-top:4px;">提示：拖拉上下左右控點不會擠壓文字；雙擊方塊可修改文字</div>
+      `;
+    } else if (obj.customType === 'equipment' && obj.equipMeta) {
+      const m = obj.equipMeta;
+      const is3d = !!m.is3d;
+      const isPallet = m.kind === 'pallet';
+      const curW = Math.round(m.width || (isPallet ? 72 : 52));
+      const curL = Math.round(m.depth || (isPallet ? 66 : 10));
+      const curH = Math.round(m.extrudeHeight || (isPallet ? 14 : 115));
+      extraHtml = `
+        <div class="insp-section">
+          <div class="row-flex" style="margin-bottom:6px;justify-content:space-between;">
+            <button type="button" class="btn btn-xs" id="insp-equip-toggle-3d" data-testid="insp-equip-toggle-3d">${is3d ? '🔄 轉為 2D 平面' : '🔄 轉為 3D 等角'}</button>
+            <label style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;">
+              配色 <input type="color" id="insp-equip-color" data-testid="insp-equip-color" class="color-swatch" value="${m.color || (isPallet ? '#e6c280' : '#15803d')}">
+            </label>
+          </div>
+          <div class="insp-section-title"><span>獨立尺寸微調</span></div>
+          <div class="insp-slider-row">
+            <label for="insp-geo-w">寬度 W</label>
+            <input type="range" id="insp-geo-w" data-testid="insp-geo-w" min="${isPallet ? 24 : 8}" max="420" value="${curW}">
+            <input type="number" id="insp-geo-w-num" data-testid="insp-geo-w-num" class="insp-num-mini" min="${isPallet ? 24 : 8}" max="500" value="${curW}">
+          </div>
+          <div class="insp-slider-row">
+            <label for="insp-geo-l">${is3d ? '深度 L' : '高度 H'}</label>
+            <input type="range" id="insp-geo-l" data-testid="insp-geo-l" min="${isPallet ? 24 : 8}" max="420" value="${curL}">
+            <input type="number" id="insp-geo-l-num" data-testid="insp-geo-l-num" class="insp-num-mini" min="${isPallet ? 24 : 8}" max="500" value="${curL}">
+          </div>
+          ${is3d ? `
+          <div class="insp-slider-row">
+            <label for="insp-geo-h">${isPallet ? '立體厚度' : '柱體高度'}</label>
+            <input type="range" id="insp-geo-h" data-testid="insp-geo-h" min="6" max="300" value="${curH}">
+            <input type="number" id="insp-geo-h-num" data-testid="insp-geo-h-num" class="insp-num-mini" min="6" max="360" value="${curH}">
+          </div>` : ''}
         </div>
-        <div style="font-size:11px;color:#2563eb;margin-top:4px;">提示：雙擊方塊可直接編輯置中標籤文字</div>
+        ${buildVertexAndIsoControlsHtml(m, is3d, true)}
       `;
     } else if (obj.customType === 'roomBox3d' && obj.room3dMeta) {
       const m = obj.room3dMeta;
       extraHtml = `
-        <div style="margin-top:8px;padding-top:7px;border-top:1px solid var(--border);">
+        <div class="insp-section">
           <div style="font-size:11px;font-weight:700;color:#14532d;margin-bottom:5px;">3D 空間箱朝向與鏡像</div>
           <div class="row-flex" style="margin-bottom:5px;">
             <select id="insp-room3d-ori" data-testid="insp-room3d-ori" class="select-input" style="flex:1;padding:3px 6px;font-size:11px;">
@@ -4081,20 +5297,23 @@
             <button type="button" class="btn btn-xs ${m.mirrorX ? 'btn-active' : ''}" id="insp-room3d-mirror-x" data-testid="insp-room3d-mirror-x">⇄ 左右鏡像${m.mirrorX ? ' ✓' : ''}</button>
             <button type="button" class="btn btn-xs ${m.mirrorY ? 'btn-active' : ''}" id="insp-room3d-mirror-y" data-testid="insp-room3d-mirror-y">⇅ 上下鏡像${m.mirrorY ? ' ✓' : ''}</button>
           </div>
-          <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin:6px 0 4px;">尺寸微調（亦可拖拉畫布四角縮放）</div>
-          <div class="row-flex" style="margin-bottom:3px;justify-content:space-between;">
-            <span style="font-size:10.5px;color:var(--text-muted);">寬 W: <strong id="insp-room3d-w-val">${m.width}</strong></span>
-            <input type="range" id="insp-room3d-w" data-testid="insp-room3d-w" min="100" max="540" value="${m.width}" style="width:130px;">
+          <div class="insp-section-title"><span>獨立尺寸微調（無變形重繪）</span></div>
+          <div class="insp-slider-row">
+            <label for="insp-room3d-w">寬 W</label>
+            <input type="range" id="insp-room3d-w" data-testid="insp-room3d-w" min="80" max="620" value="${m.width}">
+            <input type="number" id="insp-room3d-w-val" data-testid="insp-geo-w-num" class="insp-num-mini" min="80" max="720" value="${m.width}">
           </div>
-          <div class="row-flex" style="margin-bottom:3px;justify-content:space-between;">
-            <span style="font-size:10.5px;color:var(--text-muted);">深 L: <strong id="insp-room3d-l-val">${m.depth}</strong></span>
-            <input type="range" id="insp-room3d-l" data-testid="insp-room3d-l" min="100" max="620" value="${m.depth}" style="width:130px;">
+          <div class="insp-slider-row">
+            <label for="insp-room3d-l">深 L</label>
+            <input type="range" id="insp-room3d-l" data-testid="insp-room3d-l" min="80" max="680" value="${m.depth}">
+            <input type="number" id="insp-room3d-l-val" data-testid="insp-geo-l-num" class="insp-num-mini" min="80" max="760" value="${m.depth}">
           </div>
-          <div class="row-flex" style="margin-bottom:6px;justify-content:space-between;">
-            <span style="font-size:10.5px;color:var(--text-muted);">高 H: <strong id="insp-room3d-h-val">${m.wallHeight}</strong></span>
-            <input type="range" id="insp-room3d-h" data-testid="insp-room3d-h" min="60" max="320" value="${m.wallHeight}" style="width:130px;">
+          <div class="insp-slider-row">
+            <label for="insp-room3d-h">牆高 H</label>
+            <input type="range" id="insp-room3d-h" data-testid="insp-room3d-h" min="40" max="360" value="${m.wallHeight}">
+            <input type="number" id="insp-room3d-h-val" data-testid="insp-geo-h-num" class="insp-num-mini" min="40" max="420" value="${m.wallHeight}">
           </div>
-          <div class="row-flex" style="justify-content:space-between;">
+          <div class="row-flex" style="justify-content:space-between;margin-top:4px;">
             <label style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;">
               地板 <input type="color" id="insp-room3d-floor" class="color-swatch" value="${m.floorColor || '#dcfce7'}">
             </label>
@@ -4104,11 +5323,12 @@
             <button type="button" class="btn btn-xs" id="insp-room3d-grid" data-testid="insp-room3d-grid">${m.showGrid !== false ? '格線:開' : '格線:關'}</button>
           </div>
         </div>
+        ${buildVertexAndIsoControlsHtml(m, true, true)}
       `;
     } else if (obj.customType === 'door3d' && obj.door3dMeta) {
       const m = obj.door3dMeta;
       extraHtml = `
-        <div style="margin-top:8px;padding-top:7px;border-top:1px solid var(--border);">
+        <div class="insp-section">
           <div style="font-size:11px;font-weight:700;color:#991b1b;margin-bottom:5px;">3D 獨立門朝向與鏡像</div>
           <div class="row-flex" style="margin-bottom:5px;">
             <select id="insp-door3d-ori" data-testid="insp-door3d-ori" class="select-input" style="flex:1;padding:3px 6px;font-size:11px;">
@@ -4128,15 +5348,23 @@
             <button type="button" class="btn btn-xs" id="insp-door3d-style" data-testid="insp-door3d-style">${m.doorStyle === 'single' ? '🚪 切換雙開門' : '🚪 切換單開門'}</button>
             <button type="button" class="btn btn-xs" id="insp-door3d-reset-xf" data-testid="insp-door3d-reset-xf">↺ 還原變換</button>
           </div>
-          <div class="row-flex" style="margin-bottom:3px;justify-content:space-between;">
-            <span style="font-size:10.5px;color:var(--text-muted);">門寬: <strong id="insp-door3d-w-val">${m.width}</strong></span>
-            <input type="range" id="insp-door3d-w" data-testid="insp-door3d-w" min="50" max="240" value="${m.width}" style="width:130px;">
+          <div class="insp-slider-row">
+            <label for="insp-door3d-w">門寬 W</label>
+            <input type="range" id="insp-door3d-w" data-testid="insp-door3d-w" min="40" max="300" value="${m.width}">
+            <input type="number" id="insp-door3d-w-val" data-testid="insp-geo-w-num" class="insp-num-mini" min="40" max="360" value="${m.width}">
           </div>
-          <div class="row-flex" style="margin-bottom:4px;justify-content:space-between;">
-            <span style="font-size:10.5px;color:var(--text-muted);">門高: <strong id="insp-door3d-h-val">${m.height}</strong></span>
-            <input type="range" id="insp-door3d-h" data-testid="insp-door3d-h" min="70" max="260" value="${m.height}" style="width:130px;">
+          <div class="insp-slider-row">
+            <label for="insp-door3d-h">門高 H</label>
+            <input type="range" id="insp-door3d-h" data-testid="insp-door3d-h" min="50" max="320" value="${m.height}">
+            <input type="number" id="insp-door3d-h-val" data-testid="insp-geo-l-num" class="insp-num-mini" min="50" max="380" value="${m.height}">
+          </div>
+          <div class="insp-slider-row">
+            <label for="insp-geo-h">門框厚度</label>
+            <input type="range" id="insp-geo-h" data-testid="insp-geo-h" min="6" max="42" value="${m.thickness || 15}">
+            <input type="number" id="insp-geo-h-num" data-testid="insp-geo-h-num" class="insp-num-mini" min="6" max="48" value="${m.thickness || 15}">
           </div>
         </div>
+        ${buildVertexAndIsoControlsHtml(m, true, true)}
       `;
     }
 
@@ -4151,6 +5379,11 @@
         <button type="button" class="btn btn-xs" id="insp-bwd">↓ 下移一層</button>
       </div>
       <div style="font-size:10.5px;color:var(--text-muted);margin:5px 0 3px;">旋轉與翻轉（角度：<strong id="insp-angle-val">${curAngle}°</strong>）</div>
+      <div class="insp-slider-row">
+        <label for="insp-angle-slider">任意角度</label>
+        <input type="range" id="insp-angle-slider" data-testid="insp-angle-slider" min="0" max="360" value="${curAngle}">
+        <input type="number" id="insp-angle-input" data-testid="insp-angle-input" class="insp-num-mini" min="0" max="360" value="${curAngle}">
+      </div>
       <div class="grid-4" style="margin-bottom:4px;">
         <button type="button" class="btn btn-xs" id="insp-rot-m90" data-testid="insp-rot-m90" title="逆時針旋轉 90°">↺90°</button>
         <button type="button" class="btn btn-xs" id="insp-rot-m15" data-testid="insp-rot-m15" title="逆時針旋轉 15°">-15°</button>
@@ -4168,6 +5401,14 @@
       ${obj.customType === 'rackDiagram' ? `<div style="font-size:11px;color:#2563eb;margin-top:4px;">提示：可在上方「層架圖產生器」修改後點「更新已選」</div>` : ''}
     `;
 
+    const ensureNotEditingVerts = () => {
+      if (vertexEditState) {
+        exitVertexEditMode(true);
+        return canvas.getActiveObject() || obj;
+      }
+      return obj;
+    };
+
     document.getElementById('insp-opacity').oninput = function () {
       const v = parseInt(this.value, 10) / 100;
       document.getElementById('insp-op-val').textContent = this.value + '%';
@@ -4177,79 +5418,173 @@
     };
     document.getElementById('insp-opacity').onchange = () => pushUndoSnapshot();
     document.getElementById('insp-fwd').onclick = () => {
-      canvas.bringForward(obj);
+      const target = ensureNotEditingVerts();
+      canvas.bringForward(target);
       keepLabelsOnTop();
       canvas.renderAll();
       pushUndoSnapshot();
     };
     document.getElementById('insp-bwd').onclick = () => {
-      canvas.sendBackwards(obj);
+      const target = ensureNotEditingVerts();
+      canvas.sendBackwards(target);
       keepLabelsOnTop();
       canvas.renderAll();
       pushUndoSnapshot();
     };
 
-    // Universal Rotate / Flip handlers
-    const applyObjRotate = (delta) => {
-      const nextAngle = ((obj.angle || 0) + delta) % 360;
-      obj.rotate(nextAngle);
-      if (obj.customType === 'flowArrow') keepArrowTextUpright(obj);
-      obj.setCoords();
+    // Universal Rotate / Flip handlers (preserving upright text on flowArrow & shapeBlock)
+    const setObjAngleExact = (deg, commit) => {
+      const target = ensureNotEditingVerts();
+      const norm = ((Number(deg) || 0) % 360 + 360) % 360;
+      target.rotate(norm);
+      if (target.customType === 'flowArrow') keepArrowTextUpright(target);
+      if (target.customType === 'shapeBlock') keepBlockTextUpright(target);
+      target.setCoords();
+      const valEl = document.getElementById('insp-angle-val');
+      const slEl = document.getElementById('insp-angle-slider');
+      const numEl = document.getElementById('insp-angle-input');
+      if (valEl) valEl.textContent = Math.round(norm) + '°';
+      if (slEl) slEl.value = Math.round(norm);
+      if (numEl) numEl.value = Math.round(norm);
       canvas.renderAll();
-      pushUndoSnapshot();
-      updateInspector();
+      if (commit) {
+        pushUndoSnapshot();
+        updateInspector();
+      }
+    };
+    const applyObjRotate = (delta) => setObjAngleExact((obj.angle || 0) + delta, true);
+    document.getElementById('insp-angle-slider').oninput = function () {
+      setObjAngleExact(parseFloat(this.value) || 0, false);
+    };
+    document.getElementById('insp-angle-slider').onchange = function () {
+      setObjAngleExact(parseFloat(this.value) || 0, true);
+    };
+    document.getElementById('insp-angle-input').onchange = function () {
+      setObjAngleExact(parseFloat(this.value) || 0, true);
     };
     document.getElementById('insp-rot-m90').onclick = () => applyObjRotate(-90);
     document.getElementById('insp-rot-m15').onclick = () => applyObjRotate(-15);
     document.getElementById('insp-rot-p15').onclick = () => applyObjRotate(15);
     document.getElementById('insp-rot-p90').onclick = () => applyObjRotate(90);
     document.getElementById('insp-flip-x').onclick = () => {
-      obj.set('flipX', !obj.flipX);
-      obj.setCoords();
+      const target = ensureNotEditingVerts();
+      target.set('flipX', !target.flipX);
+      if (target.customType === 'shapeBlock') keepBlockTextUpright(target);
+      target.setCoords();
       canvas.renderAll();
       pushUndoSnapshot();
       updateInspector();
     };
     document.getElementById('insp-flip-y').onclick = () => {
-      obj.set('flipY', !obj.flipY);
-      obj.setCoords();
+      const target = ensureNotEditingVerts();
+      target.set('flipY', !target.flipY);
+      if (target.customType === 'shapeBlock') keepBlockTextUpright(target);
+      target.setCoords();
       canvas.renderAll();
       pushUndoSnapshot();
       updateInspector();
     };
     document.getElementById('insp-rot-reset').onclick = () => {
-      if (obj.customType === 'roomBox3d' && obj.room3dMeta) {
-        const nextMeta = Object.assign({}, obj.room3dMeta, { mirrorX: false, mirrorY: false });
-        const updated = create3DRoomBoxGroup(Object.assign({}, nextMeta, { x: obj.left, y: obj.top }));
-        updated.set({ angle: 0, flipX: false, flipY: false, scaleX: 1, scaleY: 1, opacity: obj.opacity });
-        canvas.remove(obj);
-        canvas.add(updated);
-        keepLabelsOnTop();
-        canvas.setActiveObject(updated);
-        canvas.renderAll();
-        pushUndoSnapshot();
-        updateInspector();
+      const target = ensureNotEditingVerts();
+      if (target.customType === 'roomBox3d' && target.room3dMeta) {
+        rebuildFreeformBlock(target, { mirrorX: false, mirrorY: false, isoAngle: 30, isoSkew: 0, customVerts: null }, { resetTransforms: true });
         return;
       }
-      if (obj.customType === 'door3d' && obj.door3dMeta) {
-        const nextMeta = Object.assign({}, obj.door3dMeta, { mirrorX: false, mirrorY: false });
-        const updated = create3DDoorGroup(Object.assign({}, nextMeta, { x: obj.left, y: obj.top }));
-        updated.set({ angle: 0, flipX: false, flipY: false, scaleX: 1, scaleY: 1, opacity: obj.opacity });
-        canvas.remove(obj);
-        canvas.add(updated);
-        keepLabelsOnTop();
-        canvas.setActiveObject(updated);
-        canvas.renderAll();
-        pushUndoSnapshot();
-        updateInspector();
+      if (target.customType === 'door3d' && target.door3dMeta) {
+        rebuildFreeformBlock(target, { mirrorX: false, mirrorY: false, isoAngle: 30, isoSkew: 0, customVerts: null }, { resetTransforms: true });
         return;
       }
-      obj.set({ angle: 0, flipX: false, flipY: false, scaleX: 1, scaleY: 1 });
-      if (obj.customType === 'flowArrow') keepArrowTextUpright(obj);
-      obj.setCoords();
+      if (target.customType === 'shapeBlock' && target.shapeMeta) {
+        rebuildFreeformBlock(target, { isoAngle: 30, isoSkew: 0, customVerts: null }, { resetTransforms: true });
+        return;
+      }
+      if (target.customType === 'equipment' && target.equipMeta) {
+        rebuildFreeformBlock(target, { isoAngle: 30, isoSkew: 0, customVerts: null }, { resetTransforms: true });
+        return;
+      }
+      target.set({ angle: 0, flipX: false, flipY: false, scaleX: 1, scaleY: 1 });
+      if (target.customType === 'flowArrow') keepArrowTextUpright(target);
+      target.setCoords();
       canvas.renderAll();
       pushUndoSnapshot();
       updateInspector();
+    };
+
+    // Shared wiring for v6 Vertex Edit Mode & Isometric Angle/Skew controls across ALL 4 freeform block types
+    if (isFreeformBlock(obj)) {
+      const toggleVertsBtn = document.getElementById('insp-toggle-vertex-edit');
+      if (toggleVertsBtn) {
+        toggleVertsBtn.onclick = () => {
+          if (vertexEditState) exitVertexEditMode(true);
+          else enterVertexEditMode(obj);
+        };
+      }
+      const resetVertsBtn = document.getElementById('insp-reset-verts');
+      if (resetVertsBtn) {
+        resetVertsBtn.onclick = () => {
+          const target = ensureNotEditingVerts();
+          rebuildFreeformBlock(target, { customVerts: null });
+          showToast('已重設為標準幾何頂點');
+        };
+      }
+      const applyIsoChange = (newAngle, newSkew) => {
+        const target = ensureNotEditingVerts();
+        const m = getBlockMeta(target) || {};
+        const oldA = m.isoAngle !== undefined ? m.isoAngle : 30;
+        const oldS = m.isoSkew !== undefined ? m.isoSkew : 0;
+        const clampedA = Math.round(clampNum(newAngle, 10, 60, oldA));
+        const clampedS = Math.round(clampNum(newSkew, -45, 45, oldS));
+        const patch = { isoAngle: clampedA, isoSkew: clampedS };
+        if (Array.isArray(m.customVerts) && m.customVerts.length >= 3) {
+          patch.customVerts = transformVertsByIsoDelta(m.customVerts, oldA, oldS, clampedA, clampedS);
+        }
+        rebuildFreeformBlock(target, patch);
+      };
+      const isoAngSl = document.getElementById('insp-iso-angle');
+      const isoAngNum = document.getElementById('insp-iso-angle-num');
+      const isoSkSl = document.getElementById('insp-iso-skew');
+      const isoSkNum = document.getElementById('insp-iso-skew-num');
+      if (isoAngSl && isoAngNum) {
+        isoAngSl.oninput = function () { isoAngNum.value = this.value; };
+        isoAngSl.onchange = function () {
+          const m = getBlockMeta(obj) || {};
+          applyIsoChange(parseInt(this.value, 10), m.isoSkew !== undefined ? m.isoSkew : 0);
+        };
+        isoAngNum.onchange = function () {
+          const m = getBlockMeta(obj) || {};
+          applyIsoChange(parseInt(this.value, 10), m.isoSkew !== undefined ? m.isoSkew : 0);
+        };
+      }
+      if (isoSkSl && isoSkNum) {
+        isoSkSl.oninput = function () { isoSkNum.value = this.value; };
+        isoSkSl.onchange = function () {
+          const m = getBlockMeta(obj) || {};
+          applyIsoChange(m.isoAngle !== undefined ? m.isoAngle : 30, parseInt(this.value, 10));
+        };
+        isoSkNum.onchange = function () {
+          const m = getBlockMeta(obj) || {};
+          applyIsoChange(m.isoAngle !== undefined ? m.isoAngle : 30, parseInt(this.value, 10));
+        };
+      }
+      box.querySelectorAll('[data-iso-preset]').forEach(btn => {
+        btn.onclick = () => {
+          const parts = btn.dataset.isoPreset.split(',');
+          applyIsoChange(parseInt(parts[0], 10), parseInt(parts[1], 10));
+        };
+      });
+    }
+
+    // Helper for binding synchronized slider + number dimension inputs
+    const bindDimPair = (rangeId, numId, onCommit) => {
+      const rEl = document.getElementById(rangeId);
+      const nEl = document.getElementById(numId);
+      if (!rEl || !nEl) return;
+      rEl.oninput = function () { nEl.value = this.value; };
+      rEl.onchange = function () { onCommit(parseInt(this.value, 10)); };
+      nEl.onchange = function () {
+        rEl.value = this.value;
+        onCommit(parseInt(this.value, 10));
+      };
     };
 
     if (obj.customType === 'textBox') {
@@ -4324,19 +5659,8 @@
 
     if (obj.customType === 'shapeBlock' && obj.shapeMeta) {
       const rebuildSelectedShape = (patch) => {
-        const nextMeta = Object.assign({}, obj.shapeMeta, patch);
-        const updated = createCustomShapeBlockGroup(Object.assign({}, nextMeta, { x: obj.left, y: obj.top }));
-        updated.set({
-          scaleX: obj.scaleX, scaleY: obj.scaleY, angle: obj.angle,
-          flipX: obj.flipX, flipY: obj.flipY, opacity: obj.opacity
-        });
-        canvas.remove(obj);
-        canvas.add(updated);
-        keepLabelsOnTop();
-        canvas.setActiveObject(updated);
-        canvas.renderAll();
-        pushUndoSnapshot();
-        updateInspector();
+        const target = ensureNotEditingVerts();
+        rebuildFreeformBlock(target, patch);
       };
       document.getElementById('insp-shape-fill').onchange = function () {
         rebuildSelectedShape({ fillColor: this.value });
@@ -4345,67 +5669,122 @@
         rebuildSelectedShape({ strokeColor: this.value });
       };
       document.getElementById('insp-toggle-shape-3d').onclick = () => {
-        rebuildSelectedShape({ viewMode: obj.shapeMeta.viewMode === '3d' ? '2d' : '3d' });
+        rebuildSelectedShape({ viewMode: obj.shapeMeta.viewMode === '3d' ? '2d' : '3d', customVerts: null });
       };
       document.getElementById('insp-edit-shape-label').onclick = async () => {
+        const target = ensureNotEditingVerts();
         const val = await openModal({
           mode: 'prompt',
           title: '編輯方塊置中標籤文字',
           desc: '請輸入要顯示於方塊中央的標籤文字（留空可隱藏文字）：',
-          defaultValue: obj.shapeMeta.label || ''
+          defaultValue: target.shapeMeta.label || ''
         });
         if (val !== null) {
-          rebuildSelectedShape({ label: val.trim().slice(0, 36) });
+          rebuildFreeformBlock(target, { label: val.trim().slice(0, 36) });
         }
       };
+      bindDimPair('insp-geo-w', 'insp-geo-w-num', (val) => {
+        const target = ensureNotEditingVerts();
+        const m = target.shapeMeta;
+        const nextW = Math.round(clampNum(val, 40, 800, m.width || 160));
+        const patch = { width: nextW };
+        if (Array.isArray(m.customVerts) && m.customVerts.length >= 3 && m.width) {
+          patch.customVerts = scaleCustomVertsAroundCentroid(m.customVerts, nextW / m.width, 1);
+        }
+        rebuildFreeformBlock(target, patch);
+      });
+      bindDimPair('insp-geo-l', 'insp-geo-l-num', (val) => {
+        const target = ensureNotEditingVerts();
+        const m = target.shapeMeta;
+        const nextH = Math.round(clampNum(val, 32, 800, m.height || 104));
+        const patch = { height: nextH };
+        if (Array.isArray(m.customVerts) && m.customVerts.length >= 3 && m.height) {
+          patch.customVerts = scaleCustomVertsAroundCentroid(m.customVerts, 1, nextH / m.height);
+        }
+        rebuildFreeformBlock(target, patch);
+      });
+      bindDimPair('insp-geo-h', 'insp-geo-h-num', (val) => {
+        rebuildSelectedShape({ extrudeHeight: Math.round(clampNum(val, 6, 260, 34)) });
+      });
+    }
+
+    if (obj.customType === 'equipment' && obj.equipMeta) {
+      const rebuildSelectedEquip = (patch) => {
+        const target = ensureNotEditingVerts();
+        rebuildFreeformBlock(target, patch);
+      };
+      document.getElementById('insp-equip-toggle-3d').onclick = () => {
+        rebuildSelectedEquip({ is3d: !obj.equipMeta.is3d, customVerts: null });
+      };
+      document.getElementById('insp-equip-color').onchange = function () {
+        rebuildSelectedEquip({ color: this.value });
+      };
+      const minDim = obj.equipMeta.kind === 'pallet' ? 24 : 8;
+      bindDimPair('insp-geo-w', 'insp-geo-w-num', (val) => {
+        const target = ensureNotEditingVerts();
+        const m = target.equipMeta;
+        const nextW = Math.round(clampNum(val, minDim, 500, m.width || 72));
+        const patch = { width: nextW };
+        if (Array.isArray(m.customVerts) && m.customVerts.length === 4 && m.width) {
+          patch.customVerts = scaleCustomVertsAroundCentroid(m.customVerts, nextW / m.width, 1);
+        }
+        rebuildFreeformBlock(target, patch);
+      });
+      bindDimPair('insp-geo-l', 'insp-geo-l-num', (val) => {
+        const target = ensureNotEditingVerts();
+        const m = target.equipMeta;
+        const nextL = Math.round(clampNum(val, minDim, 500, m.depth || 66));
+        const patch = { depth: nextL };
+        if (Array.isArray(m.customVerts) && m.customVerts.length === 4 && m.depth) {
+          patch.customVerts = scaleCustomVertsAroundCentroid(m.customVerts, 1, nextL / m.depth);
+        }
+        rebuildFreeformBlock(target, patch);
+      });
+      bindDimPair('insp-geo-h', 'insp-geo-h-num', (val) => {
+        rebuildSelectedEquip({ extrudeHeight: Math.round(clampNum(val, 6, 360, 14)) });
+      });
     }
 
     if (obj.customType === 'roomBox3d' && obj.room3dMeta) {
       const rebuildSelectedRoom = (patch) => {
-        const nextMeta = Object.assign({}, obj.room3dMeta, patch);
-        const updated = create3DRoomBoxGroup(Object.assign({}, nextMeta, { x: obj.left, y: obj.top }));
-        updated.set({
-          scaleX: obj.scaleX, scaleY: obj.scaleY, angle: obj.angle,
-          flipX: obj.flipX, flipY: obj.flipY, opacity: obj.opacity
-        });
-        canvas.remove(obj);
-        canvas.add(updated);
-        keepLabelsOnTop();
-        canvas.setActiveObject(updated);
-        canvas.renderAll();
-        pushUndoSnapshot();
-        updateInspector();
+        const target = ensureNotEditingVerts();
+        rebuildFreeformBlock(target, patch);
       };
       document.getElementById('insp-room3d-ori').onchange = function () {
-        rebuildSelectedRoom({ orientation: parseInt(this.value, 10) || 0 });
+        rebuildSelectedRoom({ orientation: parseInt(this.value, 10) || 0, customVerts: null });
       };
       document.getElementById('insp-room3d-ori-next').onclick = () => {
-        rebuildSelectedRoom({ orientation: ((obj.room3dMeta.orientation || 0) + 1) % 4 });
+        rebuildSelectedRoom({ orientation: ((obj.room3dMeta.orientation || 0) + 1) % 4, customVerts: null });
       };
       document.getElementById('insp-room3d-mirror-x').onclick = () => {
-        rebuildSelectedRoom({ mirrorX: !obj.room3dMeta.mirrorX });
+        rebuildSelectedRoom({ mirrorX: !obj.room3dMeta.mirrorX, customVerts: null });
       };
       document.getElementById('insp-room3d-mirror-y').onclick = () => {
-        rebuildSelectedRoom({ mirrorY: !obj.room3dMeta.mirrorY });
+        rebuildSelectedRoom({ mirrorY: !obj.room3dMeta.mirrorY, customVerts: null });
       };
-      document.getElementById('insp-room3d-w').oninput = function () {
-        document.getElementById('insp-room3d-w-val').textContent = this.value;
-      };
-      document.getElementById('insp-room3d-w').onchange = function () {
-        rebuildSelectedRoom({ width: parseInt(this.value, 10) || 240 });
-      };
-      document.getElementById('insp-room3d-l').oninput = function () {
-        document.getElementById('insp-room3d-l-val').textContent = this.value;
-      };
-      document.getElementById('insp-room3d-l').onchange = function () {
-        rebuildSelectedRoom({ depth: parseInt(this.value, 10) || 320 });
-      };
-      document.getElementById('insp-room3d-h').oninput = function () {
-        document.getElementById('insp-room3d-h-val').textContent = this.value;
-      };
-      document.getElementById('insp-room3d-h').onchange = function () {
-        rebuildSelectedRoom({ wallHeight: parseInt(this.value, 10) || 165 });
-      };
+      bindDimPair('insp-room3d-w', 'insp-room3d-w-val', (val) => {
+        const target = ensureNotEditingVerts();
+        const m = target.room3dMeta;
+        const nextW = Math.round(clampNum(val, 80, 720, m.width || 240));
+        const patch = { width: nextW };
+        if (Array.isArray(m.customVerts) && m.customVerts.length === 4 && m.width) {
+          patch.customVerts = scaleCustomVertsAroundCentroid(m.customVerts, nextW / m.width, 1);
+        }
+        rebuildFreeformBlock(target, patch);
+      });
+      bindDimPair('insp-room3d-l', 'insp-room3d-l-val', (val) => {
+        const target = ensureNotEditingVerts();
+        const m = target.room3dMeta;
+        const nextL = Math.round(clampNum(val, 80, 760, m.depth || 320));
+        const patch = { depth: nextL };
+        if (Array.isArray(m.customVerts) && m.customVerts.length === 4 && m.depth) {
+          patch.customVerts = scaleCustomVertsAroundCentroid(m.customVerts, 1, nextL / m.depth);
+        }
+        rebuildFreeformBlock(target, patch);
+      });
+      bindDimPair('insp-room3d-h', 'insp-room3d-h-val', (val) => {
+        rebuildSelectedRoom({ wallHeight: Math.round(clampNum(val, 40, 420, 165)) });
+      });
       document.getElementById('insp-room3d-floor').onchange = function () {
         rebuildSelectedRoom({ floorColor: this.value });
       };
@@ -4420,59 +5799,58 @@
     if (obj.customType === 'door3d' && obj.door3dMeta) {
       const doorOris = ['front-left', 'front-right', 'back-left', 'back-right', 'flat'];
       const rebuildSelectedDoor = (patch, resetTransforms) => {
-        const nextMeta = Object.assign({}, obj.door3dMeta, patch);
-        const updated = create3DDoorGroup(Object.assign({}, nextMeta, { x: obj.left, y: obj.top }));
-        updated.set(resetTransforms ? {
-          scaleX: 1, scaleY: 1, angle: 0, flipX: false, flipY: false, opacity: obj.opacity
-        } : {
-          scaleX: obj.scaleX, scaleY: obj.scaleY, angle: obj.angle,
-          flipX: obj.flipX, flipY: obj.flipY, opacity: obj.opacity
-        });
-        canvas.remove(obj);
-        canvas.add(updated);
-        keepLabelsOnTop();
-        canvas.setActiveObject(updated);
-        canvas.renderAll();
-        pushUndoSnapshot();
-        updateInspector();
+        const target = ensureNotEditingVerts();
+        rebuildFreeformBlock(target, patch, { resetTransforms: !!resetTransforms });
       };
       document.getElementById('insp-door3d-ori').onchange = function () {
-        rebuildSelectedDoor({ orientation: this.value });
+        rebuildSelectedDoor({ orientation: this.value, customVerts: null });
       };
       document.getElementById('insp-door3d-ori-next').onclick = () => {
         const curIdx = doorOris.indexOf(obj.door3dMeta.orientation || 'front-left');
-        rebuildSelectedDoor({ orientation: doorOris[(curIdx + 1) % doorOris.length] });
+        rebuildSelectedDoor({ orientation: doorOris[(curIdx + 1) % doorOris.length], customVerts: null });
       };
       document.getElementById('insp-door3d-mirror-x').onclick = () => {
-        rebuildSelectedDoor({ mirrorX: !obj.door3dMeta.mirrorX });
+        rebuildSelectedDoor({ mirrorX: !obj.door3dMeta.mirrorX, customVerts: null });
       };
       document.getElementById('insp-door3d-mirror-y').onclick = () => {
-        rebuildSelectedDoor({ mirrorY: !obj.door3dMeta.mirrorY });
+        rebuildSelectedDoor({ mirrorY: !obj.door3dMeta.mirrorY, customVerts: null });
       };
       document.getElementById('insp-door3d-style').onclick = () => {
         rebuildSelectedDoor({ doorStyle: obj.door3dMeta.doorStyle === 'single' ? 'double' : 'single' });
       };
       document.getElementById('insp-door3d-reset-xf').onclick = () => {
-        rebuildSelectedDoor({ mirrorX: false, mirrorY: false }, true);
+        rebuildSelectedDoor({ mirrorX: false, mirrorY: false, isoAngle: 30, isoSkew: 0, customVerts: null }, true);
       };
-      document.getElementById('insp-door3d-w').oninput = function () {
-        document.getElementById('insp-door3d-w-val').textContent = this.value;
-      };
-      document.getElementById('insp-door3d-w').onchange = function () {
-        rebuildSelectedDoor({ width: parseInt(this.value, 10) || 118 });
-      };
-      document.getElementById('insp-door3d-h').oninput = function () {
-        document.getElementById('insp-door3d-h-val').textContent = this.value;
-      };
-      document.getElementById('insp-door3d-h').onchange = function () {
-        rebuildSelectedDoor({ height: parseInt(this.value, 10) || 152 });
-      };
+      bindDimPair('insp-door3d-w', 'insp-door3d-w-val', (val) => {
+        const target = ensureNotEditingVerts();
+        const m = target.door3dMeta;
+        const nextW = Math.round(clampNum(val, 40, 360, m.width || 118));
+        const patch = { width: nextW };
+        if (Array.isArray(m.customVerts) && m.customVerts.length === 4 && m.width) {
+          patch.customVerts = scaleCustomVertsAroundCentroid(m.customVerts, nextW / m.width, 1);
+        }
+        rebuildFreeformBlock(target, patch);
+      });
+      bindDimPair('insp-door3d-h', 'insp-door3d-h-val', (val) => {
+        const target = ensureNotEditingVerts();
+        const m = target.door3dMeta;
+        const nextH = Math.round(clampNum(val, 50, 380, m.height || 152));
+        const patch = { height: nextH };
+        if (Array.isArray(m.customVerts) && m.customVerts.length === 4 && m.height) {
+          patch.customVerts = scaleCustomVertsAroundCentroid(m.customVerts, 1, nextH / m.height);
+        }
+        rebuildFreeformBlock(target, patch);
+      });
+      bindDimPair('insp-geo-h', 'insp-geo-h-num', (val) => {
+        rebuildSelectedDoor({ thickness: Math.round(clampNum(val, 6, 48, 15)) });
+      });
     }
   }
 
   // ==================== Edit Actions ====================
   function deleteSelected() {
     if (!canvas) return;
+    if (vertexEditState) exitVertexEditMode(true);
     const actives = canvas.getActiveObjects();
     if (!actives.length) return;
     canvas.discardActiveObject();
@@ -4484,6 +5862,7 @@
 
   function copySelected() {
     if (!canvas) return;
+    if (vertexEditState) exitVertexEditMode(true);
     const active = canvas.getActiveObject();
     if (!active) return;
     active.clone((cloned) => {
@@ -4494,6 +5873,7 @@
 
   function pasteClipboard() {
     if (!canvas || !clipboardObj) return;
+    if (vertexEditState) exitVertexEditMode(true);
     clipboardObj.clone((cloned) => {
       canvas.discardActiveObject();
       cloned.set({
@@ -4506,13 +5886,13 @@
         cloned.canvas = canvas;
         cloned.forEachObject(o => {
           o.objId = uid('p');
-          if (o.textBoxMeta) o.textBoxMeta = Object.assign({}, o.textBoxMeta);
+          deepCloneBlockMetas(o);
           canvas.add(o);
         });
         cloned.setCoords();
       } else {
         cloned.objId = uid('p');
-        if (cloned.textBoxMeta) cloned.textBoxMeta = Object.assign({}, cloned.textBoxMeta);
+        deepCloneBlockMetas(cloned);
         canvas.add(cloned);
       }
       clipboardObj.left += 28;
@@ -4664,6 +6044,7 @@
     if (saveTimer) clearTimeout(saveTimer);
     document.getElementById('status-save').textContent = '⏳ 儲存中...';
     saveTimer = setTimeout(() => {
+      if (vertexEditState) return; // Defer auto-save until vertex editing finishes
       try {
         const json = JSON.stringify(serializeWorkspace());
         localStorage.setItem(STORAGE_KEY, json);
@@ -4675,6 +6056,7 @@
   }
 
   function exportWorkspaceJson() {
+    if (vertexEditState) exitVertexEditMode(true);
     const payload = serializeWorkspace();
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' });
     const url = URL.createObjectURL(blob);
@@ -4707,6 +6089,7 @@
   function exportHighResPng() {
     const tab = getActiveTab();
     if (!tab || !canvas) return;
+    if (vertexEditState) exitVertexEditMode(true);
     canvas.discardActiveObject();
     canvas.renderAll();
 
@@ -4744,6 +6127,7 @@
   async function clearCurrentCanvas() {
     const tab = getActiveTab();
     if (!tab || !canvas) return;
+    if (vertexEditState) exitVertexEditMode(false);
     const ok = await openModal({
       mode: 'confirm',
       title: '清除目前畫布物件',
@@ -4763,6 +6147,7 @@
   }
 
   async function resetEntireWorkspace() {
+    if (vertexEditState) exitVertexEditMode(false);
     const ok = await openModal({
       mode: 'confirm',
       title: '重置全部工作區',
@@ -5119,8 +6504,11 @@
     document.getElementById('btn-zoom-out').onclick = () => { isFitMode = false; applyZoom(currentZoom - 0.15); };
     document.getElementById('btn-zoom-fit').onclick = fitCanvasToViewport;
 
-    // Cancel placement mode
-    document.getElementById('btn-cancel-mode').onclick = () => setPlacementMode(null);
+    // Cancel placement mode or finish vertex edit mode
+    document.getElementById('btn-cancel-mode').onclick = () => {
+      if (vertexEditState) exitVertexEditMode(true);
+      else setPlacementMode(null);
+    };
 
     // Arrow presets
     const PRESETS = {
@@ -5252,7 +6640,8 @@
       if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
 
       if (e.key === 'Escape') {
-        if (activeTool) setPlacementMode(null);
+        if (vertexEditState) exitVertexEditMode(true);
+        else if (activeTool) setPlacementMode(null);
         document.getElementById('help-drawer').classList.remove('open');
         return;
       }
