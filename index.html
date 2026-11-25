@@ -718,12 +718,8 @@
       </label>
       <select id="select-template" data-testid="select-template" class="select-input" title="選擇內建平面圖範本">
         <option value="blank">1. 空白畫布 (1200×800)</option>
-        <option value="facility_full">2. 全廠區平面範本 (完整版)</option>
-        <option value="lab_yellow">3. 實驗室平面範本 (黃區)</option>
-        <option value="mfg_red">4. 製造區平面範本 (紅框區)</option>
-        <option value="wh_blue">5. 倉儲區平面範本 (藍框區)</option>
-        <option value="coldroom_2d">6. 冷藏庫平面範本 (2D)</option>
-        <option value="coldroom_3d">7. 冷藏庫等角立體空間範本 (3D)</option>
+        <option value="coldroom_2d">2. 冷藏庫平面範本 (2D)</option>
+        <option value="coldroom_3d">3. 冷藏庫等角立體空間範本 (3D)</option>
       </select>
       <button type="button" class="btn btn-sm" id="btn-apply-template" data-testid="btn-apply-template">套用範本</button>
       <span class="divider-v"></span>
@@ -828,10 +824,49 @@
         </div>
       </section>
 
-      <!-- 4. Mapping, HVAC & Equipment -->
+      <!-- 4. 3D Green Room Box & Standalone 3D Door -->
       <section class="dock-section">
         <div class="dock-section-title">
-          <span>4. 點位、空調與尺寸標註</span>
+          <span>4. 3D 立體空間箱與獨立門物件</span>
+        </div>
+        <div class="grid-2" style="margin-bottom:6px;">
+          <button type="button" class="btn btn-sm" data-tool="room-box-3d" data-testid="tool-room-box-3d" style="background:#f0fdf4;border-color:#86efac;color:#14532d;" title="純淨 3D 綠色立體空間箱（僅地板與牆面，可旋轉、翻轉、鏡像與縮放）">🟩 3D 綠色空間箱</button>
+          <button type="button" class="btn btn-sm" data-tool="door-3d" data-testid="tool-door-3d" style="background:#fef2f2;border-color:#fca5a5;color:#991b1b;" title="獨立 3D 立體門物件（支援多朝向、旋轉、翻轉、鏡像與縮放）">🚪 3D 獨立門物件</button>
+        </div>
+        <div class="row-flex" style="margin-bottom:6px;justify-content:space-between;">
+          <label style="font-size:11px;color:var(--text-muted);white-space:nowrap;">初始朝向:</label>
+          <select id="iso3d-init-orientation" data-testid="iso3d-init-orientation" class="select-input" style="flex:1;padding:3px 6px;font-size:11.5px;">
+            <option value="front-left">前左 / 標準 NE (0°)</option>
+            <option value="front-right">前右 / 順轉 SE (90°)</option>
+            <option value="back-left">後左 / 順轉 SW (180°)</option>
+            <option value="back-right">後右 / 順轉 NW (270°)</option>
+            <option value="flat">正面立視 (僅門 0°)</option>
+          </select>
+        </div>
+        <div class="row-flex" style="margin-bottom:6px;justify-content:space-between;">
+          <label style="font-size:11px;color:var(--text-muted);white-space:nowrap;">門型式:</label>
+          <select id="door3d-style" data-testid="door3d-style" class="select-input" style="flex:1;padding:3px 6px;font-size:11.5px;">
+            <option value="double">雙開保溫門 (含雙視窗)</option>
+            <option value="single">單開保溫門 (含視窗)</option>
+          </select>
+        </div>
+        <div class="row-flex" style="justify-content:space-between;">
+          <label style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;">
+            地板色
+            <input type="color" id="room3d-floor-color" data-testid="room3d-floor-color" class="color-swatch" value="#dcfce7">
+          </label>
+          <label style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;">
+            牆面色
+            <input type="color" id="room3d-wall-color" data-testid="room3d-wall-color" class="color-swatch" value="#e2e8f0">
+          </label>
+          <span style="font-size:10.5px;color:var(--text-muted);">選取後可旋轉/翻轉/鏡像</span>
+        </div>
+      </section>
+
+      <!-- 5. Mapping, HVAC & Equipment -->
+      <section class="dock-section">
+        <div class="dock-section-title">
+          <span>5. 點位、空調與尺寸標註</span>
         </div>
         <div class="grid-3" style="margin-bottom:6px;">
           <button type="button" class="btn btn-sm marker-btn-T" data-tool="marker-T" data-testid="tool-marker-T" title="上層點位 (自動編號)">💗 T 點位</button>
@@ -881,10 +916,10 @@
         </div>
       </section>
 
-      <!-- 5. Multi-Tier Rack / Shelf Diagram Generator -->
+      <!-- 6. Multi-Tier Rack / Shelf Diagram Generator -->
       <section class="dock-section">
         <div class="dock-section-title">
-          <span>5. 多層貨架 / 層架圖產生器</span>
+          <span>6. 多層貨架 / 層架圖產生器</span>
           <button type="button" class="btn btn-xs" id="btn-toggle-racks" data-testid="btn-toggle-racks" title="顯示或隱藏畫布上的貨架圖">👁️ 顯隱</button>
         </div>
         <div class="row-flex" style="margin-bottom:6px;">
@@ -919,10 +954,10 @@
         </div>
       </section>
 
-      <!-- 6. Selected Object Inspector -->
+      <!-- 7. Selected Object Inspector -->
       <section class="dock-section">
         <div class="dock-section-title">
-          <span>6. 選取物件屬性</span>
+          <span>7. 選取物件屬性</span>
         </div>
         <div class="inspector-box" id="inspector-box" data-testid="inspector-box">
           <div style="color:var(--text-muted);font-size:11.5px;">尚未選取物件。點擊畫布上任一物件即可拖曳、縮放、旋轉或調整屬性。</div>
@@ -961,7 +996,8 @@
     <button type="button" class="btn btn-xs" id="btn-close-help" data-testid="btn-close-help" title="關閉">✕</button>
   </h3>
   <ul>
-    <li><strong>更換底圖與範本：</strong>支援上傳任意 PNG / JPG / SVG 平面圖，或直接套用 7 種內建廠區、實驗室、製造區、倉儲區與冷藏庫 2D/3D 範本。</li>
+    <li><strong>更換底圖與範本：</strong>支援上傳任意 PNG / JPG / SVG 平面圖，或直接套用 3 種內建範本（空白畫布、冷藏庫 2D、冷藏庫 3D 等角純淨空間）。</li>
+    <li><strong>3D 綠色空間箱與 3D 獨立門物件：</strong>提供純淨無內建設備的 3D 綠色空間箱（僅地板＋牆面）與獨立 3D 保溫門物件，選取後可自由切換朝向、旋轉角度、水平/垂直翻轉、左右/上下鏡像與縮放尺寸。</li>
     <li><strong>多分頁管理：</strong>上方分頁列可新增、雙擊重新命名、複製或刪除不同樓層/區域平面。</li>
     <li><strong>自訂動線圖例：</strong>放置前可勾選項目、修改代碼/名稱/顏色或新增自訂項目；放置後可自由拖曳縮放，<strong>雙擊</strong>即可再次編輯。</li>
     <li><strong>2D/3D 自訂形狀方塊：</strong>支援矩形、圓角矩形、圓形/橢圓、L 型區塊，可自由調整填滿色、框線色、透明度與 2D/3D 等角視角，<strong>雙擊</strong>即可修改置中標籤文字。</li>
@@ -1020,7 +1056,7 @@
     </div>
     <p class="modal-desc" id="cloud-mode-desc">可將目前多區域工作區暫存至雲端，方便跨裝置臨時開啟。</p>
     <div id="cloud-save-row" class="row-flex" style="margin-bottom:12px;">
-      <input type="text" id="cloud-preset-name" data-testid="cloud-preset-name" class="text-input" placeholder="輸入暫存名稱（例如：全廠區動線草稿）" style="flex:1;padding:6px 9px;">
+      <input type="text" id="cloud-preset-name" data-testid="cloud-preset-name" class="text-input" placeholder="輸入暫存名稱（例如：冷藏庫空間配置草稿）" style="flex:1;padding:6px 9px;">
       <button type="button" class="btn btn-primary" id="btn-cloud-save" data-testid="btn-cloud-save">儲存至雲端暫存</button>
     </div>
     <div id="cloud-presets-list" data-testid="cloud-presets-list" style="max-height:240px;overflow-y:auto;"></div>
@@ -1043,7 +1079,7 @@
   const CLOUD_TTL_MS = CLOUD_TTL_DAYS * 24 * 60 * 60 * 1000;
   const CUSTOM_PROPS = [
     'customType', 'isAlwaysTop', 'isMask', 'markerType', 'markerNumber',
-    'arrowMeta', 'dimMeta', 'rackConfig', 'equipMeta', 'legendConfig', 'shapeMeta', 'objId'
+    'arrowMeta', 'dimMeta', 'rackConfig', 'equipMeta', 'legendConfig', 'shapeMeta', 'room3dMeta', 'door3dMeta', 'objId'
   ];
 
   const RACK_THEMES = {
@@ -1166,20 +1202,28 @@
     }
   }
 
-  // ==================== Built-in 7 Templates (Inline SVG Data URLs, Zero External Deps) ====================
+  // ==================== Built-in 3 Templates (Inline SVG Data URLs, Zero External Deps) ====================
   function svgToDataUrl(svgStr) {
     return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgStr.trim());
   }
 
   function normalizeTemplateId(templateId) {
     const legacyMap = {
-      office: 'facility_full',
-      facility: 'lab_yellow',
-      warehouse2d: 'wh_blue',
+      office: 'blank',
+      facility: 'blank',
+      warehouse2d: 'blank',
+      facility_full: 'blank',
+      lab_yellow: 'blank',
+      mfg_red: 'blank',
+      wh_blue: 'blank',
       storage2d: 'coldroom_2d',
       isometric3d: 'coldroom_3d'
     };
-    return legacyMap[templateId] || templateId || 'facility_full';
+    const mapped = legacyMap[templateId] || templateId || 'blank';
+    if (mapped === 'blank' || mapped === 'coldroom_2d' || mapped === 'coldroom_3d') {
+      return mapped;
+    }
+    return 'blank';
   }
 
   function getTemplateAsset(rawTemplateId) {
@@ -1190,521 +1234,7 @@
       return { width: 1200, height: 800, dataUrl: null };
     }
 
-    // 2. Facility Floor Plan Template (Full) — green/orange/pink/blue/white/yellow with W-01..W-05, P-01..P-22, M-01..M-06, CH-01
-    if (templateId === 'facility_full') {
-      const svg = `
-<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900">
-  <rect width="1400" height="900" fill="#ffffff"/>
-  <rect x="24" y="24" width="1352" height="816" fill="#f8fafc" stroke="#0f172a" stroke-width="4"/>
-
-  <!-- Zone Frames -->
-  <!-- Yellow Lab Zone Frame -->
-  <rect x="36" y="38" width="290" height="632" fill="#fefce8" stroke="#ca8a04" stroke-width="3.5" stroke-dasharray="8,5"/>
-  <!-- Red Manufacturing Zone Frame -->
-  <rect x="336" y="38" width="584" height="786" fill="#ffffff" stroke="#dc2626" stroke-width="3.5" stroke-dasharray="8,5"/>
-  <!-- Blue Warehouse Zone Frame -->
-  <rect x="930" y="38" width="434" height="786" fill="#f8fafc" stroke="#2563eb" stroke-width="3.5" stroke-dasharray="8,5"/>
-
-  <!-- ===== YELLOW LABORATORY ZONE: M-01 .. M-06 ===== -->
-  <g stroke="#334155" stroke-width="2" font-family="sans-serif" text-anchor="middle">
-    <rect x="46" y="52" width="132" height="145" fill="#fef08a"/>
-    <text x="112" y="118" font-size="16" font-weight="bold" fill="#713f12">M-01</text>
-    <text x="112" y="138" font-size="11" fill="#854d0e">樣品前處理</text>
-
-    <rect x="178" y="52" width="138" height="145" fill="#fef9c3"/>
-    <text x="247" y="118" font-size="16" font-weight="bold" fill="#713f12">M-02</text>
-    <text x="247" y="138" font-size="11" fill="#854d0e">理化分析室</text>
-
-    <rect x="46" y="197" width="132" height="150" fill="#fef9c3"/>
-    <text x="112" y="266" font-size="16" font-weight="bold" fill="#713f12">M-03</text>
-    <text x="112" y="286" font-size="11" fill="#854d0e">精密儀器室</text>
-
-    <rect x="178" y="197" width="138" height="150" fill="#fef08a"/>
-    <text x="247" y="266" font-size="16" font-weight="bold" fill="#713f12">M-04</text>
-    <text x="247" y="286" font-size="11" fill="#854d0e">微生物檢測</text>
-
-    <rect x="46" y="347" width="270" height="56" fill="#ffffff"/>
-    <text x="181" y="380" font-size="12" font-weight="bold" fill="#64748b">實驗室走廊 (Lab Corridor)</text>
-
-    <rect x="46" y="403" width="132" height="130" fill="#fef08a"/>
-    <text x="112" y="464" font-size="16" font-weight="bold" fill="#713f12">M-05</text>
-    <text x="112" y="484" font-size="11" fill="#854d0e">試劑標準品</text>
-
-    <rect x="178" y="403" width="138" height="130" fill="#fef9c3"/>
-    <text x="247" y="464" font-size="16" font-weight="bold" fill="#713f12">M-06</text>
-    <text x="247" y="484" font-size="11" fill="#854d0e">清洗滅菌間</text>
-
-    <rect x="46" y="533" width="270" height="126" fill="#fefce8" stroke-dasharray="4,3"/>
-    <text x="181" y="592" font-size="13" font-weight="bold" fill="#854d0e">實驗辦公 / 紀錄區</text>
-    <text x="181" y="612" font-size="11" fill="#a16207">(黃色實驗區)</text>
-  </g>
-
-  <!-- ===== UTILITY / CHILLER ROOM: CH-01 ===== -->
-  <g stroke="#334155" stroke-width="2" font-family="sans-serif" text-anchor="middle">
-    <rect x="46" y="684" width="270" height="134" fill="#e0f2fe"/>
-    <rect x="64" y="704" width="76" height="44" fill="#bae6fd" stroke="#0284c7" stroke-width="1.5"/>
-    <rect x="154" y="704" width="76" height="44" fill="#bae6fd" stroke="#0284c7" stroke-width="1.5"/>
-    <text x="181" y="776" font-size="17" font-weight="bold" fill="#0369a1">CH-01</text>
-    <text x="181" y="796" font-size="11" fill="#075985">冰水 / 空調機械室</text>
-  </g>
-
-  <!-- ===== RED MANUFACTURING ZONE: P-01 .. P-17 (pink / blue / white) ===== -->
-  <g stroke="#334155" stroke-width="2" font-family="sans-serif" text-anchor="middle">
-    <!-- Top Row (Blue & White Airlocks / Preparation) -->
-    <rect x="348" y="52" width="110" height="118" fill="#dbeafe"/>
-    <text x="403" y="106" font-size="15" font-weight="bold" fill="#1e3a8a">P-01</text>
-    <text x="403" y="124" font-size="10.5" fill="#1e40af">更衣室 A</text>
-
-    <rect x="458" y="52" width="110" height="118" fill="#bfdbfe"/>
-    <text x="513" y="106" font-size="15" font-weight="bold" fill="#1e3a8a">P-02</text>
-    <text x="513" y="124" font-size="10.5" fill="#1e40af">人員緩衝</text>
-
-    <rect x="568" y="52" width="112" height="118" fill="#ffffff"/>
-    <text x="624" y="106" font-size="15" font-weight="bold" fill="#334155">P-03</text>
-    <text x="624" y="124" font-size="10.5" fill="#64748b">器具清洗</text>
-
-    <rect x="680" y="52" width="112" height="118" fill="#dbeafe"/>
-    <text x="736" y="106" font-size="15" font-weight="bold" fill="#1e3a8a">P-04</text>
-    <text x="736" y="124" font-size="10.5" fill="#1e40af">物料氣鎖</text>
-
-    <rect x="792" y="52" width="116" height="118" fill="#ffffff"/>
-    <text x="850" y="106" font-size="15" font-weight="bold" fill="#334155">P-05</text>
-    <text x="850" y="124" font-size="10.5" fill="#64748b">設備暫存</text>
-
-    <!-- Upper Corridor (White) -->
-    <rect x="348" y="170" width="560" height="58" fill="#ffffff"/>
-    <text x="628" y="204" font-size="13" font-weight="bold" fill="#475569">P-06 潔淨主走廊 (Corridor)</text>
-
-    <!-- Core Processing Row (Pink & Blue) -->
-    <rect x="348" y="228" width="140" height="156" fill="#fbcfe8"/>
-    <text x="418" y="302" font-size="16" font-weight="bold" fill="#831843">P-07</text>
-    <text x="418" y="322" font-size="11" fill="#9d174d">稱量配料室</text>
-
-    <rect x="488" y="228" width="142" height="156" fill="#fce7f3"/>
-    <text x="559" y="302" font-size="16" font-weight="bold" fill="#831843">P-08</text>
-    <text x="559" y="322" font-size="11" fill="#9d174d">核心製程室 A</text>
-
-    <rect x="630" y="228" width="140" height="156" fill="#fbcfe8"/>
-    <text x="700" y="302" font-size="16" font-weight="bold" fill="#831843">P-09</text>
-    <text x="700" y="322" font-size="11" fill="#9d174d">核心製程室 B</text>
-
-    <rect x="770" y="228" width="138" height="156" fill="#dbeafe"/>
-    <text x="839" y="302" font-size="16" font-weight="bold" fill="#1e3a8a">P-10</text>
-    <text x="839" y="322" font-size="11" fill="#1e40af">中間緩衝室</text>
-
-    <!-- Middle Processing Row (White & Pink) -->
-    <rect x="348" y="384" width="140" height="146" fill="#ffffff"/>
-    <text x="418" y="454" font-size="15" font-weight="bold" fill="#334155">P-11</text>
-    <text x="418" y="474" font-size="11" fill="#64748b">半成品暫存</text>
-
-    <rect x="488" y="384" width="142" height="146" fill="#fbcfe8"/>
-    <text x="559" y="454" font-size="15" font-weight="bold" fill="#831843">P-12</text>
-    <text x="559" y="474" font-size="11" fill="#9d174d">分裝作業室</text>
-
-    <rect x="630" y="384" width="140" height="146" fill="#fce7f3"/>
-    <text x="700" y="454" font-size="15" font-weight="bold" fill="#831843">P-13</text>
-    <text x="700" y="474" font-size="11" fill="#9d174d">內包裝室</text>
-
-    <rect x="770" y="384" width="138" height="146" fill="#bfdbfe"/>
-    <text x="839" y="454" font-size="15" font-weight="bold" fill="#1e3a8a">P-14</text>
-    <text x="839" y="474" font-size="11" fill="#1e40af">氣鎖傳遞間</text>
-
-    <!-- Lower Corridor (White) -->
-    <rect x="348" y="530" width="560" height="54" fill="#ffffff"/>
-    <text x="628" y="562" font-size="13" font-weight="bold" fill="#475569">P-15 物流通道 / 檢視走廊</text>
-
-    <!-- Bottom Row inside Red Frame (Blue, White, Pink) -->
-    <rect x="348" y="584" width="184" height="114" fill="#dbeafe"/>
-    <text x="440" y="638" font-size="15" font-weight="bold" fill="#1e3a8a">P-16</text>
-    <text x="440" y="658" font-size="11" fill="#1e40af">更衣室 B / 緩衝</text>
-
-    <rect x="532" y="584" width="188" height="114" fill="#ffffff"/>
-    <text x="626" y="638" font-size="15" font-weight="bold" fill="#334155">P-17</text>
-    <text x="626" y="658" font-size="11" fill="#64748b">工具清潔 / 乾燥室</text>
-
-    <rect x="720" y="584" width="188" height="114" fill="#fbcfe8"/>
-    <text x="814" y="638" font-size="15" font-weight="bold" fill="#831843">P-18</text>
-    <text x="814" y="658" font-size="11" fill="#9d174d">外包裝作業區</text>
-
-    <!-- Packing Bridge Edge P-19 .. P-22 -->
-    <rect x="348" y="698" width="140" height="116" fill="#fce7f3"/>
-    <text x="418" y="752" font-size="15" font-weight="bold" fill="#831843">P-19</text>
-    <text x="418" y="772" font-size="11" fill="#9d174d">貼標檢視區</text>
-
-    <rect x="488" y="698" width="140" height="116" fill="#fbcfe8"/>
-    <text x="558" y="752" font-size="15" font-weight="bold" fill="#831843">P-20</text>
-    <text x="558" y="772" font-size="11" fill="#9d174d">裝箱理貨區</text>
-
-    <rect x="628" y="698" width="140" height="116" fill="#fce7f3"/>
-    <text x="698" y="752" font-size="15" font-weight="bold" fill="#831843">P-21</text>
-    <text x="698" y="772" font-size="11" fill="#9d174d">成品緩衝區</text>
-
-    <rect x="768" y="698" width="140" height="116" fill="#fbcfe8"/>
-    <text x="838" y="752" font-size="15" font-weight="bold" fill="#831843">P-22</text>
-    <text x="838" y="772" font-size="11" fill="#9d174d">倉儲銜接氣鎖</text>
-  </g>
-
-  <!-- ===== BLUE WAREHOUSE ZONE: W-01 .. W-05 (Orange Racks + Green Cold Room) ===== -->
-  <g stroke="#334155" stroke-width="2" font-family="sans-serif" text-anchor="middle">
-    <!-- W-01 Receiving & W-02 Packaging Materials -->
-    <rect x="942" y="52" width="204" height="136" fill="#ffedd5"/>
-    <text x="1044" y="114" font-size="17" font-weight="bold" fill="#9a3412">W-01</text>
-    <text x="1044" y="136" font-size="11" fill="#c2410c">收貨 / 進料暫存區</text>
-
-    <rect x="1146" y="52" width="206" height="136" fill="#fed7aa"/>
-    <text x="1249" y="114" font-size="17" font-weight="bold" fill="#9a3412">W-02</text>
-    <text x="1249" y="136" font-size="11" fill="#c2410c">包材與原物料區</text>
-
-    <!-- W-03 Ambient Warehouse with Orange Pallet Racks -->
-    <rect x="942" y="188" width="410" height="332" fill="#fff7ed"/>
-    <!-- Orange Pallet Rack Bays -->
-    <g fill="#fdba74" stroke="#9a3412" stroke-width="1.4">
-      <rect x="962" y="214" width="66" height="58"/><rect x="962" y="272" width="66" height="58"/><rect x="962" y="330" width="66" height="58"/><rect x="962" y="388" width="66" height="58"/>
-      <rect x="1084" y="214" width="66" height="58"/><rect x="1084" y="272" width="66" height="58"/><rect x="1084" y="330" width="66" height="58"/><rect x="1084" y="388" width="66" height="58"/>
-      <rect x="1150" y="214" width="66" height="58"/><rect x="1150" y="272" width="66" height="58"/><rect x="1150" y="330" width="66" height="58"/><rect x="1150" y="388" width="66" height="58"/>
-      <rect x="1268" y="214" width="66" height="58"/><rect x="1268" y="272" width="66" height="58"/><rect x="1268" y="330" width="66" height="58"/><rect x="1268" y="388" width="66" height="58"/>
-    </g>
-    <rect x="1088" y="464" width="124" height="40" rx="6" fill="rgba(255,255,255,0.9)" stroke="#ea580c" stroke-width="1.5"/>
-    <text x="1150" y="489" font-size="16" font-weight="bold" fill="#9a3412">W-03 常溫倉庫</text>
-
-    <!-- W-04 Cold Room (Green) -->
-    <rect x="942" y="520" width="218" height="294" fill="#bbf7d0" stroke="#15803d" stroke-width="3.5"/>
-    <g fill="#dcfce7" stroke="#166534" stroke-width="1.3">
-      <rect x="958" y="544" width="52" height="52"/><rect x="958" y="596" width="52" height="52"/><rect x="958" y="648" width="52" height="52"/><rect x="958" y="700" width="52" height="52"/>
-      <rect x="1094" y="544" width="52" height="52"/><rect x="1094" y="596" width="52" height="52"/><rect x="1094" y="648" width="52" height="52"/><rect x="1094" y="700" width="52" height="52"/>
-    </g>
-    <rect x="1008" y="758" width="88" height="42" rx="6" fill="rgba(255,255,255,0.92)" stroke="#15803d" stroke-width="1.5"/>
-    <text x="1052" y="777" font-size="15" font-weight="bold" fill="#14532d">W-04</text>
-    <text x="1052" y="793" font-size="10.5" fill="#166534">冷藏庫</text>
-
-    <!-- W-05 Shipping & Dock -->
-    <rect x="1160" y="520" width="192" height="294" fill="#ffedd5"/>
-    <rect x="1186" y="698" width="140" height="86" fill="#ffffff" stroke="#64748b" stroke-dasharray="5,4"/>
-    <text x="1256" y="608" font-size="17" font-weight="bold" fill="#9a3412">W-05</text>
-    <text x="1256" y="630" font-size="11.5" fill="#c2410c">出貨理貨 / 裝卸區</text>
-    <text x="1256" y="746" font-size="12" font-weight="bold" fill="#475569">裝卸月台 Dock</text>
-  </g>
-
-  <!-- Bottom Color-Code Bar -->
-  <g font-family="sans-serif" font-size="12" font-weight="bold" fill="#334155">
-    <text x="36" y="874" font-size="14" fill="#0f172a">全廠區平面範本 (完整版)</text>
-    <rect x="240" y="861" width="16" height="16" fill="#fef08a" stroke="#ca8a04"/><text x="262" y="874">實驗室 (M-01~M-06)</text>
-    <rect x="415" y="861" width="16" height="16" fill="#fbcfe8" stroke="#be185d"/><text x="437" y="874">製程/包裝 (P-07~P-22)</text>
-    <rect x="605" y="861" width="16" height="16" fill="#dbeafe" stroke="#2563eb"/><text x="627" y="874">更衣/緩衝 (藍)</text>
-    <rect x="742" y="861" width="16" height="16" fill="#ffffff" stroke="#475569"/><text x="764" y="874">走道/清洗 (白)</text>
-    <rect x="875" y="861" width="16" height="16" fill="#fdba74" stroke="#c2410c"/><text x="897" y="874">常溫倉儲 (W-01~03,05)</text>
-    <rect x="1065" y="861" width="16" height="16" fill="#bbf7d0" stroke="#15803d"/><text x="1087" y="874">冷藏庫 (W-04)</text>
-    <rect x="1205" y="861" width="16" height="16" fill="#e0f2fe" stroke="#0284c7"/><text x="1227" y="874">機房 (CH-01)</text>
-  </g>
-</svg>`;
-      return { width: 1400, height: 900, dataUrl: svgToDataUrl(svg) };
-    }
-
-    // 3. Laboratory Floor Plan Template (Yellow) — M-01..M-06 & lab equipment
-    if (templateId === 'lab_yellow') {
-      const svg = `
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
-  <rect width="1200" height="800" fill="#ffffff"/>
-  <rect x="34" y="34" width="1132" height="700" fill="#fefce8" stroke="#a16207" stroke-width="5"/>
-
-  <!-- Top Row Labs: M-01, M-02, M-03 -->
-  <g stroke="#334155" stroke-width="2.5" font-family="sans-serif">
-    <!-- M-01 Sample Prep -->
-    <rect x="44" y="44" width="356" height="278" fill="#fef08a"/>
-    <!-- Wall bench & sink -->
-    <rect x="60" y="60" width="210" height="44" fill="#ffffff" stroke="#64748b" stroke-width="1.5"/>
-    <rect x="285" y="60" width="95" height="44" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.5"/>
-    <text x="332" y="86" font-size="11" fill="#0369a1" text-anchor="middle">水槽 Sink</text>
-    <!-- Sample Fridge -->
-    <rect x="60" y="185" width="76" height="90" fill="#f1f5f9" stroke="#475569" stroke-width="1.5"/>
-    <text x="98" y="234" font-size="11" fill="#334155" text-anchor="middle">樣品冰箱</text>
-    <text x="235" y="218" font-size="22" font-weight="bold" fill="#713f12" text-anchor="middle">M-01</text>
-    <text x="235" y="242" font-size="13" fill="#854d0e" text-anchor="middle">樣品收檢與前處理室</text>
-
-    <!-- M-02 Physical-Chemical Lab -->
-    <rect x="400" y="44" width="380" height="278" fill="#fef9c3"/>
-    <!-- Central Island Lab Benches -->
-    <rect x="448" y="84" width="284" height="54" fill="#ffffff" stroke="#64748b" stroke-width="1.6"/>
-    <line x1="448" y1="111" x2="732" y2="111" stroke="#cbd5e1" stroke-width="1.2"/>
-    <rect x="448" y="206" width="180" height="54" fill="#ffffff" stroke="#64748b" stroke-width="1.6"/>
-    <!-- Fume Hood -->
-    <rect x="650" y="196" width="110" height="66" fill="#fed7aa" stroke="#c2410c" stroke-width="1.8"/>
-    <text x="705" y="233" font-size="11.5" font-weight="bold" fill="#9a3412" text-anchor="middle">排煙櫃 Hood</text>
-    <text x="590" y="176" font-size="22" font-weight="bold" fill="#713f12" text-anchor="middle">M-02 理化分析實驗室</text>
-
-    <!-- M-03 Analytical Instruments -->
-    <rect x="780" y="44" width="376" height="278" fill="#fef08a"/>
-    <g fill="#ffffff" stroke="#475569" stroke-width="1.5">
-      <rect x="804" y="64" width="102" height="52"/><rect x="920" y="64" width="102" height="52"/><rect x="1036" y="64" width="100" height="52"/>
-      <rect x="804" y="230" width="144" height="56"/><rect x="978" y="230" width="158" height="56"/>
-    </g>
-    <text x="855" y="94" font-size="11" fill="#334155" text-anchor="middle">HPLC-1</text>
-    <text x="971" y="94" font-size="11" fill="#334155" text-anchor="middle">HPLC-2</text>
-    <text x="1086" y="94" font-size="11" fill="#334155" text-anchor="middle">GC-MS</text>
-    <text x="876" y="262" font-size="11" fill="#334155" text-anchor="middle">天平 / 光譜儀</text>
-    <text x="1057" y="262" font-size="11" fill="#334155" text-anchor="middle">數據工作站</text>
-    <text x="968" y="178" font-size="22" font-weight="bold" fill="#713f12" text-anchor="middle">M-03 精密儀器室</text>
-
-    <!-- Central Lab Corridor -->
-    <rect x="44" y="322" width="1112" height="106" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
-    <text x="600" y="381" font-size="17" font-weight="bold" fill="#64748b" text-anchor="middle">實驗室主走廊 (Main Lab Corridor)</text>
-    <!-- Emergency Eyewash -->
-    <circle cx="96" cy="375" r="18" fill="#dcfce7" stroke="#15803d" stroke-width="2"/>
-    <text x="96" y="379" font-size="10" font-weight="bold" fill="#166534" text-anchor="middle">沖眼</text>
-
-    <!-- Bottom Row Labs: M-04, M-05, M-06 -->
-    <!-- M-04 Microbiology / BSC -->
-    <rect x="44" y="428" width="380" height="296" fill="#fef9c3"/>
-    <rect x="66" y="454" width="136" height="62" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
-    <text x="134" y="489" font-size="12" font-weight="bold" fill="#1e3a8a" text-anchor="middle">生物安全櫃 BSC</text>
-    <rect x="234" y="454" width="166" height="62" fill="#ffffff" stroke="#64748b" stroke-width="1.5"/>
-    <text x="317" y="489" font-size="11.5" fill="#475569" text-anchor="middle">培養箱 Incubator</text>
-    <rect x="66" y="624" width="334" height="58" fill="#ffffff" stroke="#64748b" stroke-width="1.5"/>
-    <text x="233" y="657" font-size="11.5" fill="#475569" text-anchor="middle">無菌操作實驗檯</text>
-    <text x="234" y="576" font-size="22" font-weight="bold" fill="#713f12" text-anchor="middle">M-04 微生物檢測室</text>
-
-    <!-- M-05 Reagents & Standards -->
-    <rect x="424" y="428" width="356" height="296" fill="#fef08a"/>
-    <g fill="#ffffff" stroke="#64748b" stroke-width="1.5">
-      <rect x="452" y="464" width="84" height="194"/>
-      <rect x="668" y="464" width="84" height="194"/>
-    </g>
-    <text x="494" y="564" font-size="11.5" fill="#334155" text-anchor="middle">防爆藥品櫃</text>
-    <text x="710" y="564" font-size="11.5" fill="#334155" text-anchor="middle">標準品儲存</text>
-    <text x="602" y="560" font-size="22" font-weight="bold" fill="#713f12" text-anchor="middle">M-05</text>
-    <text x="602" y="586" font-size="13" fill="#854d0e" text-anchor="middle">試劑與標準品室</text>
-
-    <!-- M-06 Washing & Autoclave -->
-    <rect x="780" y="428" width="376" height="296" fill="#fef9c3"/>
-    <rect x="808" y="458" width="140" height="72" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.8"/>
-    <text x="878" y="498" font-size="12" font-weight="bold" fill="#0369a1" text-anchor="middle">超音波清洗槽</text>
-    <rect x="984" y="458" width="144" height="72" fill="#fee2e2" stroke="#dc2626" stroke-width="1.8"/>
-    <text x="1056" y="498" font-size="12" font-weight="bold" fill="#991b1b" text-anchor="middle">高壓滅菌釜</text>
-    <rect x="808" y="636" width="320" height="54" fill="#ffffff" stroke="#64748b" stroke-width="1.5"/>
-    <text x="968" y="667" font-size="11.5" fill="#475569" text-anchor="middle">烘箱 / 器皿乾燥檯</text>
-    <text x="968" y="588" font-size="22" font-weight="bold" fill="#713f12" text-anchor="middle">M-06 清洗滅菌室</text>
-  </g>
-
-  <!-- Door Swings -->
-  <g fill="none" stroke="#1e293b" stroke-width="2">
-    <path d="M 200 322 L 200 284 A 38 38 0 0 1 238 322"/>
-    <path d="M 570 322 L 570 284 A 38 38 0 0 1 608 322"/>
-    <path d="M 940 322 L 940 284 A 38 38 0 0 1 978 322"/>
-    <path d="M 200 428 L 200 466 A 38 38 0 0 0 238 428"/>
-    <path d="M 570 428 L 570 466 A 38 38 0 0 0 608 428"/>
-    <path d="M 940 428 L 940 466 A 38 38 0 0 0 978 428"/>
-  </g>
-  <text x="600" y="772" font-family="sans-serif" font-size="16" font-weight="bold" fill="#854d0e" text-anchor="middle">實驗室平面範本 (黃區 · M-01 ~ M-06 與儀器設備配置)</text>
-</svg>`;
-      return { width: 1200, height: 800, dataUrl: svgToDataUrl(svg) };
-    }
-
-    // 4. Manufacturing Zone Floor Plan Template (Red Frame) — P-01..P-21 pink/blue/white zones
-    if (templateId === 'mfg_red') {
-      const svg = `
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
-  <rect width="1200" height="800" fill="#ffffff"/>
-  <!-- Prominent Red Frame -->
-  <rect x="28" y="28" width="1144" height="712" fill="#fff5f5" stroke="#dc2626" stroke-width="6"/>
-
-  <g stroke="#334155" stroke-width="2.2" font-family="sans-serif" text-anchor="middle">
-    <!-- Row 1: P-01..P-05 (Blue & White) -->
-    <rect x="44" y="44" width="222" height="122" fill="#dbeafe"/>
-    <text x="155" y="102" font-size="19" font-weight="bold" fill="#1e3a8a">P-01</text>
-    <text x="155" y="124" font-size="12" fill="#1e40af">更衣室 A (藍區)</text>
-
-    <rect x="266" y="44" width="222" height="122" fill="#bfdbfe"/>
-    <text x="377" y="102" font-size="19" font-weight="bold" fill="#1e3a8a">P-02</text>
-    <text x="377" y="124" font-size="12" fill="#1e40af">人員氣鎖緩衝 (藍區)</text>
-
-    <rect x="488" y="44" width="224" height="122" fill="#ffffff"/>
-    <text x="600" y="102" font-size="19" font-weight="bold" fill="#334155">P-03</text>
-    <text x="600" y="124" font-size="12" fill="#64748b">器具清洗室 (白區)</text>
-
-    <rect x="712" y="44" width="222" height="122" fill="#dbeafe"/>
-    <text x="823" y="102" font-size="19" font-weight="bold" fill="#1e3a8a">P-04</text>
-    <text x="823" y="124" font-size="12" fill="#1e40af">物料氣鎖室 (藍區)</text>
-
-    <rect x="934" y="44" width="222" height="122" fill="#ffffff"/>
-    <text x="1045" y="102" font-size="19" font-weight="bold" fill="#334155">P-05</text>
-    <text x="1045" y="124" font-size="12" fill="#64748b">設備暫存間 (白區)</text>
-
-    <!-- Upper Corridor: P-06 (White) -->
-    <rect x="44" y="166" width="1112" height="58" fill="#ffffff"/>
-    <text x="600" y="201" font-size="15" font-weight="bold" fill="#475569">P-06 潔淨製程主走廊 (White Corridor)</text>
-
-    <!-- Row 2: P-07..P-10 (Pink & Blue) -->
-    <rect x="44" y="224" width="278" height="156" fill="#fbcfe8"/>
-    <text x="183" y="298" font-size="20" font-weight="bold" fill="#831843">P-07</text>
-    <text x="183" y="322" font-size="12.5" fill="#9d174d">稱量與配料作業室</text>
-
-    <rect x="322" y="224" width="278" height="156" fill="#fce7f3"/>
-    <text x="461" y="298" font-size="20" font-weight="bold" fill="#831843">P-08</text>
-    <text x="461" y="322" font-size="12.5" fill="#9d174d">核心製程作業室 A</text>
-
-    <rect x="600" y="224" width="278" height="156" fill="#fbcfe8"/>
-    <text x="739" y="298" font-size="20" font-weight="bold" fill="#831843">P-09</text>
-    <text x="739" y="322" font-size="12.5" fill="#9d174d">核心製程作業室 B</text>
-
-    <rect x="878" y="224" width="278" height="156" fill="#dbeafe"/>
-    <text x="1017" y="298" font-size="20" font-weight="bold" fill="#1e3a8a">P-10</text>
-    <text x="1017" y="322" font-size="12.5" fill="#1e40af">製程中繼緩衝室</text>
-
-    <!-- Row 3: P-11..P-14 (White, Pink, Blue) -->
-    <rect x="44" y="380" width="278" height="142" fill="#ffffff"/>
-    <text x="183" y="446" font-size="19" font-weight="bold" fill="#334155">P-11</text>
-    <text x="183" y="468" font-size="12" fill="#64748b">半成品暫存區 (白區)</text>
-
-    <rect x="322" y="380" width="278" height="142" fill="#fbcfe8"/>
-    <text x="461" y="446" font-size="19" font-weight="bold" fill="#831843">P-12</text>
-    <text x="461" y="468" font-size="12" fill="#9d174d">分裝與充填作業室</text>
-
-    <rect x="600" y="380" width="278" height="142" fill="#fce7f3"/>
-    <text x="739" y="446" font-size="19" font-weight="bold" fill="#831843">P-13</text>
-    <text x="739" y="468" font-size="12" fill="#9d174d">內包裝作業室</text>
-
-    <rect x="878" y="380" width="278" height="142" fill="#bfdbfe"/>
-    <text x="1017" y="446" font-size="19" font-weight="bold" fill="#1e3a8a">P-14</text>
-    <text x="1017" y="468" font-size="12" fill="#1e40af">物料傳遞氣鎖間</text>
-
-    <!-- Lower Corridor: P-15 (White) -->
-    <rect x="44" y="522" width="1112" height="54" fill="#ffffff"/>
-    <text x="600" y="555" font-size="15" font-weight="bold" fill="#475569">P-15 出料與包裝物流走廊</text>
-
-    <!-- Row 4: P-16..P-21 (Blue, White, Pink) -->
-    <rect x="44" y="576" width="185" height="148" fill="#dbeafe"/>
-    <text x="136" y="646" font-size="18" font-weight="bold" fill="#1e3a8a">P-16</text>
-    <text x="136" y="668" font-size="11.5" fill="#1e40af">更衣室 B</text>
-
-    <rect x="229" y="576" width="185" height="148" fill="#ffffff"/>
-    <text x="321" y="646" font-size="18" font-weight="bold" fill="#334155">P-17</text>
-    <text x="321" y="668" font-size="11.5" fill="#64748b">工具清潔乾燥</text>
-
-    <rect x="414" y="576" width="185" height="148" fill="#fbcfe8"/>
-    <text x="506" y="646" font-size="18" font-weight="bold" fill="#831843">P-18</text>
-    <text x="506" y="668" font-size="11.5" fill="#9d174d">外包裝作業</text>
-
-    <rect x="599" y="576" width="185" height="148" fill="#fce7f3"/>
-    <text x="691" y="646" font-size="18" font-weight="bold" fill="#831843">P-19</text>
-    <text x="691" y="668" font-size="11.5" fill="#9d174d">貼標檢視區</text>
-
-    <rect x="784" y="576" width="186" height="148" fill="#fbcfe8"/>
-    <text x="877" y="646" font-size="18" font-weight="bold" fill="#831843">P-20</text>
-    <text x="877" y="668" font-size="11.5" fill="#9d174d">裝箱理貨區</text>
-
-    <rect x="970" y="576" width="186" height="148" fill="#fce7f3"/>
-    <text x="1063" y="646" font-size="18" font-weight="bold" fill="#831843">P-21</text>
-    <text x="1063" y="668" font-size="11.5" fill="#9d174d">成品出貨緩衝</text>
-  </g>
-  <text x="600" y="776" font-family="sans-serif" font-size="16" font-weight="bold" fill="#b91c1c" text-anchor="middle">製造區平面範本 (紅框區 · P-01 ~ P-21 粉 / 藍 / 白分區配置)</text>
-</svg>`;
-      return { width: 1200, height: 800, dataUrl: svgToDataUrl(svg) };
-    }
-
-    // 5. Warehouse Zone Floor Plan Template (Blue Frame) — W-01..W-05, P-18..P-22, green cold room, orange pallet racks, pink packing edge
-    if (templateId === 'wh_blue') {
-      const svg = `
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
-  <rect width="1200" height="800" fill="#ffffff"/>
-  <!-- Prominent Blue Frame -->
-  <rect x="28" y="28" width="1144" height="712" fill="#f8fafc" stroke="#2563eb" stroke-width="6"/>
-
-  <!-- Left Pink Packing Edge: P-18 .. P-22 -->
-  <g stroke="#9d174d" stroke-width="2" font-family="sans-serif" text-anchor="middle">
-    <rect x="44" y="44" width="176" height="136" fill="#fbcfe8"/>
-    <text x="132" y="106" font-size="18" font-weight="bold" fill="#831843">P-18</text>
-    <text x="132" y="128" font-size="11.5" fill="#9d174d">外包裝銜接區</text>
-
-    <rect x="44" y="180" width="176" height="136" fill="#fce7f3"/>
-    <text x="132" y="242" font-size="18" font-weight="bold" fill="#831843">P-19</text>
-    <text x="132" y="264" font-size="11.5" fill="#9d174d">貼標檢驗區</text>
-
-    <rect x="44" y="316" width="176" height="136" fill="#fbcfe8"/>
-    <text x="132" y="378" font-size="18" font-weight="bold" fill="#831843">P-20</text>
-    <text x="132" y="400" font-size="11.5" fill="#9d174d">裝箱理貨區</text>
-
-    <rect x="44" y="452" width="176" height="136" fill="#fce7f3"/>
-    <text x="132" y="514" font-size="18" font-weight="bold" fill="#831843">P-21</text>
-    <text x="132" y="536" font-size="11.5" fill="#9d174d">成品緩衝暫存</text>
-
-    <rect x="44" y="588" width="176" height="136" fill="#fbcfe8"/>
-    <text x="132" y="650" font-size="18" font-weight="bold" fill="#831843">P-22</text>
-    <text x="132" y="672" font-size="11.5" fill="#9d174d">倉儲氣鎖通道</text>
-  </g>
-
-  <!-- Warehouse Core: W-01..W-05 -->
-  <g stroke="#334155" stroke-width="2.2" font-family="sans-serif" text-anchor="middle">
-    <!-- Top Row: W-01 Receiving & W-02 Packaging/Material Storage -->
-    <rect x="220" y="44" width="320" height="136" fill="#ffedd5"/>
-    <text x="380" y="106" font-size="20" font-weight="bold" fill="#9a3412">W-01</text>
-    <text x="380" y="130" font-size="12.5" fill="#c2410c">收貨進料 / 卸貨平台區</text>
-
-    <rect x="540" y="44" width="320" height="136" fill="#fed7aa"/>
-    <text x="700" y="106" font-size="20" font-weight="bold" fill="#9a3412">W-02</text>
-    <text x="700" y="130" font-size="12.5" fill="#c2410c">包材與原物料儲放區</text>
-
-    <!-- W-05 Right Side Shipping & Dock -->
-    <rect x="860" y="44" width="296" height="316" fill="#ffedd5"/>
-    <rect x="896" y="76" width="224" height="84" fill="#ffffff" stroke="#64748b" stroke-dasharray="6,4"/>
-    <text x="1008" y="122" font-size="13" font-weight="bold" fill="#475569">出貨斜坡 Ramp / Dock</text>
-    <text x="1008" y="232" font-size="22" font-weight="bold" fill="#9a3412">W-05</text>
-    <text x="1008" y="258" font-size="13" fill="#c2410c">出貨理貨與裝卸平台</text>
-
-    <!-- W-03 Ambient Warehouse with Orange Pallet Racks -->
-    <rect x="220" y="180" width="640" height="544" fill="#fff7ed"/>
-    <!-- Orange Pallet Rack Rows -->
-    <g fill="#fb923c" fill-opacity="0.45" stroke="#9a3412" stroke-width="1.6">
-      <!-- Row A -->
-      <rect x="248" y="210" width="90" height="72"/><line x1="248" y1="210" x2="338" y2="282"/><line x1="338" y1="210" x2="248" y2="282"/>
-      <rect x="248" y="282" width="90" height="72"/><line x1="248" y1="282" x2="338" y2="354"/><line x1="338" y1="282" x2="248" y2="354"/>
-      <rect x="248" y="354" width="90" height="72"/><line x1="248" y1="354" x2="338" y2="426"/><line x1="338" y1="354" x2="248" y2="426"/>
-      <rect x="248" y="426" width="90" height="72"/><line x1="248" y1="426" x2="338" y2="498"/><line x1="338" y1="426" x2="248" y2="498"/>
-      <rect x="248" y="498" width="90" height="72"/><line x1="248" y1="498" x2="338" y2="570"/><line x1="338" y1="498" x2="248" y2="570"/>
-      <!-- Row B (Double Back-to-Back) -->
-      <rect x="444" y="210" width="90" height="72"/><line x1="444" y1="210" x2="534" y2="282"/><line x1="534" y1="210" x2="444" y2="282"/>
-      <rect x="444" y="282" width="90" height="72"/><line x1="444" y1="282" x2="534" y2="354"/><line x1="534" y1="282" x2="444" y2="354"/>
-      <rect x="444" y="354" width="90" height="72"/><line x1="444" y1="354" x2="534" y2="426"/><line x1="534" y1="354" x2="444" y2="426"/>
-      <rect x="444" y="426" width="90" height="72"/><line x1="444" y1="426" x2="534" y2="498"/><line x1="534" y1="426" x2="444" y2="498"/>
-      <rect x="444" y="498" width="90" height="72"/><line x1="444" y1="498" x2="534" y2="570"/><line x1="534" y1="498" x2="444" y2="570"/>
-      <rect x="534" y="210" width="90" height="72"/><line x1="534" y1="210" x2="624" y2="282"/><line x1="624" y1="210" x2="534" y2="282"/>
-      <rect x="534" y="282" width="90" height="72"/><line x1="534" y1="282" x2="624" y2="354"/><line x1="624" y1="282" x2="534" y2="354"/>
-      <rect x="534" y="354" width="90" height="72"/><line x1="534" y1="354" x2="624" y2="426"/><line x1="624" y1="354" x2="534" y2="426"/>
-      <rect x="534" y="426" width="90" height="72"/><line x1="534" y1="426" x2="624" y2="498"/><line x1="624" y1="426" x2="534" y2="498"/>
-      <rect x="534" y="498" width="90" height="72"/><line x1="534" y1="498" x2="624" y2="570"/><line x1="624" y1="498" x2="534" y2="570"/>
-      <!-- Row C -->
-      <rect x="734" y="210" width="96" height="72"/><line x1="734" y1="210" x2="830" y2="282"/><line x1="830" y1="210" x2="734" y2="282"/>
-      <rect x="734" y="282" width="96" height="72"/><line x1="734" y1="282" x2="830" y2="354"/><line x1="830" y1="282" x2="734" y2="354"/>
-      <rect x="734" y="354" width="96" height="72"/><line x1="734" y1="354" x2="830" y2="426"/><line x1="830" y1="354" x2="734" y2="426"/>
-      <rect x="734" y="426" width="96" height="72"/><line x1="734" y1="426" x2="830" y2="498"/><line x1="830" y1="426" x2="734" y2="498"/>
-      <rect x="734" y="498" width="96" height="72"/><line x1="734" y1="498" x2="830" y2="570"/><line x1="830" y1="498" x2="734" y2="570"/>
-    </g>
-    <!-- Charging & Staging -->
-    <rect x="248" y="618" width="230" height="78" fill="#ffffff" stroke="#475569" stroke-dasharray="5,4"/>
-    <text x="363" y="662" font-size="13" font-weight="bold" fill="#475569">堆高機充電與理貨區</text>
-    <rect x="520" y="618" width="270" height="78" rx="8" fill="rgba(255,255,255,0.92)" stroke="#ea580c" stroke-width="2"/>
-    <text x="655" y="652" font-size="20" font-weight="bold" fill="#9a3412">W-03 常溫倉庫</text>
-    <text x="655" y="676" font-size="12" fill="#c2410c">橘色棧板貨架儲位區</text>
-
-    <!-- W-04 Green Cold Room (Bottom Right) -->
-    <rect x="860" y="360" width="296" height="364" fill="#bbf7d0" stroke="#15803d" stroke-width="4"/>
-    <g fill="#dcfce7" stroke="#166534" stroke-width="1.6">
-      <rect x="880" y="392" width="70" height="66"/><line x1="880" y1="392" x2="950" y2="458"/><line x1="950" y1="392" x2="880" y2="458"/>
-      <rect x="880" y="458" width="70" height="66"/><line x1="880" y1="458" x2="950" y2="524"/><line x1="950" y1="458" x2="880" y2="524"/>
-      <rect x="880" y="524" width="70" height="66"/><line x1="880" y1="524" x2="950" y2="590"/><line x1="950" y1="524" x2="880" y2="590"/>
-      <rect x="1066" y="392" width="70" height="66"/><line x1="1066" y1="392" x2="1136" y2="458"/><line x1="1136" y1="392" x2="1066" y2="458"/>
-      <rect x="1066" y="458" width="70" height="66"/><line x1="1066" y1="458" x2="1136" y2="524"/><line x1="1136" y1="458" x2="1066" y2="524"/>
-      <rect x="1066" y="524" width="70" height="66"/><line x1="1066" y1="524" x2="1136" y2="590"/><line x1="1136" y1="524" x2="1066" y2="590"/>
-    </g>
-    <rect x="928" y="624" width="160" height="72" rx="8" fill="rgba(255,255,255,0.92)" stroke="#15803d" stroke-width="2"/>
-    <text x="1008" y="656" font-size="20" font-weight="bold" fill="#14532d">W-04 冷藏庫</text>
-    <text x="1008" y="678" font-size="11.5" fill="#166534">2~8°C 綠色低溫倉</text>
-  </g>
-  <text x="600" y="776" font-family="sans-serif" font-size="16" font-weight="bold" fill="#1d4ed8" text-anchor="middle">倉儲區平面範本 (藍框區 · W-01~W-05 綠冷藏庫 / 橘棧板架 / 粉包裝銜接邊 P-18~P-22)</text>
-</svg>`;
-      return { width: 1200, height: 800, dataUrl: svgToDataUrl(svg) };
-    }
-
-    // 6. Cold Room Floor Plan Template (2D)
+    // 2. Cold Room Floor Plan Template (2D)
     if (templateId === 'coldroom_2d') {
       const svg = `
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
@@ -1749,7 +1279,7 @@
       return { width: 1200, height: 800, dataUrl: svgToDataUrl(svg) };
     }
 
-    // 7. Cold Room Isometric Space Template (3D)
+    // 3. Cold Room Isometric Space Template (3D) — Clean 3D Room/Floor/Wall Space Only (No Blue Object / Baked Door)
     if (templateId === 'coldroom_3d') {
       const ox = 540, oy = 310, s = 0.88;
       const iso = (x, y, z) => `${(ox + (-x * 0.866 + y * 0.866) * s).toFixed(1)},${(oy + (x * 0.5 + y * 0.5 - z) * s).toFixed(1)}`;
@@ -1763,29 +1293,19 @@
         const a = isoPt(0, gy, 0), b = isoPt(380, gy, 0);
         gridLines += `<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="#86efac" stroke-width="1" stroke-dasharray="4,4"/>`;
       }
-      const dMid0 = isoPt(380, 95, 0), dMid1 = isoPt(380, 95, 190);
       const svg = `
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
   <rect width="1200" height="800" fill="#ffffff"/>
-  <!-- Floor -->
+  <!-- Clean Green Isometric Floor -->
   <polygon points="${iso(0,0,0)} ${iso(380,0,0)} ${iso(380,560,0)} ${iso(0,560,0)}" fill="#dcfce7" stroke="#14532d" stroke-width="2.6" stroke-linejoin="round"/>
   ${gridLines}
   <!-- Left Back Wall (Insulated Panel) -->
   <polygon points="${iso(0,0,0)} ${iso(380,0,0)} ${iso(380,0,260)} ${iso(0,0,260)}" fill="#e2e8f0" stroke="#1e293b" stroke-width="2.6" stroke-linejoin="round"/>
   <!-- Right Back Wall (Insulated Panel) -->
   <polygon points="${iso(0,0,0)} ${iso(0,560,0)} ${iso(0,560,260)} ${iso(0,0,260)}" fill="#f1f5f9" stroke="#1e293b" stroke-width="2.6" stroke-linejoin="round"/>
-  <!-- Ceiling Cooling / Evaporator Box -->
-  <polygon points="${iso(20,160,210)} ${iso(95,160,210)} ${iso(95,300,210)} ${iso(20,300,210)}" fill="#bae6fd" stroke="#0284c7" stroke-width="1.8"/>
-  <polygon points="${iso(95,160,210)} ${iso(95,300,210)} ${iso(95,300,248)} ${iso(95,160,248)}" fill="#7dd3fc" stroke="#0284c7" stroke-width="1.8"/>
-  <polygon points="${iso(20,300,210)} ${iso(95,300,210)} ${iso(95,300,248)} ${iso(20,300,248)}" fill="#38bdf8" stroke="#0284c7" stroke-width="1.8"/>
-  <!-- Front-Left Insulated Double Door -->
-  <polygon points="${iso(380,30,0)} ${iso(380,160,0)} ${iso(380,160,190)} ${iso(380,30,190)}" fill="#ffffff" stroke="#0f172a" stroke-width="2.2"/>
-  <line x1="${dMid0[0]}" y1="${dMid0[1]}" x2="${dMid1[0]}" y2="${dMid1[1]}" stroke="#0f172a" stroke-width="1.8"/>
-  <polygon points="${iso(380,48,110)} ${iso(380,78,110)} ${iso(380,78,152)} ${iso(380,48,152)}" fill="#dbeafe" stroke="#0284c7" stroke-width="1.3"/>
-  <polygon points="${iso(380,112,110)} ${iso(380,142,110)} ${iso(380,142,152)} ${iso(380,112,152)}" fill="#dbeafe" stroke="#0284c7" stroke-width="1.3"/>
   <!-- Subtle Top Edge Guide -->
   <polyline points="${iso(380,0,260)} ${iso(380,560,260)} ${iso(0,560,260)}" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="6,5"/>
-  <text x="600" y="762" font-family="sans-serif" font-size="16" font-weight="bold" fill="#14532d" text-anchor="middle">冷藏庫等角立體空間範本 (3D Isometric · W-04 Cold Room)</text>
+  <text x="600" y="762" font-family="sans-serif" font-size="16" font-weight="bold" fill="#14532d" text-anchor="middle">冷藏庫等角立體空間範本 (3D Isometric · 純淨地板與牆面)</text>
 </svg>`;
       return { width: 1200, height: 800, dataUrl: svgToDataUrl(svg) };
     }
@@ -1795,7 +1315,7 @@
 
   // ==================== Tab Management ====================
   function createDefaultTab(name, templateId) {
-    const normTpl = normalizeTemplateId(templateId || 'facility_full');
+    const normTpl = normalizeTemplateId(templateId || 'blank');
     const tpl = getTemplateAsset(normTpl);
     return {
       id: uid('tab'),
@@ -2703,6 +2223,298 @@
     });
   }
 
+  // ==================== 3D Green Room Box (Floor + Walls Only) & Standalone 3D Door ====================
+  function hexToRgba(hex, alpha) {
+    const clean = String(hex || '#e2e8f0').replace('#', '');
+    if (clean.length !== 6) return `rgba(226,232,240,${alpha})`;
+    const num = parseInt(clean, 16);
+    const r = (num >> 16) & 255;
+    const g = (num >> 8) & 255;
+    const b = num & 255;
+    return `rgba(${r},${g},${b},${alpha})`;
+  }
+
+  function create3DRoomBoxGroup(opts) {
+    const width = Math.max(100, Math.min(600, Math.round(opts.width || 240)));
+    const depth = Math.max(100, Math.min(700, Math.round(opts.depth || 320)));
+    const wallHeight = Math.max(60, Math.min(400, Math.round(opts.wallHeight || 165)));
+    const orientation = ((parseInt(opts.orientation, 10) || 0) % 4 + 4) % 4; // 0:NE, 1:SE, 2:SW, 3:NW
+    const mirrorX = !!opts.mirrorX;
+    const mirrorY = !!opts.mirrorY;
+    const floorColor = opts.floorColor || '#dcfce7';
+    const wallColor = opts.wallColor || '#e2e8f0';
+    const wallColorLight = shadeHex(wallColor, 7);
+    const strokeColor = opts.strokeColor || '#14532d';
+    const showGrid = opts.showGrid !== false;
+
+    const effW = (orientation === 1 || orientation === 3) ? depth : width;
+    const effL = (orientation === 1 || orientation === 3) ? width : depth;
+    const s = 0.78;
+
+    const iso = (ix, iy, iz) => {
+      let px = (-ix * 0.866 + iy * 0.866) * s;
+      let py = (ix * 0.5 + iy * 0.5 - iz) * s;
+      if (mirrorX) px = -px;
+      if (mirrorY) py = -py;
+      return { x: px, y: py };
+    };
+
+    const items = [];
+
+    // 1. Clean Green Isometric Floor
+    items.push(new fabric.Polygon([
+      iso(0, 0, 0), iso(effW, 0, 0), iso(effW, effL, 0), iso(0, effL, 0)
+    ], {
+      fill: floorColor,
+      stroke: strokeColor,
+      strokeWidth: 2.5,
+      strokeLineJoin: 'round'
+    }));
+
+    // 2. Subtle Floor Grid Lines
+    if (showGrid) {
+      const step = 64;
+      const gridStroke = shadeHex(floorColor, -22);
+      for (let gx = step; gx < effW; gx += step) {
+        const a = iso(gx, 0, 0), b = iso(gx, effL, 0);
+        items.push(new fabric.Line([a.x, a.y, b.x, b.y], {
+          stroke: gridStroke, strokeWidth: 1, strokeDashArray: [4, 4]
+        }));
+      }
+      for (let gy = step; gy < effL; gy += step) {
+        const a = iso(0, gy, 0), b = iso(effW, gy, 0);
+        items.push(new fabric.Line([a.x, a.y, b.x, b.y], {
+          stroke: gridStroke, strokeWidth: 1, strokeDashArray: [4, 4]
+        }));
+      }
+    }
+
+    // Wall builders (Floor + 2 adjacent insulated walls only; NO blue rack, NO baked door)
+    const wallLeftBack = () => new fabric.Polygon([
+      iso(0, 0, 0), iso(effW, 0, 0), iso(effW, 0, wallHeight), iso(0, 0, wallHeight)
+    ], { fill: wallColor, stroke: '#1e293b', strokeWidth: 2.4, strokeLineJoin: 'round' });
+
+    const wallRightBack = () => new fabric.Polygon([
+      iso(0, 0, 0), iso(0, effL, 0), iso(0, effL, wallHeight), iso(0, 0, wallHeight)
+    ], { fill: wallColorLight, stroke: '#1e293b', strokeWidth: 2.4, strokeLineJoin: 'round' });
+
+    const wallFrontLeft = () => new fabric.Polygon([
+      iso(effW, 0, 0), iso(effW, effL, 0), iso(effW, effL, wallHeight), iso(effW, 0, wallHeight)
+    ], { fill: hexToRgba(wallColor, 0.52), stroke: '#1e293b', strokeWidth: 2.2, strokeLineJoin: 'round' });
+
+    const wallFrontRight = () => new fabric.Polygon([
+      iso(0, effL, 0), iso(effW, effL, 0), iso(effW, effL, wallHeight), iso(0, effL, wallHeight)
+    ], { fill: hexToRgba(wallColorLight, 0.56), stroke: '#1e293b', strokeWidth: 2.2, strokeLineJoin: 'round' });
+
+    // 3. Draw back walls & top guide & cutaway front walls according to 3D orientation
+    if (orientation === 0) {
+      items.push(wallLeftBack());
+      items.push(wallRightBack());
+      items.push(new fabric.Polyline([
+        iso(effW, 0, wallHeight), iso(effW, effL, wallHeight), iso(0, effL, wallHeight)
+      ], { fill: 'transparent', stroke: '#cbd5e1', strokeWidth: 1.5, strokeDashArray: [6, 5] }));
+    } else if (orientation === 1) {
+      items.push(wallRightBack());
+      items.push(new fabric.Polyline([
+        iso(0, 0, wallHeight), iso(effW, 0, wallHeight), iso(effW, effL, wallHeight)
+      ], { fill: 'transparent', stroke: '#cbd5e1', strokeWidth: 1.5, strokeDashArray: [6, 5] }));
+      items.push(wallFrontRight());
+    } else if (orientation === 2) {
+      items.push(new fabric.Polyline([
+        iso(effW, 0, wallHeight), iso(0, 0, wallHeight), iso(0, effL, wallHeight)
+      ], { fill: 'transparent', stroke: '#cbd5e1', strokeWidth: 1.5, strokeDashArray: [6, 5] }));
+      items.push(wallFrontLeft());
+      items.push(wallFrontRight());
+    } else {
+      items.push(wallLeftBack());
+      items.push(new fabric.Polyline([
+        iso(0, 0, wallHeight), iso(0, effL, wallHeight), iso(effW, effL, wallHeight)
+      ], { fill: 'transparent', stroke: '#cbd5e1', strokeWidth: 1.5, strokeDashArray: [6, 5] }));
+      items.push(wallFrontLeft());
+    }
+
+    return new fabric.Group(items, {
+      left: opts.x,
+      top: opts.y,
+      originX: 'center',
+      originY: 'center',
+      borderColor: '#15803d',
+      cornerColor: '#15803d',
+      lockUniScaling: false,
+      customType: 'roomBox3d',
+      room3dMeta: {
+        width,
+        depth,
+        wallHeight,
+        orientation,
+        mirrorX,
+        mirrorY,
+        floorColor,
+        wallColor,
+        strokeColor,
+        showGrid
+      },
+      objId: uid('rm3d')
+    });
+  }
+
+  function create3DDoorGroup(opts) {
+    const orientation = opts.orientation || 'front-left'; // front-left | front-right | back-left | back-right | flat
+    const doorStyle = opts.doorStyle === 'single' ? 'single' : 'double';
+    const width = Math.max(50, Math.min(260, Math.round(opts.width || 118)));
+    const height = Math.max(70, Math.min(280, Math.round(opts.height || 152)));
+    const thickness = Math.max(8, Math.min(28, Math.round(opts.thickness || 15)));
+    const mirrorX = !!opts.mirrorX;
+    const mirrorY = !!opts.mirrorY;
+    const panelColor = opts.panelColor || '#ffffff';
+    const frameColor = opts.frameColor || '#0f172a';
+    const windowColor = opts.windowColor || '#dbeafe';
+
+    const BASIS = {
+      'front-left':  { span: { x: 0.866, y: 0.5 },  depth: { x: 0.866, y: -0.5 }, out: { x: -0.866, y: 0.5 },  sideAtEnd: true },
+      'front-right': { span: { x: -0.866, y: 0.5 }, depth: { x: -0.866, y: -0.5 }, out: { x: 0.866, y: 0.5 },  sideAtEnd: false },
+      'back-left':   { span: { x: -0.866, y: 0.5 }, depth: { x: 0.866, y: 0.5 },   out: { x: 0.866, y: 0.5 },  sideAtEnd: true },
+      'back-right':  { span: { x: 0.866, y: 0.5 },  depth: { x: -0.866, y: 0.5 },  out: { x: -0.866, y: 0.5 }, sideAtEnd: false },
+      'flat':        { span: { x: 1, y: 0 },        depth: { x: 0.28, y: -0.22 },  out: { x: 0, y: 0.45 },     sideAtEnd: true }
+    };
+    const b = BASIS[orientation] || BASIS['front-left'];
+
+    const pt = (u, v, d, o) => {
+      const dd = d || 0;
+      const oo = o || 0;
+      let px = (u - width / 2) * b.span.x + dd * b.depth.x + oo * b.out.x;
+      let py = (u - width / 2) * b.span.y - v + dd * b.depth.y + oo * b.out.y;
+      if (mirrorX) px = -px;
+      if (mirrorY) py = -py;
+      return { x: px, y: py };
+    };
+
+    const items = [];
+
+    // 1. Subtle Floor Threshold / Swing Clearance Strip
+    const sillDepth = 18;
+    items.push(new fabric.Polygon([
+      pt(0, 0, 0, 0), pt(width, 0, 0, 0), pt(width, 0, 0, sillDepth), pt(0, 0, 0, sillDepth)
+    ], {
+      fill: 'rgba(220, 38, 38, 0.10)',
+      stroke: '#ef4444',
+      strokeWidth: 1.2,
+      strokeDashArray: [4, 3],
+      strokeLineJoin: 'round'
+    }));
+
+    // 2. 3D Top Jamb Thickness
+    items.push(new fabric.Polygon([
+      pt(0, height, 0), pt(width, height, 0), pt(width, height, thickness), pt(0, height, thickness)
+    ], {
+      fill: '#cbd5e1',
+      stroke: frameColor,
+      strokeWidth: 1.8,
+      strokeLineJoin: 'round'
+    }));
+
+    // 3. 3D Side Jamb Thickness
+    const sideU = b.sideAtEnd ? width : 0;
+    items.push(new fabric.Polygon([
+      pt(sideU, 0, 0), pt(sideU, height, 0), pt(sideU, height, thickness), pt(sideU, 0, thickness)
+    ], {
+      fill: '#94a3b8',
+      stroke: frameColor,
+      strokeWidth: 1.8,
+      strokeLineJoin: 'round'
+    }));
+
+    // 4. Main Door Panel Face
+    items.push(new fabric.Polygon([
+      pt(0, 0, 0), pt(width, 0, 0), pt(width, height, 0), pt(0, height, 0)
+    ], {
+      fill: panelColor,
+      stroke: frameColor,
+      strokeWidth: 2.4,
+      strokeLineJoin: 'round'
+    }));
+
+    // 5. Inner Recessed Frame Outline
+    items.push(new fabric.Polygon([
+      pt(width * 0.04, height * 0.03, 0),
+      pt(width * 0.96, height * 0.03, 0),
+      pt(width * 0.96, height * 0.97, 0),
+      pt(width * 0.04, height * 0.97, 0)
+    ], {
+      fill: 'transparent',
+      stroke: '#94a3b8',
+      strokeWidth: 1.1,
+      strokeLineJoin: 'round'
+    }));
+
+    if (doorStyle === 'double') {
+      // Center vertical seam
+      const m0 = pt(width * 0.5, 0, 0), m1 = pt(width * 0.5, height, 0);
+      items.push(new fabric.Line([m0.x, m0.y, m1.x, m1.y], {
+        stroke: frameColor, strokeWidth: 2
+      }));
+      // Left viewing window
+      items.push(new fabric.Polygon([
+        pt(width * 0.14, height * 0.56, 0), pt(width * 0.39, height * 0.56, 0),
+        pt(width * 0.39, height * 0.80, 0), pt(width * 0.14, height * 0.80, 0)
+      ], {
+        fill: windowColor, stroke: '#0284c7', strokeWidth: 1.5, strokeLineJoin: 'round'
+      }));
+      // Right viewing window
+      items.push(new fabric.Polygon([
+        pt(width * 0.61, height * 0.56, 0), pt(width * 0.86, height * 0.56, 0),
+        pt(width * 0.86, height * 0.80, 0), pt(width * 0.61, height * 0.80, 0)
+      ], {
+        fill: windowColor, stroke: '#0284c7', strokeWidth: 1.5, strokeLineJoin: 'round'
+      }));
+      // Two vertical door handles
+      const hl0 = pt(width * 0.43, height * 0.35, 0), hl1 = pt(width * 0.43, height * 0.49, 0);
+      const hr0 = pt(width * 0.57, height * 0.35, 0), hr1 = pt(width * 0.57, height * 0.49, 0);
+      items.push(new fabric.Line([hl0.x, hl0.y, hl1.x, hl1.y], { stroke: '#475569', strokeWidth: 2.6, strokeLineCap: 'round' }));
+      items.push(new fabric.Line([hr0.x, hr0.y, hr1.x, hr1.y], { stroke: '#475569', strokeWidth: 2.6, strokeLineCap: 'round' }));
+    } else {
+      // Single door viewing window
+      items.push(new fabric.Polygon([
+        pt(width * 0.24, height * 0.56, 0), pt(width * 0.76, height * 0.56, 0),
+        pt(width * 0.76, height * 0.80, 0), pt(width * 0.24, height * 0.80, 0)
+      ], {
+        fill: windowColor, stroke: '#0284c7', strokeWidth: 1.5, strokeLineJoin: 'round'
+      }));
+      // Latch handle
+      const h0 = pt(width * 0.83, height * 0.35, 0), h1 = pt(width * 0.83, height * 0.49, 0);
+      items.push(new fabric.Line([h0.x, h0.y, h1.x, h1.y], { stroke: '#475569', strokeWidth: 2.8, strokeLineCap: 'round' }));
+      // Hinge markers
+      const hg1a = pt(width * 0.03, height * 0.20, 0), hg1b = pt(width * 0.03, height * 0.27, 0);
+      const hg2a = pt(width * 0.03, height * 0.73, 0), hg2b = pt(width * 0.03, height * 0.80, 0);
+      items.push(new fabric.Line([hg1a.x, hg1a.y, hg1b.x, hg1b.y], { stroke: '#334155', strokeWidth: 3.2 }));
+      items.push(new fabric.Line([hg2a.x, hg2a.y, hg2b.x, hg2b.y], { stroke: '#334155', strokeWidth: 3.2 }));
+    }
+
+    return new fabric.Group(items, {
+      left: opts.x,
+      top: opts.y,
+      originX: 'center',
+      originY: 'center',
+      borderColor: '#dc2626',
+      cornerColor: '#dc2626',
+      lockUniScaling: false,
+      customType: 'door3d',
+      door3dMeta: {
+        orientation,
+        doorStyle,
+        width,
+        height,
+        thickness,
+        mirrorX,
+        mirrorY,
+        panelColor,
+        frameColor,
+        windowColor
+      },
+      objId: uid('dr3d')
+    });
+  }
+
   function createHvacLegend(x, y) {
     const text = '【點位與空調圖例】\nT : 上層 (Top)   M : 中層 (Middle)   B : 下層 (Bottom)\nSA : 出風口 (Supply Air)   SA-D : 向下出風\nRA : 回風口 (Return Air)   RA-U : 向上回風';
     const styles = { 1: {}, 2: {}, 3: {} };
@@ -3269,6 +3081,8 @@
     'shape-roundrect': '圓角矩形方塊 (點擊或拖曳)',
     'shape-ellipse': '圓形/橢圓方塊 (點擊或拖曳)',
     'shape-lshape': 'L 型區塊 (點擊或拖曳)',
+    'room-box-3d': '3D 綠色空間箱 (點擊或拖曳調整大小)',
+    'door-3d': '3D 獨立門物件 (點擊或拖曳調整大小)',
     'free-arrow': '自由箭頭 (拖曳或點擊)',
     'marker-T': 'T 點位 (連續點擊放置)',
     'marker-M': 'M 點位 (連續點擊放置)',
@@ -3365,6 +3179,7 @@
       }
       keepLabelsOnTop();
       pushUndoSnapshot();
+      updateInspector();
     });
 
     canvas.on('text:changed', () => {
@@ -3462,7 +3277,8 @@
 
       // Drag-capable tools
       const isShapeTool = activeTool.startsWith('shape-');
-      if (isShapeTool || ['mask-rect', 'mask-circle', 'free-arrow', 'sa-dir', 'ra-dir', 'dimension'].includes(activeTool)) {
+      const isIso3dTool = activeTool === 'room-box-3d' || activeTool === 'door-3d';
+      if (isShapeTool || isIso3dTool || ['mask-rect', 'mask-circle', 'free-arrow', 'sa-dir', 'ra-dir', 'dimension'].includes(activeTool)) {
         isDrawing = true;
         const drawColor = document.getElementById('draw-custom-color').value;
         if (activeTool === 'mask-rect') {
@@ -3483,6 +3299,14 @@
           previewObj = new fabric.Rect({
             left: ptr.x, top: ptr.y, width: 1, height: 1,
             fill: sFill, opacity: 0.45, stroke: sStroke, strokeWidth: 2, strokeDashArray: [5, 4],
+            originX: 'center', originY: 'center', selectable: false, evented: false
+          });
+        } else if (isIso3dTool) {
+          const pFill = activeTool === 'room-box-3d' ? '#dcfce7' : '#fee2e2';
+          const pStroke = activeTool === 'room-box-3d' ? '#15803d' : '#dc2626';
+          previewObj = new fabric.Rect({
+            left: ptr.x, top: ptr.y, width: 1, height: 1,
+            fill: pFill, opacity: 0.45, stroke: pStroke, strokeWidth: 2, strokeDashArray: [5, 4],
             originX: 'center', originY: 'center', selectable: false, evented: false
           });
         } else {
@@ -3575,7 +3399,7 @@
       const midX = (drawStart.x + ptr.x) / 2;
       const midY = (drawStart.y + ptr.y) / 2;
 
-      if (activeTool === 'mask-rect' || (activeTool && activeTool.startsWith('shape-'))) {
+      if (activeTool === 'mask-rect' || (activeTool && activeTool.startsWith('shape-')) || activeTool === 'room-box-3d' || activeTool === 'door-3d') {
         previewObj.set({ left: midX, top: midY, width: Math.max(2, w), height: Math.max(2, h) });
       } else if (activeTool === 'mask-circle') {
         previewObj.set({ left: midX, top: midY, radius: Math.max(2, Math.hypot(w, h) / 2) });
@@ -3684,6 +3508,37 @@
           x: dist < 12 ? drawStart.x : midX,
           y: dist < 12 ? drawStart.y : midY
         });
+      } else if (activeTool === 'room-box-3d') {
+        const oriMap = { 'front-left': 0, 'front-right': 1, 'back-left': 2, 'back-right': 3, 'flat': 0 };
+        const initOri = oriMap[document.getElementById('iso3d-init-orientation').value] || 0;
+        const floorColor = document.getElementById('room3d-floor-color').value || '#dcfce7';
+        const wallColor = document.getElementById('room3d-wall-color').value || '#e2e8f0';
+        const rw = dist < 16 ? 240 : Math.max(120, Math.min(540, Math.round(w * 0.72)));
+        const rl = dist < 16 ? 320 : Math.max(120, Math.min(620, Math.round(h * 0.95)));
+        const rh = dist < 16 ? 165 : Math.max(85, Math.min(300, Math.round(Math.min(rw, rl) * 0.68)));
+        created = create3DRoomBoxGroup({
+          width: rw,
+          depth: rl,
+          wallHeight: rh,
+          orientation: initOri,
+          floorColor,
+          wallColor,
+          x: dist < 16 ? drawStart.x : midX,
+          y: dist < 16 ? drawStart.y : midY
+        });
+      } else if (activeTool === 'door-3d') {
+        const initOri = document.getElementById('iso3d-init-orientation').value || 'front-left';
+        const doorStyle = document.getElementById('door3d-style').value || 'double';
+        const dw = dist < 16 ? 118 : Math.max(60, Math.min(240, Math.round(w * 0.95)));
+        const dh = dist < 16 ? 152 : Math.max(80, Math.min(260, Math.round(h * 0.92)));
+        created = create3DDoorGroup({
+          orientation: initOri,
+          doorStyle,
+          width: dw,
+          height: dh,
+          x: dist < 16 ? drawStart.x : midX,
+          y: dist < 16 ? drawStart.y : midY
+        });
       } else if (activeTool === 'sa-dir' || activeTool === 'ra-dir' || activeTool === 'free-arrow') {
         const x1 = dist < 12 ? drawStart.x - 55 : drawStart.x;
         const y1 = dist < 12 ? drawStart.y : drawStart.y;
@@ -3742,6 +3597,14 @@
     }
 
     const shapeNames = { rect: '矩形', roundrect: '圓角矩形', ellipse: '圓形/橢圓', lshape: 'L 型區塊' };
+    const roomOriNames = ['標準 NE (0°)', '順轉 SE (90°)', '順轉 SW (180°)', '順轉 NW (270°)'];
+    const doorOriNames = {
+      'front-left': '前左牆',
+      'front-right': '前右牆',
+      'back-left': '後左牆',
+      'back-right': '後右牆',
+      'flat': '正面立視'
+    };
     const typeNames = {
       flowArrow: '動線箭頭',
       maskRect: '白色方形遮罩',
@@ -3752,6 +3615,12 @@
       shapeBlock: obj.shapeMeta
         ? `自訂形狀：${shapeNames[obj.shapeMeta.shapeType] || '方塊'} (${obj.shapeMeta.viewMode === '3d' ? '3D 等角' : '2D 平面'})`
         : '自訂形狀方塊',
+      roomBox3d: obj.room3dMeta
+        ? `3D 綠色空間箱 (${roomOriNames[obj.room3dMeta.orientation || 0]})`
+        : '3D 綠色空間箱',
+      door3d: obj.door3dMeta
+        ? `3D 獨立門物件 (${doorOriNames[obj.door3dMeta.orientation] || '前左牆'})`
+        : '3D 獨立門物件',
       marker: `點位標記 (${obj.markerType || ''})`,
       'hvac-sa': 'SA 出風口',
       'hvac-ra': 'RA 回風口',
@@ -3768,6 +3637,7 @@
 
     const label = typeNames[obj.customType] || (obj.type === 'activeSelection' ? `多選物件 (${obj.getObjects().length})` : obj.type);
     const opacityPct = Math.round((obj.opacity !== undefined ? obj.opacity : 1) * 100);
+    const curAngle = Math.round(((obj.angle || 0) % 360 + 360) % 360);
 
     let extraHtml = '';
     if (obj.customType === 'customFlowLegend') {
@@ -3792,6 +3662,81 @@
         </div>
         <div style="font-size:11px;color:#2563eb;margin-top:4px;">提示：雙擊方塊可直接編輯置中標籤文字</div>
       `;
+    } else if (obj.customType === 'roomBox3d' && obj.room3dMeta) {
+      const m = obj.room3dMeta;
+      extraHtml = `
+        <div style="margin-top:8px;padding-top:7px;border-top:1px solid var(--border);">
+          <div style="font-size:11px;font-weight:700;color:#14532d;margin-bottom:5px;">3D 空間箱朝向與鏡像</div>
+          <div class="row-flex" style="margin-bottom:5px;">
+            <select id="insp-room3d-ori" data-testid="insp-room3d-ori" class="select-input" style="flex:1;padding:3px 6px;font-size:11px;">
+              <option value="0" ${m.orientation === 0 ? 'selected' : ''}>標準 NE (0° 後雙牆)</option>
+              <option value="1" ${m.orientation === 1 ? 'selected' : ''}>順轉 SE (90° 右雙牆)</option>
+              <option value="2" ${m.orientation === 2 ? 'selected' : ''}>順轉 SW (180° 前雙牆)</option>
+              <option value="3" ${m.orientation === 3 ? 'selected' : ''}>順轉 NW (270° 左雙牆)</option>
+            </select>
+            <button type="button" class="btn btn-xs" id="insp-room3d-ori-next" data-testid="insp-room3d-ori-next" title="順時針切換 3D 朝向">↻ 轉向</button>
+          </div>
+          <div class="grid-2" style="margin-bottom:5px;">
+            <button type="button" class="btn btn-xs ${m.mirrorX ? 'btn-active' : ''}" id="insp-room3d-mirror-x" data-testid="insp-room3d-mirror-x">⇄ 左右鏡像${m.mirrorX ? ' ✓' : ''}</button>
+            <button type="button" class="btn btn-xs ${m.mirrorY ? 'btn-active' : ''}" id="insp-room3d-mirror-y" data-testid="insp-room3d-mirror-y">⇅ 上下鏡像${m.mirrorY ? ' ✓' : ''}</button>
+          </div>
+          <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin:6px 0 4px;">尺寸微調（亦可拖拉畫布四角縮放）</div>
+          <div class="row-flex" style="margin-bottom:3px;justify-content:space-between;">
+            <span style="font-size:10.5px;color:var(--text-muted);">寬 W: <strong id="insp-room3d-w-val">${m.width}</strong></span>
+            <input type="range" id="insp-room3d-w" data-testid="insp-room3d-w" min="100" max="540" value="${m.width}" style="width:130px;">
+          </div>
+          <div class="row-flex" style="margin-bottom:3px;justify-content:space-between;">
+            <span style="font-size:10.5px;color:var(--text-muted);">深 L: <strong id="insp-room3d-l-val">${m.depth}</strong></span>
+            <input type="range" id="insp-room3d-l" data-testid="insp-room3d-l" min="100" max="620" value="${m.depth}" style="width:130px;">
+          </div>
+          <div class="row-flex" style="margin-bottom:6px;justify-content:space-between;">
+            <span style="font-size:10.5px;color:var(--text-muted);">高 H: <strong id="insp-room3d-h-val">${m.wallHeight}</strong></span>
+            <input type="range" id="insp-room3d-h" data-testid="insp-room3d-h" min="60" max="320" value="${m.wallHeight}" style="width:130px;">
+          </div>
+          <div class="row-flex" style="justify-content:space-between;">
+            <label style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;">
+              地板 <input type="color" id="insp-room3d-floor" class="color-swatch" value="${m.floorColor || '#dcfce7'}">
+            </label>
+            <label style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;">
+              牆面 <input type="color" id="insp-room3d-wall" class="color-swatch" value="${m.wallColor || '#e2e8f0'}">
+            </label>
+            <button type="button" class="btn btn-xs" id="insp-room3d-grid" data-testid="insp-room3d-grid">${m.showGrid !== false ? '格線:開' : '格線:關'}</button>
+          </div>
+        </div>
+      `;
+    } else if (obj.customType === 'door3d' && obj.door3dMeta) {
+      const m = obj.door3dMeta;
+      extraHtml = `
+        <div style="margin-top:8px;padding-top:7px;border-top:1px solid var(--border);">
+          <div style="font-size:11px;font-weight:700;color:#991b1b;margin-bottom:5px;">3D 獨立門朝向與鏡像</div>
+          <div class="row-flex" style="margin-bottom:5px;">
+            <select id="insp-door3d-ori" data-testid="insp-door3d-ori" class="select-input" style="flex:1;padding:3px 6px;font-size:11px;">
+              <option value="front-left" ${m.orientation === 'front-left' ? 'selected' : ''}>前左牆面 (左下)</option>
+              <option value="front-right" ${m.orientation === 'front-right' ? 'selected' : ''}>前右牆面 (右下)</option>
+              <option value="back-left" ${m.orientation === 'back-left' ? 'selected' : ''}>後左牆面 (左上)</option>
+              <option value="back-right" ${m.orientation === 'back-right' ? 'selected' : ''}>後右牆面 (右上)</option>
+              <option value="flat" ${m.orientation === 'flat' ? 'selected' : ''}>正面立視 (0°)</option>
+            </select>
+            <button type="button" class="btn btn-xs" id="insp-door3d-ori-next" data-testid="insp-door3d-ori-next" title="切換下一個門朝向">↻ 轉向</button>
+          </div>
+          <div class="grid-2" style="margin-bottom:5px;">
+            <button type="button" class="btn btn-xs ${m.mirrorX ? 'btn-active' : ''}" id="insp-door3d-mirror-x" data-testid="insp-door3d-mirror-x">⇄ 左右鏡像${m.mirrorX ? ' ✓' : ''}</button>
+            <button type="button" class="btn btn-xs ${m.mirrorY ? 'btn-active' : ''}" id="insp-door3d-mirror-y" data-testid="insp-door3d-mirror-y">⇅ 上下鏡像${m.mirrorY ? ' ✓' : ''}</button>
+          </div>
+          <div class="grid-2" style="margin-bottom:6px;">
+            <button type="button" class="btn btn-xs" id="insp-door3d-style" data-testid="insp-door3d-style">${m.doorStyle === 'single' ? '🚪 切換雙開門' : '🚪 切換單開門'}</button>
+            <button type="button" class="btn btn-xs" id="insp-door3d-reset-xf" data-testid="insp-door3d-reset-xf">↺ 還原變換</button>
+          </div>
+          <div class="row-flex" style="margin-bottom:3px;justify-content:space-between;">
+            <span style="font-size:10.5px;color:var(--text-muted);">門寬: <strong id="insp-door3d-w-val">${m.width}</strong></span>
+            <input type="range" id="insp-door3d-w" data-testid="insp-door3d-w" min="50" max="240" value="${m.width}" style="width:130px;">
+          </div>
+          <div class="row-flex" style="margin-bottom:4px;justify-content:space-between;">
+            <span style="font-size:10.5px;color:var(--text-muted);">門高: <strong id="insp-door3d-h-val">${m.height}</strong></span>
+            <input type="range" id="insp-door3d-h" data-testid="insp-door3d-h" min="70" max="260" value="${m.height}" style="width:130px;">
+          </div>
+        </div>
+      `;
     }
 
     box.innerHTML = `
@@ -3800,9 +3745,21 @@
         <span style="font-size:11px;color:var(--text-muted);">透明度: <strong id="insp-op-val">${opacityPct}%</strong></span>
         <input type="range" id="insp-opacity" min="15" max="100" value="${opacityPct}" style="width:130px;">
       </div>
-      <div class="grid-2" style="margin-bottom:4px;">
+      <div class="grid-2" style="margin-bottom:5px;">
         <button type="button" class="btn btn-xs" id="insp-fwd">↑ 上移一層</button>
         <button type="button" class="btn btn-xs" id="insp-bwd">↓ 下移一層</button>
+      </div>
+      <div style="font-size:10.5px;color:var(--text-muted);margin:5px 0 3px;">旋轉與翻轉（角度：<strong id="insp-angle-val">${curAngle}°</strong>）</div>
+      <div class="grid-4" style="margin-bottom:4px;">
+        <button type="button" class="btn btn-xs" id="insp-rot-m90" data-testid="insp-rot-m90" title="逆時針旋轉 90°">↺90°</button>
+        <button type="button" class="btn btn-xs" id="insp-rot-m15" data-testid="insp-rot-m15" title="逆時針旋轉 15°">-15°</button>
+        <button type="button" class="btn btn-xs" id="insp-rot-p15" data-testid="insp-rot-p15" title="順時針旋轉 15°">+15°</button>
+        <button type="button" class="btn btn-xs" id="insp-rot-p90" data-testid="insp-rot-p90" title="順時針旋轉 90°">↻90°</button>
+      </div>
+      <div class="grid-3" style="margin-bottom:4px;">
+        <button type="button" class="btn btn-xs ${obj.flipX ? 'btn-active' : ''}" id="insp-flip-x" data-testid="insp-flip-x" title="水平翻轉 (Flip X)">↔ 水平翻轉</button>
+        <button type="button" class="btn btn-xs ${obj.flipY ? 'btn-active' : ''}" id="insp-flip-y" data-testid="insp-flip-y" title="垂直翻轉 (Flip Y)">↕ 垂直翻轉</button>
+        <button type="button" class="btn btn-xs" id="insp-rot-reset" data-testid="insp-rot-reset" title="重設旋轉與翻轉">↺ 重設</button>
       </div>
       ${extraHtml}
       ${obj.customType === 'marker' ? `<div style="font-size:11px;color:#2563eb;margin-top:4px;">提示：雙擊點位可修改編號 (目前: ${obj.markerNumber})</div>` : ''}
@@ -3831,6 +3788,69 @@
       pushUndoSnapshot();
     };
 
+    // Universal Rotate / Flip handlers
+    const applyObjRotate = (delta) => {
+      const nextAngle = ((obj.angle || 0) + delta) % 360;
+      obj.rotate(nextAngle);
+      if (obj.customType === 'flowArrow') keepArrowTextUpright(obj);
+      obj.setCoords();
+      canvas.renderAll();
+      pushUndoSnapshot();
+      updateInspector();
+    };
+    document.getElementById('insp-rot-m90').onclick = () => applyObjRotate(-90);
+    document.getElementById('insp-rot-m15').onclick = () => applyObjRotate(-15);
+    document.getElementById('insp-rot-p15').onclick = () => applyObjRotate(15);
+    document.getElementById('insp-rot-p90').onclick = () => applyObjRotate(90);
+    document.getElementById('insp-flip-x').onclick = () => {
+      obj.set('flipX', !obj.flipX);
+      obj.setCoords();
+      canvas.renderAll();
+      pushUndoSnapshot();
+      updateInspector();
+    };
+    document.getElementById('insp-flip-y').onclick = () => {
+      obj.set('flipY', !obj.flipY);
+      obj.setCoords();
+      canvas.renderAll();
+      pushUndoSnapshot();
+      updateInspector();
+    };
+    document.getElementById('insp-rot-reset').onclick = () => {
+      if (obj.customType === 'roomBox3d' && obj.room3dMeta) {
+        const nextMeta = Object.assign({}, obj.room3dMeta, { mirrorX: false, mirrorY: false });
+        const updated = create3DRoomBoxGroup(Object.assign({}, nextMeta, { x: obj.left, y: obj.top }));
+        updated.set({ angle: 0, flipX: false, flipY: false, scaleX: 1, scaleY: 1, opacity: obj.opacity });
+        canvas.remove(obj);
+        canvas.add(updated);
+        keepLabelsOnTop();
+        canvas.setActiveObject(updated);
+        canvas.renderAll();
+        pushUndoSnapshot();
+        updateInspector();
+        return;
+      }
+      if (obj.customType === 'door3d' && obj.door3dMeta) {
+        const nextMeta = Object.assign({}, obj.door3dMeta, { mirrorX: false, mirrorY: false });
+        const updated = create3DDoorGroup(Object.assign({}, nextMeta, { x: obj.left, y: obj.top }));
+        updated.set({ angle: 0, flipX: false, flipY: false, scaleX: 1, scaleY: 1, opacity: obj.opacity });
+        canvas.remove(obj);
+        canvas.add(updated);
+        keepLabelsOnTop();
+        canvas.setActiveObject(updated);
+        canvas.renderAll();
+        pushUndoSnapshot();
+        updateInspector();
+        return;
+      }
+      obj.set({ angle: 0, flipX: false, flipY: false, scaleX: 1, scaleY: 1 });
+      if (obj.customType === 'flowArrow') keepArrowTextUpright(obj);
+      obj.setCoords();
+      canvas.renderAll();
+      pushUndoSnapshot();
+      updateInspector();
+    };
+
     if (obj.customType === 'customFlowLegend') {
       document.getElementById('insp-edit-legend').onclick = () => openLegendModal(obj);
     }
@@ -3839,7 +3859,10 @@
       const rebuildSelectedShape = (patch) => {
         const nextMeta = Object.assign({}, obj.shapeMeta, patch);
         const updated = createCustomShapeBlockGroup(Object.assign({}, nextMeta, { x: obj.left, y: obj.top }));
-        updated.set({ scaleX: obj.scaleX, scaleY: obj.scaleY, angle: obj.angle, opacity: obj.opacity });
+        updated.set({
+          scaleX: obj.scaleX, scaleY: obj.scaleY, angle: obj.angle,
+          flipX: obj.flipX, flipY: obj.flipY, opacity: obj.opacity
+        });
         canvas.remove(obj);
         canvas.add(updated);
         keepLabelsOnTop();
@@ -3867,6 +3890,115 @@
         if (val !== null) {
           rebuildSelectedShape({ label: val.trim().slice(0, 36) });
         }
+      };
+    }
+
+    if (obj.customType === 'roomBox3d' && obj.room3dMeta) {
+      const rebuildSelectedRoom = (patch) => {
+        const nextMeta = Object.assign({}, obj.room3dMeta, patch);
+        const updated = create3DRoomBoxGroup(Object.assign({}, nextMeta, { x: obj.left, y: obj.top }));
+        updated.set({
+          scaleX: obj.scaleX, scaleY: obj.scaleY, angle: obj.angle,
+          flipX: obj.flipX, flipY: obj.flipY, opacity: obj.opacity
+        });
+        canvas.remove(obj);
+        canvas.add(updated);
+        keepLabelsOnTop();
+        canvas.setActiveObject(updated);
+        canvas.renderAll();
+        pushUndoSnapshot();
+        updateInspector();
+      };
+      document.getElementById('insp-room3d-ori').onchange = function () {
+        rebuildSelectedRoom({ orientation: parseInt(this.value, 10) || 0 });
+      };
+      document.getElementById('insp-room3d-ori-next').onclick = () => {
+        rebuildSelectedRoom({ orientation: ((obj.room3dMeta.orientation || 0) + 1) % 4 });
+      };
+      document.getElementById('insp-room3d-mirror-x').onclick = () => {
+        rebuildSelectedRoom({ mirrorX: !obj.room3dMeta.mirrorX });
+      };
+      document.getElementById('insp-room3d-mirror-y').onclick = () => {
+        rebuildSelectedRoom({ mirrorY: !obj.room3dMeta.mirrorY });
+      };
+      document.getElementById('insp-room3d-w').oninput = function () {
+        document.getElementById('insp-room3d-w-val').textContent = this.value;
+      };
+      document.getElementById('insp-room3d-w').onchange = function () {
+        rebuildSelectedRoom({ width: parseInt(this.value, 10) || 240 });
+      };
+      document.getElementById('insp-room3d-l').oninput = function () {
+        document.getElementById('insp-room3d-l-val').textContent = this.value;
+      };
+      document.getElementById('insp-room3d-l').onchange = function () {
+        rebuildSelectedRoom({ depth: parseInt(this.value, 10) || 320 });
+      };
+      document.getElementById('insp-room3d-h').oninput = function () {
+        document.getElementById('insp-room3d-h-val').textContent = this.value;
+      };
+      document.getElementById('insp-room3d-h').onchange = function () {
+        rebuildSelectedRoom({ wallHeight: parseInt(this.value, 10) || 165 });
+      };
+      document.getElementById('insp-room3d-floor').onchange = function () {
+        rebuildSelectedRoom({ floorColor: this.value });
+      };
+      document.getElementById('insp-room3d-wall').onchange = function () {
+        rebuildSelectedRoom({ wallColor: this.value });
+      };
+      document.getElementById('insp-room3d-grid').onclick = () => {
+        rebuildSelectedRoom({ showGrid: obj.room3dMeta.showGrid === false });
+      };
+    }
+
+    if (obj.customType === 'door3d' && obj.door3dMeta) {
+      const doorOris = ['front-left', 'front-right', 'back-left', 'back-right', 'flat'];
+      const rebuildSelectedDoor = (patch, resetTransforms) => {
+        const nextMeta = Object.assign({}, obj.door3dMeta, patch);
+        const updated = create3DDoorGroup(Object.assign({}, nextMeta, { x: obj.left, y: obj.top }));
+        updated.set(resetTransforms ? {
+          scaleX: 1, scaleY: 1, angle: 0, flipX: false, flipY: false, opacity: obj.opacity
+        } : {
+          scaleX: obj.scaleX, scaleY: obj.scaleY, angle: obj.angle,
+          flipX: obj.flipX, flipY: obj.flipY, opacity: obj.opacity
+        });
+        canvas.remove(obj);
+        canvas.add(updated);
+        keepLabelsOnTop();
+        canvas.setActiveObject(updated);
+        canvas.renderAll();
+        pushUndoSnapshot();
+        updateInspector();
+      };
+      document.getElementById('insp-door3d-ori').onchange = function () {
+        rebuildSelectedDoor({ orientation: this.value });
+      };
+      document.getElementById('insp-door3d-ori-next').onclick = () => {
+        const curIdx = doorOris.indexOf(obj.door3dMeta.orientation || 'front-left');
+        rebuildSelectedDoor({ orientation: doorOris[(curIdx + 1) % doorOris.length] });
+      };
+      document.getElementById('insp-door3d-mirror-x').onclick = () => {
+        rebuildSelectedDoor({ mirrorX: !obj.door3dMeta.mirrorX });
+      };
+      document.getElementById('insp-door3d-mirror-y').onclick = () => {
+        rebuildSelectedDoor({ mirrorY: !obj.door3dMeta.mirrorY });
+      };
+      document.getElementById('insp-door3d-style').onclick = () => {
+        rebuildSelectedDoor({ doorStyle: obj.door3dMeta.doorStyle === 'single' ? 'double' : 'single' });
+      };
+      document.getElementById('insp-door3d-reset-xf').onclick = () => {
+        rebuildSelectedDoor({ mirrorX: false, mirrorY: false }, true);
+      };
+      document.getElementById('insp-door3d-w').oninput = function () {
+        document.getElementById('insp-door3d-w-val').textContent = this.value;
+      };
+      document.getElementById('insp-door3d-w').onchange = function () {
+        rebuildSelectedDoor({ width: parseInt(this.value, 10) || 118 });
+      };
+      document.getElementById('insp-door3d-h').oninput = function () {
+        document.getElementById('insp-door3d-h-val').textContent = this.value;
+      };
+      document.getElementById('insp-door3d-h').onchange = function () {
+        rebuildSelectedDoor({ height: parseInt(this.value, 10) || 152 });
       };
     }
   }
@@ -4150,7 +4282,7 @@
     if (!ok) return;
     if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
     try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
-    tabs = [createDefaultTab('主區域 1', 'facility_full')];
+    tabs = [createDefaultTab('主區域 1', 'blank')];
     activeTabId = tabs[0].id;
     renderTabsBar();
     await renderTabToCanvas(tabs[0]);
@@ -4678,7 +4810,7 @@
     }
 
     if (!restored) {
-      tabs = [createDefaultTab('主區域 1', 'facility_full')];
+      tabs = [createDefaultTab('主區域 1', 'blank')];
       activeTabId = tabs[0].id;
       renderTabsBar();
       await renderTabToCanvas(tabs[0]);
