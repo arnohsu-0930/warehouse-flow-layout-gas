@@ -759,22 +759,57 @@
       position: fixed;
       top: 56px;
       right: 16px;
-      width: 340px;
+      width: 420px;
       max-width: calc(100vw - 32px);
-      max-height: calc(100vh - 80px);
+      max-height: calc(100vh - 76px);
       overflow-y: auto;
-      background: rgba(255, 255, 255, 0.98);
+      background: rgba(255, 255, 255, 0.99);
       border: 1px solid var(--border-strong);
       border-radius: 10px;
       box-shadow: var(--shadow-lg);
-      padding: 14px 16px;
+      padding: 14px 16px 16px;
       z-index: 60;
       display: none;
+      box-sizing: border-box;
     }
     .help-drawer.open { display: block; }
-    .help-drawer h3 { margin: 0 0 8px 0; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
-    .help-drawer ul { margin: 0; padding-left: 18px; line-height: 1.65; color: #334155; }
-    .help-drawer li { margin-bottom: 4px; }
+    .help-drawer h3 { margin: 0 0 10px 0; font-size: 14.5px; display: flex; justify-content: space-between; align-items: center; }
+    .help-drawer h4 { margin: 12px 0 6px 0; font-size: 12.5px; color: #0f172a; font-weight: 700; }
+    .help-drawer ul { margin: 0; padding-left: 18px; line-height: 1.65; color: #334155; font-size: 12.2px; }
+    .help-drawer li { margin-bottom: 5px; }
+    .help-callout {
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+      font-size: 12.2px;
+      line-height: 1.6;
+      color: #1e293b;
+    }
+    .help-callout-save {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+    }
+    .help-callout-reset {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+    }
+    .help-callout-title {
+      font-size: 12.8px;
+      font-weight: 700;
+      margin: 0 0 6px 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #0f172a;
+    }
+    .help-callout ul {
+      margin: 0;
+      padding-left: 17px;
+      line-height: 1.6;
+      color: #1e293b;
+    }
+    .help-callout li { margin-bottom: 4px; }
+    .help-callout li:last-child { margin-bottom: 0; }
     .kbd {
       display: inline-block;
       padding: 1px 5px;
@@ -796,16 +831,77 @@
       justify-content: center;
       z-index: 100;
       padding: 16px;
+      box-sizing: border-box;
     }
     .modal-backdrop.open { display: flex; }
     #generic-modal { z-index: 115; }
+    #welcome-modal { z-index: 110; }
     .modal-card {
       background: #fff;
       border-radius: 10px;
       box-shadow: var(--shadow-lg);
       width: 100%;
       max-width: 440px;
+      max-height: calc(100vh - 32px);
+      overflow-y: auto;
       padding: 18px 20px;
+      box-sizing: border-box;
+    }
+    .welcome-card {
+      max-width: 480px;
+      padding: 20px 22px;
+    }
+    .welcome-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1d4ed8;
+      font-size: 11.5px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .welcome-highlight {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin: 10px 0 12px;
+      font-size: 12.3px;
+      line-height: 1.6;
+      color: #334155;
+    }
+    .welcome-highlight ul {
+      margin: 4px 0 0 0;
+      padding-left: 18px;
+    }
+    .welcome-highlight li { margin-bottom: 4px; }
+    .welcome-highlight li:last-child { margin-bottom: 0; }
+    .welcome-session-opt {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      color: var(--text-muted);
+      cursor: pointer;
+      user-select: none;
+      margin-top: 4px;
+    }
+    .welcome-session-opt input[type="checkbox"] {
+      width: 15px;
+      height: 15px;
+      cursor: pointer;
+      accent-color: var(--primary);
+    }
+    .welcome-footer {
+      display: flex;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
     }
     .modal-title {
       font-size: 15px;
@@ -822,6 +918,7 @@
     .modal-footer {
       display: flex;
       justify-content: flex-end;
+      flex-wrap: wrap;
       gap: 8px;
       margin-top: 14px;
     }
@@ -1013,7 +1110,7 @@
       <button type="button" class="btn btn-sm btn-primary" id="btn-export-png" data-testid="btn-export-png" title="匯出高解析 PNG 圖片 (適合貼入 Word/簡報)">⬇️ 匯出 PNG</button>
       <span class="divider-v"></span>
       <button type="button" class="btn btn-sm btn-danger" id="btn-clear-canvas" data-testid="btn-clear-canvas" title="清除目前分頁上的物件">🧹 清除畫布</button>
-      <button type="button" class="btn btn-sm btn-danger" id="btn-reset-all" data-testid="btn-reset-all" title="重置全部專案並清除瀏覽器快取">↺ 重置全部</button>
+      <button type="button" class="btn btn-sm btn-danger" id="btn-reset-all" data-testid="btn-reset-all" title="重置全部工作區並套用網站最新預設值與範本">🔄 重置全部</button>
       <button type="button" class="btn btn-sm" id="btn-help" data-testid="btn-help" title="操作說明與快捷鍵">❓ 說明</button>
     </div>
   </header>
@@ -1352,9 +1449,30 @@
 <!-- Dismissible Quick Help Drawer -->
 <aside class="help-drawer" id="help-drawer" data-testid="help-drawer" aria-label="操作說明">
   <h3>
-    <span>💡 快速操作指南</span>
+    <span>💡 快速操作指南與重要注意事項</span>
     <button type="button" class="btn btn-xs" id="btn-close-help" data-testid="btn-close-help" title="關閉">✕</button>
   </h3>
+
+  <div class="help-callout help-callout-save" id="help-section-save-load" data-testid="help-section-save-load">
+    <div class="help-callout-title">💾 「儲存專案」與「📂 開啟專案」用途說明（必讀）</div>
+    <ul>
+      <li><strong>與「⬇️ 匯出 PNG」的差別：</strong>「⬇️ 匯出 PNG」輸出的是<strong>平面圖片</strong>（適合貼入 Word／簡報），<strong>無法再重新編輯</strong>；若希望日後繼續修改，請務必使用「<strong>💾 儲存專案</strong>」。</li>
+      <li><strong>💾 儲存專案（永久備份與分享）：</strong>會將目前工作區下載為可編輯的 <code>.json</code> 專案檔至本機電腦，適合長期保存或傳給同事接續編輯。</li>
+      <li><strong>📂 開啟專案（100% 完整還原）：</strong>載入先前存下的 <code>.json</code> 專案檔後，可 <strong>100% 完整還原所有分頁、畫布圖層、物件、旋轉角度、尺寸與各項設定</strong>，無縫接續編輯。</li>
+      <li><strong>☁️ 雲端暫存注意事項：</strong>僅提供 <strong>14 天自動清除的臨時暫存空間</strong>，到期系統將自動刪除；重要或長期專案請一律使用「<strong>💾 儲存專案</strong>」下載至本機保存。</li>
+    </ul>
+  </div>
+
+  <div class="help-callout help-callout-reset" id="help-section-reset" data-testid="help-section-reset">
+    <div class="help-callout-title">🔄 「重置全部」功能與網站更新套用說明</div>
+    <ul>
+      <li><strong>恢復出廠預設：</strong>點擊「<strong>🔄 重置全部</strong>」會清除瀏覽器本機快取的所有分頁、物件與設定，將工作區恢復為乾淨的初始狀態。</li>
+      <li><strong>套用網站最新更新：</strong>每當網站發布<strong>新功能或新版範本更新</strong>時，點擊「<strong>🔄 重置全部</strong>」可完整套用最新版本預設值與更新後的範本，避免殘留舊版瀏覽器快取影響顯示。</li>
+      <li><strong>⚠️ 重置前務必備份：</strong>若您想保留目前的設計進度，請先點擊「<strong>💾 儲存專案</strong>」下載 <code>.json</code> 檔備份，再點擊「<strong>🔄 重置全部</strong>」，之後再用「<strong>📂 開啟專案</strong>」載入即可。</li>
+    </ul>
+  </div>
+
+  <h4>📌 進階操作與功能一覽</h4>
   <ul>
     <li><strong>更換底圖與範本：</strong>支援上傳任意 PNG / JPG / SVG 平面圖，或直接套用 3 種內建範本（空白畫布、冷藏庫 2D、冷藏庫 3D 等角純淨空間）。</li>
     <li><strong>3D 綠色空間箱與 3D 獨立門物件：</strong>提供純淨無內建設備的 3D 綠色空間箱（僅地板＋牆面）與獨立 3D 保溫門物件，選取後可自由切換朝向、旋轉角度、水平/垂直翻轉、左右/上下鏡像與縮放尺寸。</li>
@@ -1363,12 +1481,11 @@
     <li><strong>點位按鈕依層數同步：</strong>「6. 多層貨架」層數（2–8 層）或 M 層變更時，「5. 點位」按鈕會自動產生 T / L… / M / B 各層按鈕；各層左側色塊可改顏色，點位按鈕、已放置點位、貨架層徽章與「點位圖例」卡片會同步更新項目與顏色。</li>
     <li><strong>自訂動線圖例：</strong>放置前可勾選項目、修改代碼/名稱/顏色或新增自訂項目；放置後可自由拖曳縮放，<strong>雙擊</strong>即可再次編輯。</li>
     <li><strong>2D/3D 自訂形狀方塊與自由頂點拉伸：</strong>支援矩形、圓角矩形、圓形/橢圓、L 型區塊、3D 棧板/立柱、3D 空間箱、3D 門物件與製劑廠設備。拖曳上下左右控點可獨立變寬/變高並即時無變形重繪、置中文字永遠保持清晰水平正向；點選右側「<strong>✏️ 頂點自由拉伸</strong>」可自由拉出斜牆、梯形或任意透視斜角。</li>
-    <li><strong>全物件通用角度與尺寸微調（v7）：</strong>畫布上 <strong>100% 所有物件</strong>（動線/自由箭頭、文字方塊、區域標籤、遮罩、圖例、點位、HVAC、尺寸線、貨架、形狀方塊、3D 空間箱/門與製劑廠設備）選取後，右側屬性面板皆提供 <strong>X/Y 座標、寬度 W、高度/深度 H、0°–360° 旋轉角度（含 -90/-15/+15/+90 快捷鍵）、水平/垂直翻轉</strong>；3D 物件並同步提供<strong>立體厚度與等角俯角/斜角偏斜</strong>微調。</li>
-    <li><strong>製劑廠專用設備器具圖塊庫（v7）：</strong>內建 <strong>QC 實驗室（12 項）、製造/工廠部（10 項）、倉庫設備（10 項）</strong>共 32 種專業向量設備圖塊，支援 2D 平面 / 3D 等角一鍵切換、自訂填滿/框線色、點擊或拖曳放置與雙擊編輯置中標籤。</li>
+    <li><strong>全物件通用角度與尺寸微調：</strong>畫布上 <strong>100% 所有物件</strong>選取後，右側屬性面板皆提供 <strong>X/Y 座標、寬度 W、高度/深度 H、0°–360° 旋轉角度（含 -90/-15/+15/+90 快捷鍵）、水平/垂直翻轉</strong>；3D 物件並同步提供<strong>立體厚度與等角俯角/斜角偏斜</strong>微調。</li>
+    <li><strong>製劑廠專用設備器具圖塊庫：</strong>內建 <strong>QC 實驗室（12 項）、製造/工廠部（10 項）、倉庫設備（10 項）</strong>共 32 種專業向量設備圖塊，支援 2D 平面 / 3D 等角一鍵切換、自訂填滿/框線色、點擊或拖曳放置與雙擊編輯置中標籤。</li>
     <li><strong>文字正向箭頭：</strong>P / M / W 與自訂動線箭頭支援 6 種方向，旋轉時文字仍保持水平正向。</li>
     <li><strong>快速複製與復原：</strong>按住 <span class="kbd">Ctrl</span> 拖曳複製，或使用 <span class="kbd">Ctrl+C</span> / <span class="kbd">Ctrl+V</span>、<span class="kbd">Ctrl+Z</span> 復原、<span class="kbd">Ctrl+Y</span> 重做、<span class="kbd">Delete</span> 刪除。</li>
-    <li><strong>專案保存與雲端暫存：</strong>「儲存專案 / 開啟專案」可本機備份；「雲端暫存」固定保留 <strong>14 天</strong>，到期將自動清除。</li>
-    <li><strong>高解析輸出：</strong>點選「匯出 PNG」會輸出 2 倍解析度純淨無框線圖片，適合直接貼入 Word 或簡報。</li>
+    <li><strong>高解析圖片輸出：</strong>點選「⬇️ 匯出 PNG」會輸出 2 倍解析度純淨無框線圖片，適合直接貼入 Word 或簡報（純圖片不可再編輯，保留可編輯原檔請用「💾 儲存專案」）。</li>
   </ul>
 </aside>
 
@@ -1430,6 +1547,32 @@
   </div>
 </div>
 
+<!-- Startup Welcome Notice Modal -->
+<div class="modal-backdrop" id="welcome-modal" data-testid="welcome-modal" role="dialog" aria-modal="true" aria-labelledby="welcome-modal-title">
+  <div class="modal-card welcome-card">
+    <div class="welcome-badge">👋 歡迎使用平面動線與空間配置工作室</div>
+    <h3 class="modal-title" id="welcome-modal-title">開始前請先閱讀使用說明與重要提醒</h3>
+    <p class="modal-desc" style="color:#334155;margin-bottom:8px;">
+      請先點擊右上角「<strong>❓ 說明</strong>」查看操作指南與存檔／重置注意事項，確保您的設計進度完整保存並享有最新功能。
+    </p>
+    <div class="welcome-highlight">
+      <strong>💡 兩大重要提醒：</strong>
+      <ul>
+        <li><strong>💾 儲存專案 / 📂 開啟專案：</strong>長期保存或日後需繼續編輯請下載 <code>.json</code> 專案檔（匯出 PNG 為純圖片無法再編輯；☁️ 雲端暫存僅保留 14 天）。</li>
+        <li><strong>🔄 重置全部：</strong>可清空本機快取恢復初始設定；網站有新功能／範本更新時，點擊即可套用最新預設值與範本（重置前請先「💾 儲存專案」備份）。</li>
+      </ul>
+    </div>
+    <label class="welcome-session-opt" for="welcome-dont-show-session">
+      <input type="checkbox" id="welcome-dont-show-session" data-testid="welcome-dont-show-session">
+      <span>本次瀏覽器工作階段不再提醒</span>
+    </label>
+    <div class="welcome-footer">
+      <button type="button" class="btn" id="btn-welcome-dismiss" data-testid="btn-welcome-dismiss">我知道了，開始使用</button>
+      <button type="button" class="btn btn-primary" id="btn-welcome-open-help" data-testid="btn-welcome-open-help">📖 立即查看說明</button>
+    </div>
+  </div>
+</div>
+
 <!-- Toast Container -->
 <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
@@ -1439,6 +1582,7 @@
 
   const STORAGE_KEY = 'FPLS_WORKSPACE_V1';
   const LOCAL_CLOUD_KEY = 'FPLS_LOCAL_CLOUD_TEMP_V2';
+  const WELCOME_SESSION_KEY = 'FPLS_WELCOME_DISMISSED_SESSION_V8';
   const CLOUD_TTL_DAYS = 14;
   const CLOUD_TTL_MS = CLOUD_TTL_DAYS * 24 * 60 * 60 * 1000;
   const CUSTOM_PROPS = [
@@ -7897,7 +8041,7 @@
     const ok = await openModal({
       mode: 'confirm',
       title: '重置全部工作區',
-      desc: '確定要清空所有分頁、物件與瀏覽器自動儲存快取，恢復為全新初始狀態嗎？',
+      desc: '確定要清空所有分頁、物件與瀏覽器自動儲存快取，恢復為全新初始狀態並套用網站最新預設值與範本嗎？（若需保留目前進度，請先按取消並使用「💾 儲存專案」備份）',
       danger: true,
       okText: '全部重置'
     });
@@ -8253,6 +8397,33 @@
       document.getElementById('help-drawer').classList.remove('open');
     };
 
+    // Startup Welcome Notice Modal
+    function closeWelcomeModal(openHelpAfter) {
+      const modal = document.getElementById('welcome-modal');
+      const chk = document.getElementById('welcome-dont-show-session');
+      if (chk && chk.checked) {
+        try { sessionStorage.setItem(WELCOME_SESSION_KEY, '1'); } catch (_) {}
+      }
+      if (modal) modal.classList.remove('open');
+      if (openHelpAfter) {
+        const drawer = document.getElementById('help-drawer');
+        if (drawer) {
+          drawer.classList.add('open');
+          drawer.scrollTop = 0;
+        }
+      }
+    }
+    const btnWelcomeOpenHelp = document.getElementById('btn-welcome-open-help');
+    const btnWelcomeDismiss = document.getElementById('btn-welcome-dismiss');
+    const welcomeBackdrop = document.getElementById('welcome-modal');
+    if (btnWelcomeOpenHelp) btnWelcomeOpenHelp.onclick = () => closeWelcomeModal(true);
+    if (btnWelcomeDismiss) btnWelcomeDismiss.onclick = () => closeWelcomeModal(false);
+    if (welcomeBackdrop) {
+      welcomeBackdrop.addEventListener('click', (e) => {
+        if (e.target === welcomeBackdrop) closeWelcomeModal(false);
+      });
+    }
+
     // Base map & zoom
     document.getElementById('input-bg-upload').onchange = function (e) {
       handleBaseMapUpload(e.target.files[0]);
@@ -8457,10 +8628,12 @@
     window.addEventListener('keydown', (e) => {
       const modalOpen = document.getElementById('generic-modal').classList.contains('open')
         || document.getElementById('cloud-modal').classList.contains('open')
-        || document.getElementById('legend-modal').classList.contains('open');
+        || document.getElementById('legend-modal').classList.contains('open')
+        || document.getElementById('welcome-modal').classList.contains('open');
       if (modalOpen) {
         if (e.key === 'Escape') {
           if (document.getElementById('generic-modal').classList.contains('open')) closeModal(false);
+          if (document.getElementById('welcome-modal').classList.contains('open')) closeWelcomeModal(false);
           document.getElementById('cloud-modal').classList.remove('open');
           closeLegendModal();
         }
@@ -8547,6 +8720,20 @@
       renderTabsBar();
       await renderTabToCanvas(tabs[0]);
       document.getElementById('status-save').textContent = '💾 自動儲存就緒';
+    }
+
+    // Show Startup Welcome Notice unless dismissed for this browser session
+    let welcomeDismissed = false;
+    try {
+      welcomeDismissed = sessionStorage.getItem(WELCOME_SESSION_KEY) === '1';
+    } catch (_) {
+      welcomeDismissed = false;
+    }
+    if (!welcomeDismissed) {
+      const welcomeModal = document.getElementById('welcome-modal');
+      const welcomeChk = document.getElementById('welcome-dont-show-session');
+      if (welcomeChk) welcomeChk.checked = false;
+      if (welcomeModal) welcomeModal.classList.add('open');
     }
   }
 
